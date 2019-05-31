@@ -20,45 +20,23 @@
 #include <QMenu>
 #include <QInputDialog>
 
+const float UASView3::updateHzLowpass = 0.2f;
+const unsigned int UASView3::updateInterval = 1000U;
+
 UASView3::UASView3(UASInterface* uas, QWidget *parent) :
-        QWidget(parent),
-        startTime(0),
-        timeout(false),
-        iconIsRed(true),
-        timeRemaining(0),
-        chargeLevel(0),
-        uas(uas),
-        load(0),
-        state("UNKNOWN"),
-        stateDesc(tr("Unknown state")),
-        mode("MAV_MODE_UNKNOWN"),
-        thrust(0),
-        isActive(false),
-        x(0),
-        y(0),
-        z(0),
-        totalSpeed(0),
-        lat(0),
-        lon(0),
-        alt(0),
-        groundDistance(0),
-        localFrame(false),
-        globalFrameKnown(false),
-        removeAction(new QAction("Delete this system", this)),
-        renameAction(new QAction("Rename..", this)),
-        selectAction(new QAction("Control this system", this )),
-        hilAction(new QAction("HIL - Hardware in the Loop", this )),
-        selectAirframeAction(new QAction("Choose Airframe", this)),
-        setBatterySpecsAction(new QAction("Set Battery Options", this)),
-        lowPowerModeEnabled(true),
-        generalUpdateCount(0),
-        filterTime(0),
-        m_ui(new Ui::UASView3)
+    QWidget(parent),
+    startTime(0),
+    timeout(false),
+    timeRemaining(0),
+    uas(uas),
+    isActive(false),
+    lowPowerModeEnabled(true),
+    filterTime(0),
+    m_ui(new Ui::UASView3)
 {
     // FIXME XXX
     lowPowerModeEnabled = MainWindow::instance()->lowPowerModeEnabled();
 
-    hilAction->setCheckable(true);
     m_uas = 0;
     m_ui->setupUi(this);
 
@@ -77,9 +55,20 @@ UASView3::UASView3(UASInterface* uas, QWidget *parent) :
 
     setBackgroundColor();
 
+    QVector<mavlink_message_info_t> mavlinkMsg = MAVLINK_MESSAGE_INFO;
+    for(const auto &typeInfo : mavlinkMsg)
+    {
+        if(!messageInfo.contains(typeInfo.msgid))
+        {
+            messageInfo.insert(typeInfo.msgid, typeInfo);
+        }
+    }
+    connect(LinkManager::instance(), SIGNAL(messageReceived(LinkInterface*,mavlink_message_t)),
+            this, SLOT(receiveMessage(LinkInterface*,mavlink_message_t)));
+
     // Heartbeat fade
     refreshTimer = new QTimer(this);
-    connect(refreshTimer, SIGNAL(timeout()), this, SLOT(refresh()));
+    connect(refreshTimer, SIGNAL(timeout()), this, SLOT(refreshView()));
     if (lowPowerModeEnabled)
     {
         refreshTimer->start(updateInterval*3);
@@ -89,146 +78,13 @@ UASView3::UASView3(UASInterface* uas, QWidget *parent) :
         refreshTimer->start(updateInterval);
     }
 
-    connect(UASManager::instance(),SIGNAL(activeUASSet(UASInterface*)),this,SLOT(activeUASSet(UASInterface*)));
-    activeUASSet(UASManager::instance()->getActiveUAS());
-
-    // Set state and mode
-//    updateMode(uas->getUASID(), uas->getShortMode(), "");
-//    updateState(uas, uas->getShortState(), "");
-//    setSystemType(uas, uas->getSystemType());
-
-    //added by:Xiangwei Niu
-//    m_tableRefreshTimer = new QTimer(this);
-//    connect(m_tableRefreshTimer,SIGNAL(timeout()),this,SLOT(updateTableTimerTick()));
-
-//    m_updateTimer = new QTimer(this);
-//    connect(m_updateTimer,SIGNAL(timeout()),this,SLOT(updateTimerTick()));
-
-
-//    for (QMap<QString,double>::const_iterator i=valueMap.constBegin();i!=valueMap.constEnd();i++)
-//    {
-//        QString ikey = i.key();
-//        if (ikey.contains("GPS Fix")){
-//            m_ui->GPSFixNum->setText(QString::number(i.value(),'f',4));
-//        }
-//        else if (ikey.contains("GPS Fix")){
-//            m_ui->GPSFixNum->setText(QString::number(i.value(),'f',4));
-//        }
-//        else if (ikey.contains("GPS Fix")){
-//            m_ui->GPSFixNum->setText(QString::number(i.value(),'f',4));
-//        }
-//        else if (ikey.contains("GPS Fix")){
-//            m_ui->GPSFixNum->setText(QString::number(i.value(),'f',4));
-//        }
-//        else if (ikey.contains("GPS Fix")){
-//            m_ui->GPSFixNum->setText(QString::number(i.value(),'f',4));
-//        }
-//        else if (ikey.contains("GPS Fix")){
-//            m_ui->GPSFixNum->setText(QString::number(i.value(),'f',4));
-//        }
-//        else if (ikey.contains("GPS Fix")){
-//            m_ui->GPSFixNum->setText(QString::number(i.value(),'f',4));
-//        }
-//        else if (ikey.contains("GPS Fix")){
-//            m_ui->GPSFixNum->setText(QString::number(i.value(),'f',4));
-//        }
-//        else if (ikey.contains("GPS Fix")){
-//            m_ui->GPSFixNum->setText(QString::number(i.value(),'f',4));
-//        }
-//        else if (ikey.contains("GPS Fix")){
-//            m_ui->GPSFixNum->setText(QString::number(i.value(),'f',4));
-//        }
-//    }
-}
-
-void UASView3::activeUASSet(UASInterface* uas)
-{
-    if (!uas)
-    {
-        return;
-    }
-    if (m_uas)
-    {
-        disconnect(m_uas,SIGNAL(valueChanged(int,QString,QString,QVariant,quint64)),this,SLOT(valueChanged(int,QString,QString,QVariant,quint64)));
-    }
-    m_uas = uas;
-    connect(m_uas,SIGNAL(valueChanged(int,QString,QString,QVariant,quint64)),this,SLOT(valueChanged(int,QString,QString,QVariant,quint64)));
-
-}
-
-void UASView3::valueChanged(const int uasId, const QString& name, const QString& unit, const QVariant value, const quint64 msec)
-{
-    if (value.type() == QVariant::Double)
-    {
-        valueChanged(uasId,name,unit,value.toDouble(),msec);
-    }
-    else
-    {
-        valueChanged(uasId,name,unit,static_cast<double>(value.toInt()),msec);
-    }
-}
-
-void UASView3::valueChanged(const int uasId, const QString& name, const QString& unit, const double value, const quint64 msec)
-{
-    Q_UNUSED(uasId)
-    Q_UNUSED(unit)
-    Q_UNUSED(msec)
-    valueMap[name] = value;
-}
-
-void UASView3::updateTableTimerTick()
-{
-    //m_ui->GPSFixNum->setText(QString::number(valueMap["M252:GCS GPS.GPS Fix"],'f',4));
-    //m_ui->GPSHDOPNum->setText(QString::number(valueMap["M252:GCS GPS.GPS HDOP"],'f',4));
-
-
-}
-
-void UASView3::updateTimerTick()
-{
-    for (QMap<QString,double>::const_iterator i=valueMap.constBegin();i!=valueMap.constEnd();i++)
-    {
-        if (nameToUpdateWidgetMap.contains(i.key()))
-        {
-            nameToUpdateWidgetMap[i.key()] = (QString::number(i.value(),'f',4));
-        }
-        else
-        {
-            m_tableDirty = true;
-        }
-    }
-    return;
 }
 
 UASView3::~UASView3()
 {
     delete m_ui;
-    delete removeAction;
-    delete renameAction;
-    delete selectAction;
 }
 
-void UASView3::heartbeatTimeout(bool timeout, unsigned int ms)
-{
-    Q_UNUSED(ms);
-    this->timeout = timeout;
-}
-
-void UASView3::updateNavMode(int uasid, int mode, const QString& text)
-{
-    Q_UNUSED(uasid);
-    Q_UNUSED(mode);
-    //m_ui->navLabel->setText(text);
-}
-
-void UASView3::showStatusText(int uasid, int componentid, int severity, QString text)
-{
-    Q_UNUSED(uasid);
-    Q_UNUSED(componentid);
-    Q_UNUSED(severity);
-    //m_ui->statusTextLabel->setText(text);
-    stateDesc = text;
-}
 
 /**
  * Set the background color based on the MAV color. If the MAV is selected as the
@@ -271,75 +127,6 @@ void UASView3::updateActiveUAS(UASInterface* uas, bool active)
     }
 }
 
-void UASView3::updateMode(int sysId, QString status, QString description)
-{
-    Q_UNUSED(description);
-
-    //int aa=this->uas->getUASID();
-    //if (sysId == this->uas->getUASID()) m_ui->modeLabel->setText(status);
-
-    //m_ui->modeLabel->setText(status);
-}
-
-void UASView3::mouseDoubleClickEvent (QMouseEvent * event)
-{
-    Q_UNUSED(event);
-    UASManager::instance()->setActiveUAS(uas);
-     QLOG_TRACE() << __FILE__ << __LINE__ << "DOUBLECLICKED";
-}
-
-void UASView3::enterEvent(QEvent* event)
-{
-    if (event->type() == QEvent::MouseMove)
-    {
-        emit uasInFocus(uas);
-        if (uas != UASManager::instance()->getActiveUAS())
-        {
-            grabMouse(QCursor(Qt::PointingHandCursor));
-        }
-    }
-
-    if (event->type() == QEvent::MouseButtonDblClick)
-    {
-         QLOG_TRACE() << __FILE__ << __LINE__ << "UAS CLICKED!";
-    }
-}
-
-void UASView3::leaveEvent(QEvent* event)
-{
-    if (event->type() == QEvent::MouseMove)
-    {
-        emit uasOutFocus(uas);
-        releaseMouse();
-    }
-}
-
-void UASView3::showEvent(QShowEvent* event)
-{
-    // React only to internal (pre-display)
-    // events
-    Q_UNUSED(event);
-    refreshTimer->start(updateInterval*10);
-}
-
-void UASView3::hideEvent(QHideEvent* event)
-{
-    // React only to internal (pre-display)
-    // events
-    Q_UNUSED(event);
-   // refreshTimer->stop();
-}
-
-void UASView3::receiveHeartbeat(UASInterface* uas)
-{
-    Q_UNUSED(uas);
-    heartbeatColor = QColor(20, 200, 20);
-    QString colorstyle("QGroupBox { border-radius: 5px; padding: 2px; margin: 0px; border: 0px; background-color: %1; }");
-    //m_ui->heartbeatIcon->setStyleSheet(colorstyle.arg(heartbeatColor.name()));
-    if (timeout) setBackgroundColor();
-    timeout = false;
-}
-
 void UASView3::updateName(const QString& name)
 {
     if (uas) m_ui->nameLabel->setText(name);
@@ -352,130 +139,7 @@ void UASView3::updateName(const QString& name)
  * @param systemType type ID, following the MAVLink system type conventions
  * @see http://pixhawk.ethz.ch/software/mavlink
  */
-void UASView3::setSystemType(UASInterface* uas, unsigned int systemType)
-{
 
-}
-
-void UASView3::updateLocalPosition(UASInterface* uas, double x, double y, double z, quint64 usec)
-{
-    Q_UNUSED(usec);
-    Q_UNUSED(uas);
-    this->x = x;
-    this->y = y;
-    this->z = z;
-    localFrame = true;
-}
-
-void UASView3::updateGlobalPosition(UASInterface* uas, double lon, double lat, double alt, quint64 usec)
-{
-    Q_UNUSED(uas);
-    Q_UNUSED(usec);
-    this->lon = lon;
-    this->lat = lat;
-    this->alt = alt;
-    globalFrameKnown = true;
-}
-
-void UASView3::updateSpeed(UASInterface*, double x, double y, double z, quint64 usec)
-{
-    Q_UNUSED(usec);
-    totalSpeed = sqrt(x*x + y*y + z*z);
-}
-
-void UASView3::currentWaypointUpdated(quint16 waypoint)
-{
-    //m_ui->waypointLabel->setText(tr("WP") + QString::number(waypoint));
-}
-
-void UASView3::setWaypoint(int uasId, int id, double x, double y, double z, double yaw, bool autocontinue, bool current)
-{
-    Q_UNUSED(x);
-    Q_UNUSED(y);
-    Q_UNUSED(z);
-    Q_UNUSED(yaw);
-    Q_UNUSED(autocontinue);
-    if (uasId == this->uas->getUASID())
-    {
-        if (current)
-        {
-            //m_ui->waypointLabel->setText(tr("WP") + QString::number(id));
-        }
-    }
-}
-
-void UASView3::selectWaypoint(int uasId, int id)
-{
-    if (uasId == this->uas->getUASID())
-    {
-        //m_ui->waypointLabel->setText(tr("WP") + QString::number(id));
-    }
-}
-
-void UASView3::updateThrust(UASInterface* uas, double thrust)
-{
-    if (this->uas == uas)
-    {
-        this->thrust = thrust;
-    }
-}
-
-void UASView3::updateBattery(UASInterface* uas, double voltage, double current, double percent, int seconds)
-{
-    Q_UNUSED(voltage);
-    Q_UNUSED(current);
-    if (this->uas == uas)
-    {
-        timeRemaining = seconds;
-        chargeLevel = percent;
-    }
-}
-
-void UASView3::updateState(UASInterface* uas, QString uasState, QString stateDescription)
-{
-    if (this->uas == uas)
-    {
-        state = uasState;
-        stateDesc = stateDescription;
-    }
-}
-
-void UASView3::updateLoad(UASInterface* uas, double load)
-{
-    if (this->uas == uas)
-    {
-        this->load = load;
-    }
-}
-
-void UASView3::contextMenuEvent (QContextMenuEvent* event)
-{
-    QMenu menu(this);
-    menu.addAction(selectAction);
-    menu.addSeparator();
-    menu.addAction(renameAction);
-    if (timeout)
-    {
-        menu.addAction(removeAction);
-    }
-    menu.addAction(hilAction);
-    menu.addAction(selectAirframeAction);
-    menu.addAction(setBatterySpecsAction);
-    menu.exec(event->globalPos());
-}
-
-void UASView3::setBatterySpecs()
-{
-    if (uas)
-    {
-        bool ok;
-        QString newName = QInputDialog::getText(this, tr("Set Battery Specifications for %1").arg(uas->getUASName()),
-                                                tr("Specs: (empty,warn,full), e.g. (9V,9.5V,12.6V) or just warn level in percent (e.g. 15%) to use estimate from MAV"), QLineEdit::Normal,
-                                                uas->getBatterySpecs(), &ok);
-
-        if (ok && !newName.isEmpty()) uas->setBatterySpecs(newName);
-    }
-}
 
 void UASView3::rename()
 {
@@ -490,43 +154,7 @@ void UASView3::rename()
     }
 }
 
-void UASView3::selectAirframe()
-{
-    if (uas)
-    {
-        // Get list of airframes from UAS
-        QStringList airframes;
-        airframes << "Generic"
-                << "Multiplex Easystar"
-                << "Multiplex Twinstar"
-                << "Multiplex Merlin"
-                << "Pixhawk Cheetah"
-                << "Mikrokopter"
-                << "Reaper"
-                << "Predator"
-                << "Coaxial"
-                << "Pteryx"
-                << "Tricopter"
-                << "Asctec Firefly"
-                << "X8 Flying Wing"
-                << "Viper 2.0 Flying Wing"
-                << "Cam Flyer Q Flying Wing";
 
-        bool ok;
-        QString item = QInputDialog::getItem(this, tr("Select Airframe for %1").arg(uas->getUASName()),
-                                             tr("Airframe"), airframes, uas->getAirframe(), false, &ok);
-        if (ok && !item.isEmpty())
-        {
-            // Set this airframe as UAS airframe
-            uas->setAirframe(airframes.indexOf(item));
-        }
-    }
-}
-
-void UASView3::showHILUi()
-{
-     MainWindow::instance()->showHILConfigurationWidget(uas);
-}
 
 void UASView3::refresh()
 {
@@ -539,26 +167,26 @@ void UASView3::refresh()
     if (generalUpdateCount == 4)
     {
 #if (QGC_EVENTLOOP_DEBUG)
-         QLOG_TRACE() << "EVENTLOOP:" << __FILE__ << __LINE__;
+        QLOG_TRACE() << "EVENTLOOP:" << __FILE__ << __LINE__;
 #endif
         generalUpdateCount = 0;
         QLOG_TRACE() << "UPDATING EVERYTHING";
         // State
         //m_ui->stateLabel->setText(state);
         //m_ui->statusTextLabel->setText(stateDesc);
-        m_ui->GPSFixNum->setText(QString::number(valueMap["M252:GCS GPS.GPS Fix"],'f',2));
-        m_ui->GPSHDOPNum->setText(QString::number(valueMap["M252:GCS GPS.GPS HDOP"],'f',2));
-        m_ui->GPSSatsNum->setText(QString::number(valueMap["M252:GCS GPS.GPS Sats"],'f',2));
-        m_ui->AHRELNum->setText(QString::number(valueMap["M252:GCS Metric.Alt REL"],'f',2));
+        //        m_ui->GPSFixNum->setText(QString::number(valueMap["M252:GCS GPS.GPS Fix"],'f',2));
+        //        m_ui->GPSHDOPNum->setText(QString::number(valueMap["M252:GCS GPS.GPS HDOP"],'f',2));
+        //        m_ui->GPSSatsNum->setText(QString::number(valueMap["M252:GCS GPS.GPS Sats"],'f',2));
+        //        m_ui->AHRELNum->setText(QString::number(valueMap["M252:GCS Metric.Alt REL"],'f',2));
 
-        m_ui->C1->setText(QString::number(valueMap["M2:RC_CHANNELS.chan1_raw"],'f',2));
-        m_ui->C2->setText(QString::number(valueMap["M2:RC_CHANNELS.chan2_raw"],'f',2));
-        m_ui->C3->setText(QString::number(valueMap["M2:RC_CHANNELS.chan3_raw"],'f',2));
-        m_ui->C4->setText(QString::number(valueMap["M2:RC_CHANNELS.chan4_raw"],'f',2));
-        m_ui->C5->setText(QString::number(valueMap["M2:RC_CHANNELS.chan5_raw"],'f',2));
-        m_ui->C6->setText(QString::number(valueMap["M2:RC_CHANNELS.chan6_raw"],'f',2));
-        m_ui->C7->setText(QString::number(valueMap["M2:RC_CHANNELS.chan7_raw"],'f',2));
-        m_ui->C8->setText(QString::number(valueMap["M2:RC_CHANNELS.chan8_raw"],'f',2));
+        //        m_ui->C1->setText(QString::number(valueMap["M2:RC_CHANNELS.chan1_raw"],'f',2));
+        //        m_ui->C2->setText(QString::number(valueMap["M2:RC_CHANNELS.chan2_raw"],'f',2));
+        //        m_ui->C3->setText(QString::number(valueMap["M2:RC_CHANNELS.chan3_raw"],'f',2));
+        //        m_ui->C4->setText(QString::number(valueMap["M2:RC_CHANNELS.chan4_raw"],'f',2));
+        //        m_ui->C5->setText(QString::number(valueMap["M2:RC_CHANNELS.chan5_raw"],'f',2));
+        //        m_ui->C6->setText(QString::number(valueMap["M2:RC_CHANNELS.chan6_raw"],'f',2));
+        //        m_ui->C7->setText(QString::number(valueMap["M2:RC_CHANNELS.chan7_raw"],'f',2));
+        //        m_ui->C8->setText(QString::number(valueMap["M2:RC_CHANNELS.chan8_raw"],'f',2));
 
     }
     generalUpdateCount++;
@@ -574,43 +202,15 @@ void UASView3::refresh()
         {
             borderColor = "#FA4A4F";
         }
-
-        if (iconIsRed)
-        {
-            QColor warnColor(Qt::red);
-            //m_ui->heartbeatIcon->setStyleSheet(colorstyle.arg(warnColor.name()));
-            QString style = QString("QGroupBox { border-radius: 12px; padding: 0px; margin: 0px; border: 2px solid %1; background-color: %2; }").arg(borderColor, warnColor.name());
-            m_ui->uasViewFrame->setStyleSheet(style);
-        }
-        else
-        {
-            QColor warnColor(Qt::black);
-            //m_ui->heartbeatIcon->setStyleSheet(colorstyle.arg(warnColor.name()));
-            QString style = QString("QGroupBox { border-radius: 12px; padding: 0px; margin: 0px; border: 2px solid %1; background-color: %2; }").arg(borderColor, warnColor.name());
-            m_ui->uasViewFrame->setStyleSheet(style);
-
-            refreshTimer->setInterval(errorUpdateInterval);
-            refreshTimer->start();
-        }
-        iconIsRed = !iconIsRed;
     }
     else
     {
         if (!lowPowerModeEnabled)
         {
-            // Fade heartbeat icon
-            // Make color darker
-            heartbeatColor = heartbeatColor.darker(210);
-
-            //m_ui->heartbeatIcon->setAutoFillBackground(true);
-            //m_ui->heartbeatIcon->setStyleSheet(colorstyle.arg(heartbeatColor.name()));
             refreshTimer->setInterval(updateInterval);
             refreshTimer->start();
         }
     }
-    //setUpdatesEnabled(true);
-
-    //setUpdatesEnabled(false);
 }
 
 void UASView3::changeEvent(QEvent *e)
@@ -625,3 +225,732 @@ void UASView3::changeEvent(QEvent *e)
         break;
     }
 }
+
+void UASView3::receiveMessage(LinkInterface* link,mavlink_message_t message)
+{
+    Q_UNUSED(link);
+
+    quint64 receiveTime;
+
+    // Create dynamically an array to store the messages for each UAS
+    if (!uasMessageStorage.contains(message.sysid))
+    {
+        mavlink_message_t* msg = new mavlink_message_t;
+        *msg = message;
+        uasMessageStorage.insertMulti(message.sysid,msg);
+    }
+
+    //QMap<int, mavlink_message_t* > uasMessageStorage1 = uasMessageStorage;
+
+    bool msgFound = false;
+    QMap<int, mavlink_message_t* >::const_iterator iteMsg = uasMessageStorage.find(message.sysid);
+    mavlink_message_t* uasMessage = iteMsg.value();
+    while((iteMsg != uasMessageStorage.end()) && (iteMsg.key() == message.sysid))
+    {
+        if (iteMsg.value()->msgid == message.msgid)
+        {
+            msgFound = true;
+            uasMessage = iteMsg.value();
+            break;
+        }
+        ++iteMsg;
+    }
+    if (!msgFound)
+    {
+        mavlink_message_t* msgIdMessage = new mavlink_message_t;
+        *msgIdMessage = message;
+        uasMessageStorage.insertMulti(message.sysid,msgIdMessage);
+    }
+    else
+    {
+        *uasMessage = message;
+    }
+
+    // Looking if this message has already been received once
+    msgFound = false;
+    QMap<int, QMap<int, quint64>* >::const_iterator ite = uasLastMessageUpdate.find(message.sysid);
+    QMap<int, quint64>* lastMsgUpdate = ite.value();
+    while((ite != uasLastMessageUpdate.end()) && (ite.key() == message.sysid))
+    {
+        if(ite.value()->contains(message.msgid))
+        {
+            msgFound = true;
+
+            // Point to the found message
+            lastMsgUpdate = ite.value();
+            break;
+        }
+        ++ite;
+    }
+
+    receiveTime = QGC::groundTimeMilliseconds();
+
+    // If the message doesn't exist, create a map for the frequency, message count and time of reception
+    if(!msgFound)
+    {
+        // Create a map for the message frequency
+        QMap<int, float>* messageHz = new QMap<int,float>;
+        messageHz->insert(message.msgid,0.0f);
+        uasMessageHz.insertMulti(message.sysid,messageHz);
+
+        // Create a map for the message count
+        QMap<int, unsigned int>* messagesCount = new QMap<int, unsigned int>;
+        messagesCount->insert(message.msgid,0);
+        uasMessageCount.insertMulti(message.sysid,messagesCount);
+
+        // Create a map for the time of reception of the message
+        QMap<int, quint64>* lastMessage = new QMap<int, quint64>;
+        lastMessage->insert(message.msgid,receiveTime);
+        uasLastMessageUpdate.insertMulti(message.sysid,lastMessage);
+
+        // Point to the created message
+        lastMsgUpdate = lastMessage;
+    }
+    else
+    {
+        // The message has been found/created
+        if ((lastMsgUpdate->contains(message.msgid))&&(uasMessageCount.contains(message.sysid)))
+        {
+            // Looking for and updating the message count
+            unsigned int count = 0;
+            QMap<int, QMap<int, unsigned int>* >::const_iterator iter = uasMessageCount.find(message.sysid);
+            QMap<int, unsigned int> * uasMsgCount = iter.value();
+            while((iter != uasMessageCount.end()) && (iter.key() == message.sysid))
+            {
+                if(iter.value()->contains(message.msgid))
+                {
+                    uasMsgCount = iter.value();
+                    count = uasMsgCount->value(message.msgid,0);
+                    uasMsgCount->insert(message.msgid,count+1);
+                    break;
+                }
+                ++iter;
+            }
+        }
+        lastMsgUpdate->insert(message.msgid,receiveTime);
+    }
+
+    switch (message.msgid)
+    {
+    case MAVLINK_MSG_ID_DATA_STREAM:
+    {
+        mavlink_data_stream_t stream;
+        mavlink_msg_data_stream_decode(&message, &stream);
+        onboardMessageInterval.insert(stream.stream_id, stream.message_rate);
+    }
+        break;
+    }
+}
+
+void UASView3::refreshView()
+{
+    //    QMap<int, mavlink_message_t* > uasMessageStorage1 = uasMessageStorage;
+    //    QMap<int, QMap<int, float>* > uasMessageHz1 = uasMessageHz;
+    //    QMap<int, QMap<int, unsigned int>* > uasMessageCount1 = uasMessageCount;
+
+    valueMap.clear();
+    fieldMap.clear();
+    sysidList.clear();
+
+    QMap<int, mavlink_message_t* >::const_iterator ite;
+
+    for(ite=uasMessageStorage.constBegin(); ite!=uasMessageStorage.constEnd();++ite)
+    {
+
+        mavlink_message_t* msg = ite.value();
+        // Ignore NULL values
+        int a = msg->msgid;
+        //int b = msg->sysid;
+
+        if (msg->msgid == 0xFF) continue;
+
+
+        int b = msg->sysid;
+        if (!sysidList.contains(b)){
+            sysidList.append(b);
+        }
+        // Update the message frenquency
+
+        // Get the previous frequency for low-pass filtering
+        //QMap<int, QMap<int, float>* > uasMessageHz1 = uasMessageHz;
+        float msgHz = 0.0f;
+        QMap<int, QMap<int, float>* >::const_iterator iteHz = uasMessageHz.find(msg->sysid);
+        QMap<int, float>* uasMsgHz = iteHz.value();
+
+        while((iteHz != uasMessageHz.end()) && (iteHz.key() == msg->sysid))
+        {
+            if(iteHz.value()->contains(msg->msgid))
+            {
+                uasMsgHz = iteHz.value();
+                msgHz = iteHz.value()->value(msg->msgid);
+                break;
+            }
+            ++iteHz;
+        }
+
+        // Get the number of message received
+        float msgCount = 0;
+        QMap<int, QMap<int, unsigned int> * >::const_iterator iter = uasMessageCount.find(msg->sysid);
+        QMap<int, unsigned int>* uasMsgCount = iter.value();
+
+        while((iter != uasMessageCount.end()) && (iter.key()==msg->sysid))
+        {
+            if(iter.value()->contains(msg->msgid))
+            {
+                msgCount = (float) iter.value()->value(msg->msgid);
+                uasMsgCount = iter.value();
+                break;
+            }
+            ++iter;
+        }
+
+        // Compute the new low-pass filtered frequency and update the message count
+        msgHz = (1.0f-updateHzLowpass)* msgHz + updateHzLowpass*msgCount/((float)updateInterval/1000.0f);
+        uasMsgHz->insert(msg->msgid,msgHz);
+        uasMsgCount->insert(msg->msgid,(unsigned int) 0);
+
+        // Update the tree view
+        //QHash<quint32, mavlink_message_info_t> messageInfo1 = messageInfo;
+        QString messageName("%1 (%2 Hz, #%3)");
+        messageName = messageName.arg(messageInfo[msg->msgid].name).arg(msgHz, 3, 'f', 1).arg(msg->msgid);
+
+        QMap<int,QMap<QString,double>> valueMapaa = valueMap;
+
+        //added by: Xiangwei Niu
+        //        if (msg->msgid == 0){
+        //            heartbeatHz = msgHz;
+        //        }
+
+        //added by: Xiangwei Niu
+        // add messagename and its value (Hz) to valueMap
+        QString messageName1 = messageInfo[msg->msgid].name;
+        if (valueMap.contains(msg->sysid)){
+            if (!valueMap[msg->sysid].contains(messageName1)){
+                QMap<QString,double> valueMap1;
+                valueMap1.insert(messageName1,msgHz);
+                valueMap.insertMulti(msg->sysid,valueMap1);
+            }
+            else{
+                QMap<QString,double> valueMap1 = valueMap[msg->sysid];
+                valueMap1[messageName1] = msgHz;
+                //valueMap.insert(msg->msgid,valueMap1);
+            }
+        }
+        else{
+            QMap<QString,double> valueMap1;
+            valueMap1.insert(messageName1,msgHz);
+            valueMap.insert(msg->sysid,valueMap1);
+        }
+
+        //addUAStoTree(msg->sysid);
+
+        // Look for the tree for the UAS sysid
+        /*
+        QMap<int, QMap<int, QTreeWidgetItem*>* > uasMsgTreeItems1 = uasMsgTreeItems;
+        QHash<quint32, mavlink_message_info_t> messageInfo1 = messageInfo;
+
+        QMap<int, QTreeWidgetItem*>* msgTreeItems = uasMsgTreeItems.value(msg->sysid);
+        if (!msgTreeItems)
+        {
+            // The UAS tree has not been created yet, no update
+            return;
+        }
+
+        // Add the message with msgid to the tree if not done yet
+        if(!msgTreeItems->contains(msg->msgid))
+        {
+            QStringList fields;
+            fields << messageName;
+            QTreeWidgetItem* widget = new QTreeWidgetItem();
+            for (unsigned int i = 0; i < messageInfo[msg->msgid].num_fields; ++i)
+            {
+                QTreeWidgetItem* field = new QTreeWidgetItem();
+                widget->addChild(field);
+            }
+            msgTreeItems->insert(msg->msgid,widget);
+            QList<int> groupKeys = msgTreeItems->uniqueKeys();
+            int insertIndex = groupKeys.indexOf(msg->msgid);
+            uasTreeWidgetItems.value(msg->sysid)->insertChild(insertIndex,widget);
+        }
+
+        // Update the message
+        QTreeWidgetItem* message = msgTreeItems->value(msg->msgid);
+
+        if(message)
+        {
+            message->setFirstColumnSpanned(true);
+            message->setData(0, Qt::DisplayRole, QVariant(messageName));
+            for (unsigned int i = 0; i < messageInfo[msg->msgid].num_fields; ++i)
+            {
+                updateField(msg->sysid,msg->msgid, i, message->child(i));
+            }
+        }*/
+
+        for (unsigned int i = 0; i < messageInfo[msg->msgid].num_fields; ++i)
+        {
+            updateField(msg->sysid,msg->msgid, i);
+        }
+    }
+    //    QMap<int,QMap<QString,double>> valueMapbb = valueMap;
+    //    QMap<int,QMap<QString,QString>> fieldMap1 = fieldMap;
+
+    QMap<int,QMap<QString,QString>> infoMap;
+    for (int sysid1 : sysidList){
+        QMap<QString,QString> infoMap1;
+        infoMap1.insert("Heartbeat",QString::number(valueMap[sysid1]["HEARTBEAT"],'f',2));
+        m_ui->HeartbeatNum->setText(QString::number(valueMap[sysid1]["HEARTBEAT"],'f',2));
+
+        QList<QMap<QString,QString>> temp = fieldMap.values(sysid1);
+        for (QMap<QString,QString> tempMap : temp){
+            if(!QString::compare(tempMap.firstKey(), "fix_type", Qt::CaseInsensitive))
+            {
+                infoMap1.insert("fix",tempMap["fix_type"]);
+                //m_ui->GPSFixNum->setText(tempMap["fix_type"]);
+            }
+            else if (!QString::compare(tempMap.firstKey(), "eph", Qt::CaseInsensitive)){
+                infoMap1.insert("hdop",QString::number(tempMap["eph"].QString::toDouble() / 100.0 ,'f',2));
+            }
+            else if (!QString::compare(tempMap.firstKey(), "satellites_visible", Qt::CaseInsensitive)){
+                infoMap1.insert("sats",tempMap["satellites_visible"]);
+            }
+            else if (!QString::compare(tempMap.firstKey(), "relative_alt", Qt::CaseInsensitive)){
+                infoMap1.insert("alt",QString::number(tempMap["relative_alt"].QString::toDouble() / 1000.0 ,'f',2));
+                //m_ui->AHRELNum->setText(QString::number(tempMap["relative_alt"].QString::toDouble() / 1000.0 ,'f',2));
+            }
+            else if (!QString::compare(tempMap.firstKey(), "chan1_raw", Qt::CaseInsensitive)){
+                infoMap1.insert("c1",tempMap["chan1_raw"]);
+            }
+            else if (!QString::compare(tempMap.firstKey(), "chan2_raw", Qt::CaseInsensitive)){
+                infoMap1.insert("c2",tempMap["chan2_raw"]);
+            }
+            else if (!QString::compare(tempMap.firstKey(), "chan3_raw", Qt::CaseInsensitive)){
+                infoMap1.insert("c3",tempMap["chan3_raw"]);
+            }
+            else if (!QString::compare(tempMap.firstKey(), "chan4_raw", Qt::CaseInsensitive)){
+                infoMap1.insert("c4",tempMap["chan4_raw"]);
+            }
+            else if (!QString::compare(tempMap.firstKey(), "chan5_raw", Qt::CaseInsensitive)){
+                infoMap1.insert("c5",tempMap["chan5_raw"]);
+            }
+            else if (!QString::compare(tempMap.firstKey(), "chan6_raw", Qt::CaseInsensitive)){
+                infoMap1.insert("c6",tempMap["chan6_raw"]);
+            }
+            else if (!QString::compare(tempMap.firstKey(), "chan7_raw", Qt::CaseInsensitive)){
+                infoMap1.insert("c7",tempMap["chan7_raw"]);
+            }
+            else if (!QString::compare(tempMap.firstKey(), "chan8_raw", Qt::CaseInsensitive)){
+                infoMap1.insert("c8",tempMap["chan8_raw"]);
+            }
+        }
+        if (infoMap.contains(sysid1)){
+            infoMap.insertMulti(sysid1,infoMap1);
+        }
+        else {
+            infoMap.insert(sysid1,infoMap1);
+        }
+    }
+
+    //QMap<int,QMap<QString,QString>> infoMap2 = infoMap;
+
+    //initialize labels:
+    m_ui->GPSFixNum->setText("N/A");
+    m_ui->GPSHDOPNum->setText("N/A");
+    m_ui->GPSSatsNum->setText("N/A");
+    m_ui->AHRELNum->setText("N/A");
+    m_ui->RTKGPSNum->setText("N/A");
+
+    m_ui->C1->setText("N/A");
+    m_ui->C2->setText("N/A");
+    m_ui->C3->setText("N/A");
+    m_ui->C4->setText("N/A");
+    m_ui->C5->setText("N/A");
+    m_ui->C6->setText("N/A");
+    m_ui->C7->setText("N/A");
+    m_ui->C8->setText("N/A");
+
+    int ida = uas->getUASID();
+    QMap<QString,QString> tempMap = infoMap.value(ida);
+    QMap<QString,QString>::iterator tempMap1;
+
+    for (tempMap1=tempMap.begin(); tempMap1 != tempMap.end(); tempMap1++){
+        //        QString aa1= tempMap1.key();
+        //        QString aa2= tempMap1.value();
+        //int gad = QString::compare(aa1, "Heartbeat", Qt::CaseInsensitive);
+
+        if (!QString::compare(tempMap1.key(), "Heartbeat", Qt::CaseInsensitive)){
+            m_ui->HeartbeatNum->setText(tempMap1.value());
+            if (tempMap1.value().QString::toDouble() <= 0.03){
+                m_ui->statusLabel->setText("Disconnected");
+            }
+            else{
+                m_ui->statusLabel->setText("Connected");
+            }
+        }
+        else if(!QString::compare(tempMap1.key(),"fix", Qt::CaseInsensitive))
+        {
+            m_ui->GPSFixNum->setText(tempMap1.value());
+        }
+        else if (!QString::compare(tempMap1.key(), "hdop", Qt::CaseInsensitive)){
+            m_ui->GPSHDOPNum->setText(tempMap1.value());
+        }
+        else if (!QString::compare(tempMap1.key(), "sats", Qt::CaseInsensitive)){
+            m_ui->GPSSatsNum->setText(tempMap1.value());
+        }
+        else if (!QString::compare(tempMap1.key(), "alt", Qt::CaseInsensitive)){
+            m_ui->AHRELNum->setText(tempMap1.value());
+        }
+        else if (!QString::compare(tempMap1.key(), "c1", Qt::CaseInsensitive)){
+            m_ui->C1->setText(tempMap1.value());
+        }
+        else if (!QString::compare(tempMap1.key(), "c2", Qt::CaseInsensitive)){
+            m_ui->C2->setText(tempMap1.value());
+        }
+        else if (!QString::compare(tempMap1.key(), "c3", Qt::CaseInsensitive)){
+            m_ui->C3->setText(tempMap1.value());
+        }
+        else if (!QString::compare(tempMap1.key(), "chan4_raw", Qt::CaseInsensitive)){
+            m_ui->C4->setText(tempMap1.value());
+        }
+        else if (!QString::compare(tempMap1.key(), "chan5_raw", Qt::CaseInsensitive)){
+            m_ui->C5->setText(tempMap1.value());
+        }
+        else if (!QString::compare(tempMap1.key(), "chan6_raw", Qt::CaseInsensitive)){
+            m_ui->C6->setText(tempMap1.value());
+        }
+        else if (!QString::compare(tempMap1.key(), "chan7_raw", Qt::CaseInsensitive)){
+            m_ui->C7->setText(tempMap1.value());
+        }
+        else if (!QString::compare(tempMap1.key(), "chan8_raw", Qt::CaseInsensitive)){
+            m_ui->C8->setText(tempMap1.value());
+        }
+
+    }
+
+    //emit sendInfoMap(infoMap);
+}
+
+void UASView3::updateField(int sysid, int msgid, int fieldid)
+{
+    // Add field tree widget item
+    const auto p_messageInfo = messageInfo.find(static_cast<quint32>(msgid));
+    if(p_messageInfo == messageInfo.end())
+    {
+        QLOG_INFO() << "No Mavlink message info for message ID:" << msgid << "Cannot send message!";
+        return;
+    }
+
+    //item->setData(0, Qt::DisplayRole, QVariant(p_messageInfo->fields[fieldid].name));
+
+    QString fieldName = p_messageInfo->fields[fieldid].name;
+
+    bool msgFound = false;
+    QMap<int, mavlink_message_t* >::const_iterator iteMsg = uasMessageStorage.find(sysid);
+    mavlink_message_t* uasMessage = iteMsg.value();
+    while((iteMsg != uasMessageStorage.end()) && (iteMsg.key() == sysid))
+    {
+        if (iteMsg.value()->msgid == msgid)
+        {
+            msgFound = true;
+            uasMessage = iteMsg.value();
+            break;
+        }
+        ++iteMsg;
+    }
+
+    if (!msgFound)
+    {
+        return;
+    }
+
+    const char *p_payload = _MAV_PAYLOAD(uasMessage);
+
+    switch (p_messageInfo->fields[fieldid].type)
+    {
+    case MAVLINK_TYPE_CHAR:
+        if (p_messageInfo->fields[fieldid].array_length > 0)
+        {
+            char* str = (char*)(p_payload + p_messageInfo->fields[fieldid].wire_offset);
+            // Enforce null termination
+            str[p_messageInfo->fields[fieldid].array_length-1] = '\0';
+            QString string(str);
+            //            item->setData(2, Qt::DisplayRole, "char");
+            //            item->setData(1, Qt::DisplayRole, string);
+            addToFieldMap(sysid, fieldName, string);
+        }
+        else
+        {
+            // Single char
+            char b = *((char*)(p_payload + p_messageInfo->fields[fieldid].wire_offset));
+            //            item->setData(2, Qt::DisplayRole, QString("char[%1]").arg(p_messageInfo->fields[fieldid].array_length));
+            //            item->setData(1, Qt::DisplayRole, b);
+            QString string1(b);
+            addToFieldMap(sysid, fieldName, string1);
+        }
+        break;
+    case MAVLINK_TYPE_UINT8_T:
+        if (p_messageInfo->fields[fieldid].array_length > 0)
+        {
+            uint8_t* nums = (uint8_t*)(p_payload + p_messageInfo->fields[fieldid].wire_offset);
+            // Enforce null termination
+            QString tmp("%1, ");
+            QString string;
+            for (unsigned int j = 0; j < p_messageInfo->fields[fieldid].array_length; ++j)
+            {
+                string += tmp.arg(nums[j]);
+            }
+            //            item->setData(2, Qt::DisplayRole, QString("uint8_t[%1]").arg(p_messageInfo->fields[fieldid].array_length));
+            //            item->setData(1, Qt::DisplayRole, string);
+            addToFieldMap(sysid, fieldName, string);
+        }
+        else
+        {
+            // Single value
+            uint8_t u = *(p_payload + p_messageInfo->fields[fieldid].wire_offset);
+            //            item->setData(2, Qt::DisplayRole, "uint8_t");
+            //            item->setData(1, Qt::DisplayRole, u);
+            addToFieldMap(sysid, fieldName, QString::number(u));
+        }
+        break;
+    case MAVLINK_TYPE_INT8_T:
+        if (p_messageInfo->fields[fieldid].array_length > 0)
+        {
+            int8_t* nums = (int8_t*)(p_payload + p_messageInfo->fields[fieldid].wire_offset);
+            // Enforce null termination
+            QString tmp("%1, ");
+            QString string;
+            for (unsigned int j = 0; j < p_messageInfo->fields[fieldid].array_length; ++j)
+            {
+                string += tmp.arg(nums[j]);
+            }
+            //            item->setData(2, Qt::DisplayRole, QString("int8_t[%1]").arg(p_messageInfo->fields[fieldid].array_length));
+            //            item->setData(1, Qt::DisplayRole, string);
+            addToFieldMap(sysid, fieldName, string);
+
+        }
+        else
+        {
+            // Single value
+            int8_t n = *((int8_t*)(p_payload + p_messageInfo->fields[fieldid].wire_offset));
+            //            item->setData(2, Qt::DisplayRole, "int8_t");
+            //            item->setData(1, Qt::DisplayRole, n);
+            addToFieldMap(sysid, fieldName, QString::number(n));
+
+        }
+        break;
+    case MAVLINK_TYPE_UINT16_T:
+        if (p_messageInfo->fields[fieldid].array_length > 0)
+        {
+            uint16_t* nums = (uint16_t*)(p_payload + p_messageInfo->fields[fieldid].wire_offset);
+            // Enforce null termination
+            QString tmp("%1, ");
+            QString string;
+            for (unsigned int j = 0; j < p_messageInfo->fields[fieldid].array_length; ++j)
+            {
+                string += tmp.arg(nums[j]);
+            }
+            //            item->setData(2, Qt::DisplayRole, QString("uint16_t[%1]").arg(p_messageInfo->fields[fieldid].array_length));
+            //            item->setData(1, Qt::DisplayRole, string);
+            addToFieldMap(sysid, fieldName, string);
+        }
+        else
+        {
+            // Single value
+            uint16_t n = *((uint16_t*)(p_payload + p_messageInfo->fields[fieldid].wire_offset));
+            //            item->setData(2, Qt::DisplayRole, "uint16_t");
+            //            item->setData(1, Qt::DisplayRole, n);
+            addToFieldMap(sysid, fieldName, QString::number(n));
+        }
+        break;
+    case MAVLINK_TYPE_INT16_T:
+        if (p_messageInfo->fields[fieldid].array_length > 0)
+        {
+            int16_t* nums = (int16_t*)(p_payload + p_messageInfo->fields[fieldid].wire_offset);
+            // Enforce null termination
+            QString tmp("%1, ");
+            QString string;
+            for (unsigned int j = 0; j < p_messageInfo->fields[fieldid].array_length; ++j)
+            {
+                string += tmp.arg(nums[j]);
+            }
+            //            item->setData(2, Qt::DisplayRole, QString("int16_t[%1]").arg(p_messageInfo->fields[fieldid].array_length));
+            //            item->setData(1, Qt::DisplayRole, string);
+            addToFieldMap(sysid, fieldName, string);
+        }
+        else
+        {
+            // Single value
+            int16_t n = *((int16_t*)(p_payload + p_messageInfo->fields[fieldid].wire_offset));
+            //            item->setData(2, Qt::DisplayRole, "int16_t");
+            //            item->setData(1, Qt::DisplayRole, n);
+            addToFieldMap(sysid, fieldName, QString::number(n));
+        }
+        break;
+    case MAVLINK_TYPE_UINT32_T:
+        if (p_messageInfo->fields[fieldid].array_length > 0)
+        {
+            uint32_t* nums = (uint32_t*)(p_payload + p_messageInfo->fields[fieldid].wire_offset);
+            // Enforce null termination
+            QString tmp("%1, ");
+            QString string;
+            for (unsigned int j = 0; j < p_messageInfo->fields[fieldid].array_length; ++j)
+            {
+                string += tmp.arg(nums[j]);
+            }
+            //            item->setData(2, Qt::DisplayRole, QString("uint32_t[%1]").arg(p_messageInfo->fields[fieldid].array_length));
+            //            item->setData(1, Qt::DisplayRole, string);
+            addToFieldMap(sysid, fieldName, string);
+        }
+        else
+        {
+            // Single value
+            float n = *((uint32_t*)(p_payload + p_messageInfo->fields[fieldid].wire_offset));
+            //            item->setData(2, Qt::DisplayRole, "uint32_t");
+            //            item->setData(1, Qt::DisplayRole, n);
+            addToFieldMap(sysid, fieldName, QString::number(n));
+        }
+        break;
+    case MAVLINK_TYPE_INT32_T:
+        if (p_messageInfo->fields[fieldid].array_length > 0)
+        {
+            int32_t* nums = (int32_t*)(p_payload + p_messageInfo->fields[fieldid].wire_offset);
+            // Enforce null termination
+            QString tmp("%1, ");
+            QString string;
+            for (unsigned int j = 0; j < p_messageInfo->fields[fieldid].array_length; ++j)
+            {
+                string += tmp.arg(nums[j]);
+            }
+            //            item->setData(2, Qt::DisplayRole, QString("int32_t[%1]").arg(p_messageInfo->fields[fieldid].array_length));
+            //            item->setData(1, Qt::DisplayRole, string);
+            addToFieldMap(sysid, fieldName, string);
+
+        }
+        else
+        {
+            // Single value
+            int32_t n = *((int32_t*)(p_payload + p_messageInfo->fields[fieldid].wire_offset));
+            //            item->setData(2, Qt::DisplayRole, "int32_t");
+            //            item->setData(1, Qt::DisplayRole, n);
+            addToFieldMap(sysid, fieldName, QString::number(n));
+        }
+        break;
+    case MAVLINK_TYPE_FLOAT:
+        if (p_messageInfo->fields[fieldid].array_length > 0)
+        {
+            float* nums = (float*)(p_payload + p_messageInfo->fields[fieldid].wire_offset);
+            // Enforce null termination
+            QString tmp("%1, ");
+            QString string;
+            for (unsigned int j = 0; j < p_messageInfo->fields[fieldid].array_length; ++j)
+            {
+                string += tmp.arg(nums[j]);
+            }
+            //            item->setData(2, Qt::DisplayRole, QString("float[%1]").arg(p_messageInfo->fields[fieldid].array_length));
+            //            item->setData(1, Qt::DisplayRole, string);
+            addToFieldMap(sysid, fieldName, string);
+        }
+        else
+        {
+            // Single value
+            float f = *((float*)(p_payload + p_messageInfo->fields[fieldid].wire_offset));
+            //            item->setData(2, Qt::DisplayRole, "float");
+            //            item->setData(1, Qt::DisplayRole, f);
+            addToFieldMap(sysid, fieldName, QString::number(f,'f',2));
+        }
+        break;
+    case MAVLINK_TYPE_DOUBLE:
+        if (p_messageInfo->fields[fieldid].array_length > 0)
+        {
+            double* nums = (double*)(p_payload + p_messageInfo->fields[fieldid].wire_offset);
+            // Enforce null termination
+            QString tmp("%1, ");
+            QString string;
+            for (unsigned int j = 0; j < p_messageInfo->fields[fieldid].array_length; ++j)
+            {
+                string += tmp.arg(nums[j]);
+            }
+            //            item->setData(2, Qt::DisplayRole, QString("double[%1]").arg(p_messageInfo->fields[fieldid].array_length));
+            //            item->setData(1, Qt::DisplayRole, string);
+            addToFieldMap(sysid, fieldName, string);
+        }
+        else
+        {
+            // Single value
+            double f = *((double*)(p_payload + p_messageInfo->fields[fieldid].wire_offset));
+            //            item->setData(2, Qt::DisplayRole, "double");
+            //            item->setData(1, Qt::DisplayRole, f);
+            addToFieldMap(sysid, fieldName, QString::number(f,'f',4));
+        }
+        break;
+    case MAVLINK_TYPE_UINT64_T:
+        if (p_messageInfo->fields[fieldid].array_length > 0)
+        {
+            uint64_t* nums = (uint64_t*)(p_payload + p_messageInfo->fields[fieldid].wire_offset);
+            // Enforce null termination
+            QString tmp("%1, ");
+            QString string;
+            for (unsigned int j = 0; j < p_messageInfo->fields[fieldid].array_length; ++j)
+            {
+                string += tmp.arg(nums[j]);
+            }
+            //            item->setData(2, Qt::DisplayRole, QString("uint64_t[%1]").arg(p_messageInfo->fields[fieldid].array_length));
+            //            item->setData(1, Qt::DisplayRole, string);
+            addToFieldMap(sysid, fieldName, string);
+        }
+        else
+        {
+            // Single value
+            uint64_t n = *((uint64_t*)(p_payload + p_messageInfo->fields[fieldid].wire_offset));
+            //            item->setData(2, Qt::DisplayRole, "uint64_t");
+            //            item->setData(1, Qt::DisplayRole, (quint64) n);
+            addToFieldMap(sysid, fieldName, QString::number(n));
+        }
+        break;
+    case MAVLINK_TYPE_INT64_T:
+        if (p_messageInfo->fields[fieldid].array_length > 0)
+        {
+            int64_t* nums = (int64_t*)(p_payload + p_messageInfo->fields[fieldid].wire_offset);
+            // Enforce null termination
+            QString tmp("%1, ");
+            QString string;
+            for (unsigned int j = 0; j < p_messageInfo->fields[fieldid].array_length; ++j)
+            {
+                string += tmp.arg(nums[j]);
+            }
+            //            item->setData(2, Qt::DisplayRole, QString("int64_t[%1]").arg(p_messageInfo->fields[fieldid].array_length));
+            //            item->setData(1, Qt::DisplayRole, string);
+            addToFieldMap(sysid, fieldName, string);
+        }
+        else
+        {
+            // Single value
+            int64_t n = *((int64_t*)(p_payload + p_messageInfo->fields[fieldid].wire_offset));
+            //            item->setData(2, Qt::DisplayRole, "int64_t");
+            //            item->setData(1, Qt::DisplayRole, (qint64) n);
+            addToFieldMap(sysid, fieldName, QString::number(n));
+        }
+        break;
+    }
+}
+
+void UASView3::addToFieldMap(int msgid, QString fieldName, QString value){
+    if (fieldMap.contains(msgid)){
+        if (!fieldMap[msgid].contains(fieldName)){
+            QMap<QString,QString> fieldMap1;
+            fieldMap1.insert(fieldName,value);
+            fieldMap.insertMulti(msgid,fieldMap1);
+        }
+        else{
+            QMap<QString,QString> fieldMap1 = fieldMap[msgid];
+            fieldMap1[fieldName] = value;
+            //valueMap.insertMulti(msg->msgid,valueMap1);
+        }
+    }
+    else{
+        QMap<QString,QString> fieldMap1;
+        fieldMap1.insert(fieldName,value);
+        fieldMap.insert(msgid,fieldMap1);
+    }
+}
+
+
