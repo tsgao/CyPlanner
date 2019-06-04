@@ -376,6 +376,7 @@ FORMS += \
     src/ui/AudioOutputWidget.ui \
     src/ui/QGCSensorSettingsWidget.ui \
     src/ui/uasdetails.ui \
+    src/ui/uasmulticontrol.ui \
     src/ui/uasmultiview.ui \
     src/ui/uasview2.ui \
     src/ui/uasview3.ui \
@@ -545,6 +546,7 @@ HEADERS += \
     src/uas/ArduPilotMegaMAV.h \
     src/uas/senseSoarMAV.h \
     src/ui/uasdetails.h \
+    src/ui/uasmulticontrol.h \
     src/ui/uasmultiview.h \
     src/ui/uasview2.h \
     src/ui/uasview3.h \
@@ -781,6 +783,7 @@ SOURCES += src/main.cc \
     src/uas/ArduPilotMegaMAV.cc \
     src/uas/senseSoarMAV.cpp \
     src/ui/uasdetails.cpp \
+    src/ui/uasmulticontrol.cpp \
     src/ui/uasmultiview.cpp \
     src/ui/uasview2.cpp \
     src/ui/uasview3.cpp \

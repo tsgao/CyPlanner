@@ -6,12 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>500</width>
+    <width>471</width>
     <height>300</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
+  </property>
+  <property name="autoFillBackground">
+   <bool>true</bool>
   </property>
   <widget class="QLabel" name="label">
    <property name="geometry">
@@ -26,7 +29,230 @@
     <string>Multi Fight view</string>
    </property>
   </widget>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>30</y>
+     <width>222</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,1,1,0,1,1,1">
+    <property name="spacing">
+     <number>4</number>
+    </property>
+    <property name="sizeConstraint">
+     <enum>QLayout::SetMinimumSize</enum>
+    </property>
+    <item>
+     <widget class="QPushButton" name="liftoffButton">
+      <property name="minimumSize">
+       <size>
+        <width>26</width>
+        <height>22</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>38</width>
+        <height>22</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>Liftoff / Launch</string>
+      </property>
+      <property name="statusTip">
+       <string>Liftoff / Launch</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset resource="../../qgroundcontrol.qrc">
+        <normaloff>:/files/images/control/launch.svg</normaloff>:/files/images/control/launch.svg</iconset>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="haltButton">
+      <property name="minimumSize">
+       <size>
+        <width>26</width>
+        <height>22</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>38</width>
+        <height>22</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>Loiter / Wait at current position</string>
+      </property>
+      <property name="statusTip">
+       <string>Loiter / Wait at current position</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset resource="../../qgroundcontrol.qrc">
+        <normaloff>:/files/images/actions/media-playback-pause.svg</normaloff>:/files/images/actions/media-playback-pause.svg</iconset>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="continueButton">
+      <property name="minimumSize">
+       <size>
+        <width>26</width>
+        <height>22</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>38</width>
+        <height>22</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>Continue flightplan</string>
+      </property>
+      <property name="statusTip">
+       <string>Continue flightplan</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset resource="../../qgroundcontrol.qrc">
+        <normaloff>:/files/images/actions/media-playback-start.svg</normaloff>:/files/images/actions/media-playback-start.svg</iconset>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="landButton">
+      <property name="minimumSize">
+       <size>
+        <width>26</width>
+        <height>22</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>38</width>
+        <height>22</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>Fly straight to landing location</string>
+      </property>
+      <property name="statusTip">
+       <string>Fly straight to landing location</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset resource="../../qgroundcontrol.qrc">
+        <normaloff>:/files/images/control/land.svg</normaloff>:/files/images/control/land.svg</iconset>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="shutdownButton">
+      <property name="maximumSize">
+       <size>
+        <width>38</width>
+        <height>22</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>Only in standby mode: Power off system</string>
+      </property>
+      <property name="statusTip">
+       <string>Only in standby mode: Power off system</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset resource="../../qgroundcontrol.qrc">
+        <normaloff>:/files/images/actions/system-log-out.svg</normaloff>:/files/images/actions/system-log-out.svg</iconset>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="abortButton">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>26</width>
+        <height>22</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>38</width>
+        <height>22</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>Emergency land system at closest possible site</string>
+      </property>
+      <property name="statusTip">
+       <string>Emergency land system at closest possible site</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset resource="../../qgroundcontrol.qrc">
+        <normaloff>:/files/images/actions/media-playback-stop.svg</normaloff>:/files/images/actions/media-playback-stop.svg</iconset>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="killButton">
+      <property name="minimumSize">
+       <size>
+        <width>26</width>
+        <height>22</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>38</width>
+        <height>22</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>Kill immediately all onboard power</string>
+      </property>
+      <property name="statusTip">
+       <string>Kill immediately all onboard power</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset resource="../../qgroundcontrol.qrc">
+        <normaloff>:/files/images/actions/process-stop.svg</normaloff>:/files/images/actions/process-stop.svg</iconset>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="../../qgroundcontrol.qrc"/>
+ </resources>
  <connections/>
 </ui>

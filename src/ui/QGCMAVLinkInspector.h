@@ -1,6 +1,8 @@
 #ifndef QGCMAVLINKINSPECTOR_H
 #define QGCMAVLINKINSPECTOR_H
 
+extern float heartbeatHz;
+
 #include <QWidget>
 #include <QMap>
 #include <QTimer>
@@ -49,7 +51,6 @@ protected:
     QMap<int, QTreeWidgetItem*> rateTreeWidgetItems; ///< Available rate tree widget items
     QTimer updateTimer; ///< Only update at 1 Hz to not overload the GUI
     QHash<quint32, mavlink_message_info_t> messageInfo; ///< Meta information about all messages
-
     QMap<int, QTreeWidgetItem* > uasTreeWidgetItems; ///< Tree of available uas with their widget
     QMap<int, QMap<int, QTreeWidgetItem*>* > uasMsgTreeItems; ///< Stores the widget of the received message for each UAS
 

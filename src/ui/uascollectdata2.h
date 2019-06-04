@@ -1,55 +1,32 @@
-/*
- * Author: Xiangwei Niu
- * Show multiple Systems in Multi Flight Panel
- *
- * */
-
-#ifndef UASMULTIVIEW_H
-#define UASMULTIVIEW_H
+#ifndef UASCOLLECTDATA2_H
+#define UASCOLLECTDATA2_H
 
 #include <QWidget>
-#include <QMap>
-#include <QScrollArea>
-#include <QVBoxLayout>
 #include "UASInterface.h"
-#include "UASView.h"
-#include "uasview2.h"
-#include "uasview3.h"
-#include "QGCUnconnectedInfoWidget.h"
 
-//QMap<QString,double> valueMap;
+//extern QMap<int,QMap<QString,QString>> infoMap;
 
 namespace Ui {
-class UASMultiView;
+class UASCollectData2;
 }
 
-class UASMultiView : public QWidget
+class UASCollectData2 : public QWidget
 {
     Q_OBJECT
 
+public:
+    explicit UASCollectData2(QWidget *parent = nullptr);
+    static UASCollectData2* instance();
+    QMap<int,QMap<QString,QString>> infoMap;
+    ~UASCollectData2();
+
 public slots:
-    void addUAS(UASInterface* uas);
-    void activeUAS(UASInterface* uas);
-    void removeUAS(UASInterface* uas);
     void refreshView();
 
-public:
-    explicit UASMultiView(QWidget *parent = nullptr);
-    static UASMultiView* instance();
-    ~UASMultiView();
+private:
+    Ui::UASCollectData2 *ui;
 
 protected:
-    QMap<UASInterface*, UASView*> uasViews;
-    QMap<UASInterface*, UASView3*> uasViews2;
-    QHBoxLayout* mainLayout;
-    QScrollArea* scrollArea;
-    QWidget* scrollAreaWidgetContents;
-    QVBoxLayout* listLayout;
-    QGCUnconnectedInfoWidget* uWidget;
-    void changeEvent(QEvent *e);
-    void resizeEvent(QResizeEvent *e);
-    UASInterface *m_uas;
-
     QMap<int,QMap<QString,double>> valueMap;
     QMap<int,QMap<QString,QString>> fieldMap;
     QVector<int> sysidList;
@@ -63,7 +40,6 @@ protected:
     QTimer updateTimer; ///< Only update at 1 Hz to not overload the GUI
     void updateField(int sysid, int msgid, int fieldid);
     void addToFieldMap(int msgid, QString fieldName, QString value);
-
     static const unsigned int updateInterval; ///< The update interval of the refresh function
     static const float updateHzLowpass; ///< The low-pass filter value for the frequency of each message
 
@@ -73,7 +49,8 @@ signals:
     void sendInfoMap(QMap<int,QMap<QString,QString>> infoMap);
 
 private:
-    Ui::UASMultiView *ui;
+    UASInterface *m_uas;
+
 };
 
-#endif // UASMULTIVIEW_H
+#endif // UASCOLLECTDATA2_H

@@ -58,6 +58,10 @@ private slots:
     void batteryVoltChanged();
     void navModeChanged(int uasid, int mode, const QString& text);
     void batteryCapChanged();
+
+signals:
+    //void sendMode(int sysid, QString text);
+
 private:
     QString m_lowVoltParam;
     Ui::FailSafeConfig ui;
