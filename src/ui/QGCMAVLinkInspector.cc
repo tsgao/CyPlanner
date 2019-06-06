@@ -8,7 +8,6 @@
 
 const float QGCMAVLinkInspector::updateHzLowpass = 0.2f;
 const unsigned int QGCMAVLinkInspector::updateInterval = 1000U;
-float heartbeatHz;
 
 QGCMAVLinkInspector::QGCMAVLinkInspector(MAVLinkProtocol* protocol, QWidget *parent) :
     QWidget(parent),
@@ -19,7 +18,6 @@ QGCMAVLinkInspector::QGCMAVLinkInspector(MAVLinkProtocol* protocol, QWidget *par
 {
     ui->setupUi(this);
 
-    //heartbeatHz = 0.0;
     // Make sure "All" is an option for both the system and components
     ui->systemComboBox->addItem(tr("All"), 0);
     ui->componentComboBox->addItem(tr("All"), 0);
@@ -108,7 +106,6 @@ void QGCMAVLinkInspector::rebuildComponentList()
     ui->componentComboBox->addItem(tr("All"), 0);
 
     // Fill
-    int aa = selectedSystemID;
     UASInterface* uas = UASManager::instance()->getUASForId(selectedSystemID);
     if (uas)
     {
@@ -211,10 +208,6 @@ void QGCMAVLinkInspector::refreshView()
     message.append(QString::number(m_mavlink_status[0].packet_rx_drop_count));
     ui->msg_lost->setText(message);
 
-//    QMap<int, mavlink_message_t* > uasMessageStorage1 = uasMessageStorage;
-//    QMap<int, QMap<int, float>* > uasMessageHz1 = uasMessageHz;
-//    QMap<int, QMap<int, unsigned int>* > uasMessageCount1 = uasMessageCount;
-
     QMap<int, mavlink_message_t* >::const_iterator ite;
 
     for(ite=uasMessageStorage.constBegin(); ite!=uasMessageStorage.constEnd();++ite)
@@ -223,14 +216,12 @@ void QGCMAVLinkInspector::refreshView()
         mavlink_message_t* msg = ite.value();
         // Ignore NULL values
         int a = msg->msgid;
-        //int b = msg->sysid;
 
         if (msg->msgid == 0xFF) continue;
 
         // Update the message frenquency
 
         // Get the previous frequency for low-pass filtering
-        //QMap<int, QMap<int, float>* > uasMessageHz1 = uasMessageHz;
         float msgHz = 0.0f;
         QMap<int, QMap<int, float>* >::const_iterator iteHz = uasMessageHz.find(msg->sysid);
         QMap<int, float>* uasMsgHz = iteHz.value();
@@ -268,20 +259,12 @@ void QGCMAVLinkInspector::refreshView()
         uasMsgCount->insert(msg->msgid,(unsigned int) 0);
 
         // Update the tree view
-        //QHash<quint32, mavlink_message_info_t> messageInfo1 = messageInfo;
         QString messageName("%1 (%2 Hz, #%3)");
         messageName = messageName.arg(messageInfo[msg->msgid].name).arg(msgHz, 3, 'f', 1).arg(msg->msgid);
 
-        //added by: Xiangwei Niu
-        if (msg->msgid == 0){
-            heartbeatHz = msgHz;
-        }
         addUAStoTree(msg->sysid);
 
         // Look for the tree for the UAS sysid
-        QMap<int, QMap<int, QTreeWidgetItem*>* > uasMsgTreeItems1 = uasMsgTreeItems;
-        QHash<quint32, mavlink_message_info_t> messageInfo1 = messageInfo;
-
         QMap<int, QTreeWidgetItem*>* msgTreeItems = uasMsgTreeItems.value(msg->sysid);
         if (!msgTreeItems)
         {
@@ -308,7 +291,6 @@ void QGCMAVLinkInspector::refreshView()
 
         // Update the message
         QTreeWidgetItem* message = msgTreeItems->value(msg->msgid);
-
         if(message)
         {
             message->setFirstColumnSpanned(true);
@@ -360,7 +342,6 @@ void QGCMAVLinkInspector::refreshView()
 
 void QGCMAVLinkInspector::addUAStoTree(int sysId)
 {
-    int aa = sysId;
     if(!uasTreeWidgetItems.contains(sysId))
     {
         // Add the UAS to the main tree after it has been created
@@ -402,8 +383,6 @@ void QGCMAVLinkInspector::receiveMessage(LinkInterface* link,mavlink_message_t m
         *msg = message;
         uasMessageStorage.insertMulti(message.sysid,msg);
     }
-
-    QMap<int, mavlink_message_t* > uasMessageStorage1 = uasMessageStorage;
 
     bool msgFound = false;
     QMap<int, mavlink_message_t* >::const_iterator iteMsg = uasMessageStorage.find(message.sysid);

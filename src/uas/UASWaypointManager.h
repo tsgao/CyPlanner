@@ -119,6 +119,7 @@ public:
     double getAcceptanceRadiusRecommendation();
 
     double getDefaultRelAltitude();
+    void insertEditable(int n, Waypoint* t);
 
 private:
     /** @name Message send functions */
@@ -145,7 +146,7 @@ public slots:
     int removeWaypoint(quint16 seq);                       ///< locally remove the specified waypoint from the storage
     void moveWaypoint(quint16 cur_seq, quint16 new_seq);   ///< locally move a waypoint from its current position cur_seq to a new position new_seq
     void saveWaypoints(const QString &saveFile);           ///< saves the local waypoint list to saveFile
-    void loadWaypoints(const QString &loadFile);           ///< loads a waypoint list from loadFile
+    void loadWaypoints(const QString &loadFile);
     void notifyOfChangeEditable(Waypoint* wp);             ///< Notifies manager to changes to an editable waypoint
     void notifyOfChangeViewOnly(Waypoint* wp);             ///< Notifies manager to changes to a viewonly waypoint, e.g. some widget wants to change "current"
     /*@}*/
@@ -153,7 +154,8 @@ public slots:
     void handleGlobalPositionChanged(UASInterface* mav, double lat, double lon, double alt, quint64 time);
 
     void setDefaultRelAltitude(double alt);
-
+    //added by: Guang Yi Lim
+    void waypointsEditableClear();
 signals:
     void waypointEditableListChanged(void);                 ///< emits signal that the list of editable waypoints has been changed
     void waypointEditableListChanged(int uasid);            ///< emits signal that the list of editable waypoints has been changed

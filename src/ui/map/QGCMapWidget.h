@@ -72,7 +72,9 @@ public slots:
     void updateWaypointList(int uas);
     /** @brief Redraw lines between waypoints */
     void redrawWaypointLines();
-    void redrawWaypointLines(int uas);
+    //void redrawWaypointLines(int uas);
+
+    //void redrawWaypointLines(int uas,QList<Waypoint*> wps);
     /** @brief Update the home position on the map */
     void updateHomePosition(double latitude, double longitude, double altitude);
     /** @brief Set update rate limit */
@@ -126,6 +128,9 @@ public slots:
     void loadSettings();
     /** @brief Store the settings for this widget to disk */
     void storeSettings();
+
+   /** @brief GUANG YI LIM refreshes lines for all waypoints */
+    //void refreshLines();
 
 protected slots:
     /** @brief Convert a map edit into a QGC waypoint event */

@@ -674,13 +674,13 @@ void MainWindow::buildCommonWidgets()
         addToCentralStackedWidget(engineeringView, VIEW_ENGINEER, tr("Logfile Plot"));
     }
 
-    if (!mavlinkView)
-    {
-        //mavlinkView = new SubMainWindow(this);
-        //mavlinkView->setObjectName("VIEW_MAVLINK");
-        //mavlinkView->setCentralWidget(new XMLCommProtocolWidget(this));
-        //addToCentralStackedWidget(mavlinkView, VIEW_MAVLINK, tr("Mavlink Generator"));
-    }
+//    if (!mavlinkView)
+//    {
+//        //mavlinkView = new SubMainWindow(this);
+//        //mavlinkView->setObjectName("VIEW_MAVLINK");
+//        //mavlinkView->setCentralWidget(new XMLCommProtocolWidget(this));
+//        //addToCentralStackedWidget(mavlinkView, VIEW_MAVLINK, tr("Mavlink Generator"));
+//    }
 
     if (!simView)
     {
@@ -714,7 +714,7 @@ void MainWindow::buildCommonWidgets()
         QAction* tempAction = ui.menuTools->addAction(tr("Mission Elevation"));
         tempAction->setCheckable(true);
         connect(tempAction,SIGNAL(triggered(bool)),this, SLOT(showTool(bool)));
-        menuToDockNameMap[tempAction] = "MISSION_ELEVATION_DOCKWIDGET";
+            menuToDockNameMap[tempAction] = "MISSION_ELEVATION_DOCKWIDGET";
     }
 
     createDockWidget(simView,new QGCWaypointListMulti(this),tr("Mission Plan"),"WAYPOINT_LIST_DOCKWIDGET",VIEW_SIMULATION,Qt::BottomDockWidgetArea);

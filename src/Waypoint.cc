@@ -189,18 +189,18 @@ bool Waypoint::load(QTextStream &loadStream)
 
     if ((wpParams.size() >= 12)
         &&(wpParams.size() <= 13)){
-        this->id = wpParams[0].toInt();
-        this->current = (wpParams[1].toInt() == 1 ? true : false);
-        this->frame = (MAV_FRAME) wpParams[2].toInt();
-        this->action = (MAV_CMD) wpParams[3].toInt();
-        this->param1 = wpParams[4].toDouble();
-        this->param2 = wpParams[5].toDouble();
-        this->orbit = wpParams[6].toDouble();
-        this->yaw = wpParams[7].toDouble();
-        this->x = wpParams[8].toDouble();
-        this->y = wpParams[9].toDouble();
-        this->z = wpParams[10].toDouble();
-        this->autocontinue = (wpParams[11].toInt() == 1 ? true : false);
+        this->id = wpParams[0].toInt();//Waypoint ID use int counter to simulate
+        this->current = (wpParams[1].toInt() == 1 ? true : false);//start point
+        this->frame = (MAV_FRAME) wpParams[2].toInt();//framework to use? //can set default based on ID?
+        this->action = (MAV_CMD) wpParams[3].toInt();//MAVLINK Command //can set default as waypoint
+        this->param1 = wpParams[4].toDouble();//first param depending on MAVLINK command if waypoint is the loiter time
+        this->param2 = wpParams[5].toDouble();//second param if waypoint is the radius of the waypoint
+        this->orbit = wpParams[6].toDouble();//loiter radius //can set default as 0
+        this->yaw = wpParams[7].toDouble();//angle
+        this->x = wpParams[8].toDouble();//latitude
+        this->y = wpParams[9].toDouble();//longitude
+        this->z = wpParams[10].toDouble();//altitude
+        this->autocontinue = (wpParams[11].toInt() == 1 ? true : false);//autocontinue
         if(wpParams.size() == 13) { // Optional Description
             this->description = wpParams[12];
         }
@@ -208,7 +208,32 @@ bool Waypoint::load(QTextStream &loadStream)
     }
     return false;
 }
+bool Waypoint::load2(QString loadStream)
+{
 
+    const QStringList& wpParams = loadStream.split("\t");
+
+    if ((wpParams.size() >= 12)
+        &&(wpParams.size() <= 13)){
+        this->id = wpParams[0].toInt();//Waypoint ID use int counter to simulate
+        this->current = (wpParams[1].toInt() == 1 ? true : false);//start point
+        this->frame = (MAV_FRAME) wpParams[2].toInt();//framework to use? //can set default based on ID?
+        this->action = (MAV_CMD) wpParams[3].toInt();//MAVLINK Command //can set default as waypoint
+        this->param1 = wpParams[4].toDouble();//first param depending on MAVLINK command if waypoint is the loiter time
+        this->param2 = wpParams[5].toDouble();//second param if waypoint is the radius of the waypoint
+        this->orbit = wpParams[6].toDouble();//loiter radius //can set default as 0
+        this->yaw = wpParams[7].toDouble();//angle
+        this->x = wpParams[8].toDouble();//latitude
+        this->y = wpParams[9].toDouble();//longitude
+        this->z = wpParams[10].toDouble();//altitude
+        this->autocontinue = (wpParams[11].toInt() == 1 ? true : false);//autocontinue
+        if(wpParams.size() == 13) { // Optional Description
+            this->description = wpParams[12];
+        }
+        return true;
+    }
+    return false;
+}
 
 void Waypoint::setId(quint16 id)
 {

@@ -38,6 +38,7 @@ This file is part of the APM_PLANNER project
 #include <QTimer>
 #include <QQuickItem>
 #include <QQmlEngine>
+#include "MultiviewPopup.h"
 
 APMToolBar::APMToolBar(QWindow *parent):
     QQuickView(parent), m_uas(NULL), m_disableOverride(false), m_currentLinkId(0)
@@ -103,7 +104,7 @@ APMToolBar::APMToolBar(QWindow *parent):
     }
     connect(LinkManager::instance(),SIGNAL(linkChanged(int)),this,SLOT(updateLinkDisplay(int)));
 
-    connect(this, SIGNAL(triggerDonateView()), this, SLOT(selectDonateView()));
+   // connect(this, SIGNAL(triggerDonateView()), this, SLOT(selectDonateView()));
 }
 
 void APMToolBar::checkAdvancedMode(bool checked)
@@ -229,7 +230,7 @@ void APMToolBar::setPlotViewAction(QAction *action)
 
 void APMToolBar::setDonateViewAction(QAction *action)
 {
-    connect(action, SIGNAL(triggered()), this, SLOT(selectDonateView()));
+   // connect(action, SIGNAL(triggered()), this, SLOT(selectDonateView()));
 }
 
 void APMToolBar::setSimulationViewAction(QAction *action)
@@ -283,9 +284,9 @@ void APMToolBar::selectSimulationView()
 
 void APMToolBar::selectDonateView()
 {
-    QLOG_DEBUG() << "APMToolBar: selectDonateView";
-    QString donateUrl = "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=UKV3U28LVDGN4";
-    QDesktopServices::openUrl(QUrl(donateUrl));
+//    QLOG_DEBUG() << "APMToolBar: selectDonateView";
+//    QString donateUrl = "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=UKV3U28LVDGN4";
+//    QDesktopServices::openUrl(QUrl(donateUrl));
 
 }
 

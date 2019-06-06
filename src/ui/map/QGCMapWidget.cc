@@ -738,10 +738,12 @@ void QGCMapWidget::handleMapWaypointEdit(mapcontrol::WayPointItem* waypoint)
 }
 
 // WAYPOINT UPDATE FUNCTIONS
-
 /**
  * This function is called if a a single waypoint is updated and
  * also if the whole list changes.
+ *
+ * Modified by: Guang Yi Lim
+ * Allows waypoints from all UAS not just the active UAS to show
  */
 void QGCMapWidget::updateWaypoint(int uas, Waypoint* wp)
 {
@@ -753,7 +755,7 @@ void QGCMapWidget::updateWaypoint(int uas, Waypoint* wp)
     // Currently only accept waypoint updates from the UAS in focus
     // this has to be changed to accept read-only updates from other systems as well.
     UASInterface* uasInstance = UASManager::instance()->getUASForId(uas);
-    if (currWPManager)
+    //if (currWPManager)
     {
         // Only accept waypoints in global coordinate frame
         if (((wp->getFrame() == MAV_FRAME_GLOBAL) ||
@@ -763,7 +765,7 @@ void QGCMapWidget::updateWaypoint(int uas, Waypoint* wp)
             // We're good, this is a global waypoint
 
             // Get the index of this waypoint
-            int wpindex = currWPManager->getIndexOf(wp);
+            int wpindex = uasInstance->getWaypointManager()->getIndexOf(wp);
             // If not found, return (this should never happen, but helps safety)
             if (wpindex < 0) return;
             // Mark this wp as currently edited
@@ -816,7 +818,7 @@ void QGCMapWidget::updateWaypoint(int uas, Waypoint* wp)
                 this->blockSignals(false);
             }
 
-            redrawWaypointLines(uas);
+            redrawWaypointLines();
 
             firingWaypointChange = NULL;
         }
@@ -834,67 +836,66 @@ void QGCMapWidget::updateWaypoint(int uas, Waypoint* wp)
     }
 }
 
+/***
+ * Guang Yi Lim
+ * modified the function to draw multiple waypoints on one map
+ ***/
 void QGCMapWidget::redrawWaypointLines()
 {
-    redrawWaypointLines(uas ? uas->getUASID() : 0);
-}
+    QList<Waypoint*> wps;
+    foreach (UASInterface * u, UASManager::instance()->getUASList()){
+        QLOG_TRACE() << "REDRAW WAYPOINT LINES FOR UAS" << u->getUASID();
+        QGraphicsItemGroup* group = waypointLine(u->getUASID());
+            if (!group)
+                return;
+        Q_ASSERT(group->parentItem() == map);
 
-void QGCMapWidget::redrawWaypointLines(int uas)
-{
-    QLOG_TRACE() << "REDRAW WAYPOINT LINES FOR UAS" << uas;
-
-    if (!currWPManager)
-        return;
-
-    QGraphicsItemGroup* group = waypointLine(uas);
-    if (!group)
-        return;
-    Q_ASSERT(group->parentItem() == map);
-
-    // Delete existing waypoint lines
-    foreach (QGraphicsItem* item, group->childItems())
-    {
-        QLOG_TRACE() << "DELETE EXISTING WAYPOINT LINES" << item;
-        delete item;
-    }
-
-    QList<Waypoint*> wps = currWPManager->getGlobalFrameAndNavTypeWaypointList(true);
-    if (wps.size() > 1)
-    {
-        QPainterPath path = WaypointNavigation::path(wps, *map);
-        if (path.elementCount() > 1)
+        // Delete existing waypoint lines
+        foreach (QGraphicsItem* item, group->childItems())
         {
-            QGraphicsPathItem* gpi = new QGraphicsPathItem(map);
-            gpi->setPath(path);
+            QLOG_TRACE() << "DELETE EXISTING WAYPOINT LINES" << item;
+            delete item;
+        }
 
-            QColor color(Qt::red);
-            UASInterface* uasInstance = UASManager::instance()->getUASForId(uas);
-            if (uasInstance) color = uasInstance->getColor();
-            QPen pen(color);
-            pen.setWidth(2);
-            gpi->setPen(pen);
+        wps = u->getWaypointManager()->getGlobalFrameAndNavTypeWaypointList(true);
+        if (wps.size() > 1)
+        {
+            QPainterPath path = WaypointNavigation::path(wps, *map);
+            if (path.elementCount() > 1)
+            {
+                QGraphicsPathItem* gpi = new QGraphicsPathItem(map);
+                gpi->setPath(path);
 
-            QLOG_TRACE() << "ADDING WAYPOINT LINES" << gpi;
-            group->addToGroup(gpi);
+                QColor color(Qt::red);
+                if (u) color = u->getColor();
+                QPen pen(color);
+                pen.setWidthF(1.75);
+                gpi->setPen(pen);
+
+                QLOG_TRACE() << "ADDING WAYPOINT LINES" << gpi;
+                group->addToGroup(gpi);
+            }
         }
     }
 }
-
-/**
+    /**
  * Update the whole list of waypoints. This is e.g. necessary if the list order changed.
  * The UAS manager will emit the appropriate signal whenever updating the list
  * is necessary.
+ *
+ * modified by: Guang Yi Lim
+ * Allows waypoints from all UAS to appear on the map
  */
 void QGCMapWidget::updateWaypointList(int uas)
 {
     QLOG_DEBUG() << "UPDATE WP LIST IN 2D MAP CALLED FOR UAS" << uas;
     // Currently only accept waypoint updates from the UAS in focus
     // this has to be changed to accept read-only updates from other systems as well.
-    if (currWPManager)
-    {
-        // Delete first all old waypoints
-        // this is suboptimal (quadratic, but wps should stay in the sub-100 range anyway)
-        QList<Waypoint* > wps = currWPManager->getGlobalFrameAndNavTypeWaypointList(false);
+    // Delete first all old waypoints
+    // this is suboptimal (quadratic, but wps should stay in the sub-100 range anyway)
+    QList<Waypoint* > wps;
+    foreach (UASInterface * u, UASManager::instance()->getUASList()){
+        wps = u->getWaypointManager()->getGlobalFrameAndNavTypeWaypointList(false);
         foreach (Waypoint* wp, waypointsToIcons.keys())
         {
             if (!wps.contains(wp))
@@ -907,12 +908,15 @@ void QGCMapWidget::updateWaypointList(int uas)
                 WPDelete(icon);
             }
         }
+    }
 
+    foreach (UASInterface * u, UASManager::instance()->getUASList()){
+        wps = u->getWaypointManager()->getGlobalFrameAndNavTypeWaypointList(false);
         // Update all existing waypoints
         foreach (Waypoint* wp, waypointsToIcons.keys())
         {
             QLOG_TRACE() << "UPDATING EXISTING WP" << wp->getId();
-            updateWaypoint(uas, wp);
+            updateWaypoint(u->getUASID(), wp);
         }
 
         // Update all potentially new waypoints
@@ -922,10 +926,8 @@ void QGCMapWidget::updateWaypointList(int uas)
             if (!waypointsToIcons.contains(wp))
             {
                 QLOG_TRACE() << "UPDATING NEW WP" << wp->getId();
-                updateWaypoint(uas, wp);
+                updateWaypoint(u->getUASID(), wp);
             }
         }
-
-//        redrawWaypointLines(uas);
     }
 }

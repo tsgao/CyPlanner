@@ -361,6 +361,7 @@ INCLUDEPATH += \
 FORMS += \
     src/ui/MainWindow.ui \
     src/ui/CommSettings.ui \
+    src/ui/MultiviewPopup.ui \
     src/ui/SerialSettings.ui \
     src/ui/UASControl.ui \
     src/ui/UASList.ui \
@@ -375,8 +376,9 @@ FORMS += \
     src/ui/MAVLinkSettingsWidget.ui \
     src/ui/AudioOutputWidget.ui \
     src/ui/QGCSensorSettingsWidget.ui \
+    src/ui/map/CoordinateInput.ui \
+    src/ui/map/WaypointInput.ui \
     src/ui/uasdetails.ui \
-    src/ui/uasmulticontrol.ui \
     src/ui/uasmultiview.ui \
     src/ui/uasview2.ui \
     src/ui/uasview3.ui \
@@ -515,8 +517,11 @@ HEADERS += \
 #    src/comm/QGCXPlaneLink.h \
     src/comm/serialconnection.h \
     src/ui/CommConfigurationWindow.h \
+    src/ui/MultiviewPopup.h \
     src/ui/SerialConfigurationWindow.h \
     src/ui/MainWindow.h \
+    src/ui/map/CoordinateInput.h \
+    src/ui/map/WaypoIntinput.h \
     src/ui/uas/UASControlWidget.h \
     src/ui/uas/UASListWidget.h \
     src/ui/uas/UASInfoWidget.h \
@@ -546,7 +551,6 @@ HEADERS += \
     src/uas/ArduPilotMegaMAV.h \
     src/uas/senseSoarMAV.h \
     src/ui/uasdetails.h \
-    src/ui/uasmulticontrol.h \
     src/ui/uasmultiview.h \
     src/ui/uasview2.h \
     src/ui/uasview3.h \
@@ -753,8 +757,11 @@ SOURCES += src/main.cc \
 #    src/comm/QGCXPlaneLink.cc \
     src/comm/serialconnection.cc \
     src/ui/CommConfigurationWindow.cc \
+    src/ui/MultiviewPopup.cpp \
     src/ui/SerialConfigurationWindow.cc \
     src/ui/MainWindow.cc \
+    src/ui/map/CoordinateInput.cpp \
+    src/ui/map/WaypoIntinput.cpp \
     src/ui/uas/UASControlWidget.cc \
     src/ui/uas/UASListWidget.cc \
     src/ui/uas/UASInfoWidget.cc \
@@ -783,7 +790,6 @@ SOURCES += src/main.cc \
     src/uas/ArduPilotMegaMAV.cc \
     src/uas/senseSoarMAV.cpp \
     src/ui/uasdetails.cpp \
-    src/ui/uasmulticontrol.cpp \
     src/ui/uasmultiview.cpp \
     src/ui/uasview2.cpp \
     src/ui/uasview3.cpp \

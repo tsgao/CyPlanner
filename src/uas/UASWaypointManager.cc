@@ -23,7 +23,7 @@ This file is part of the QGROUNDCONTROL project
 
 /**
  * @file
- *   @brief Implementation of the waypoint protocol handler
+ *    @brief Implementation of the waypoint protocol handler
  *
  *   @author Petri Tanskanen <mavteam@student.ethz.ch>
  *
@@ -1186,3 +1186,10 @@ const QVariant UASWaypointManager::readSetting(const QString& key, const QVarian
     return result;
 }
 
+void UASWaypointManager::waypointsEditableClear(){
+    this->waypointsEditable.clear();
+}
+
+void UASWaypointManager::insertEditable(int w, Waypoint * t){
+    waypointsEditable.insert(w,t);
+}

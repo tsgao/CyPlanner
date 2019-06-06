@@ -3,6 +3,9 @@
 #include "ArduPilotMegaMAV.h"
 #include "QGCMapWidget.h"
 #include "ui_QGCMapToolBar.h"
+#include "WaypoIntinput.h"
+#include "QFileDialog"
+
 
 QGCMapToolBar::QGCMapToolBar(QWidget *parent) :
     QWidget(parent),
@@ -301,4 +304,95 @@ QGCMapToolBar::~QGCMapToolBar()
     delete updateTimesGroup;
     delete mapTypesGroup;
     // FIXME Delete all actions
+}
+//added by: GUANG YI LIM
+void QGCMapToolBar::on_pushButton_clicked()
+{
+    QFileDialog *dialog = new QFileDialog(this, tr("Load File"), QGC::missionDirectory(), tr("Waypoint File (*.txt)"));
+    dialog->setFileMode(QFileDialog::ExistingFile);
+    connect(dialog,SIGNAL(accepted()),this,SLOT(loadUASWaypointsDialogAccepted()));
+    dialog->show();
+}
+/**
+ * @brief QGCMapToolBar::loadUASWaypointsDialogAccepted
+ * loads waypoints for multiple UAS into the system and dispalys them
+ */
+void QGCMapToolBar::loadUASWaypointsDialogAccepted(){
+    QFileDialog *dialog = qobject_cast<QFileDialog*>(sender());
+    if (!dialog)
+    {
+        return;
+    }
+    if (dialog->selectedFiles().size() == 0)
+    {
+        //No file selected/cancel clicked
+        return;
+    }
+    QFile file(dialog->selectedFiles().at(0));
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)){
+        return;
+    }
+
+    UASWaypointManager * wpm;
+
+    QTextStream in(&file);
+
+    QString check = in.readLine();
+    if(check != "CYPLANNER"){
+        return;
+    }
+
+    //loops through entire file
+    int n;
+    bool skip = false;
+    while(!in.atEnd()){
+        //gets UAS ID
+        if(!skip){
+            QString id =  in.readLine();
+            QStringRef sub(&id,4,2);
+            n = sub.toInt();
+        }
+        //error here if we input an invalid UASID, will crash due to accessing non existance location
+        UASInterface * uas = UASManager::instance()->getUASForId(n);
+
+        if(uas== nullptr){
+            return;
+        }
+        wpm = uas->getWaypointManager();
+        qDeleteAll(wpm->getWaypointEditableList());
+        wpm->waypointsEditableClear();
+
+        emit wpm->waypointEditableListChanged();
+        emit wpm->waypointViewOnlyListChanged(n);
+
+        while(!in.atEnd()){
+            Waypoint *t = new Waypoint();
+            QString nxtLine;
+            nxtLine = in.readLine();
+
+            if(t->load2(nxtLine)){
+                int m = wpm->getWaypointEditableList().count();
+                t->setId(m);
+                wpm->insertEditable(m,t);
+            }
+            else{
+                QStringRef temp(&nxtLine,4,2);
+                n = temp.toInt();
+                skip = true;
+                break;
+            }
+
+        }
+        emit wpm->loadWPFile();
+        emit wpm->waypointEditableListChanged();
+        emit wpm->waypointViewOnlyListChanged(n);
+    }
+    file.close();
+    foreach (UASInterface * uas, UASManager::instance()->getUASList()){
+        wpm = uas->getWaypointManager();
+        emit wpm->waypointEditableListChanged();
+        emit wpm->waypointEditableListChanged(uas->getUASID());
+    }
+
+
 }

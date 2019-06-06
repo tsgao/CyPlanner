@@ -114,8 +114,8 @@ QRectF Waypoint2DIcon::boundingRect() const
         loiter = map->metersToPixels(waypoint->getParam2(), coord);
     }
 
-    int width = qMax(picture.width()/2, qMax(loiter, acceptance));
-    int height = qMax(picture.height()/2, qMax(loiter, acceptance));
+    int width = qMax(picture.width()/35, qMax(loiter, acceptance));
+    int height = qMax(picture.height()/35, qMax(loiter, acceptance));
 
     return QRectF(-width,-height,2*width,2*height);
 }
@@ -132,14 +132,14 @@ void Waypoint2DIcon::drawIcon()
     font.setPixelSize(fontSize);
 
     QFontMetrics metrics = QFontMetrics(font);
-    int border = qMax(4, metrics.leading());
+    int border = qMax(3, metrics.leading());
     painter.setFont(font);
     painter.setRenderHint(QPainter::TextAntialiasing);
 
 
 
     QPen pen1(Qt::black);
-    pen1.setWidth(4);
+    pen1.setWidth(2);
     QPen pen2(color);
     pen2.setWidth(2);
     painter.setBrush(Qt::NoBrush);
@@ -149,17 +149,18 @@ void Waypoint2DIcon::drawIcon()
     // DRAW WAYPOINT
     QPointF p(picture.width()/2, picture.height()/2);
 
+    /** @brief Guang Yi Lim this is where you change the size of the diamond**/
     QPolygonF poly(4);
     // Top point
-    poly.replace(0, QPointF(p.x(), p.y()-picture.height()/2.0f+penWidth/2));
+    poly.replace(0, QPointF(p.x(), p.y()-picture.height()/9.0f+penWidth/3));
     // Right point
-    poly.replace(1, QPointF(p.x()+picture.width()/2.0f-penWidth/2, p.y()));
+    poly.replace(1, QPointF(p.x()+picture.width()/9.0f-penWidth/3, p.y()));
     // Bottom point
-    poly.replace(2, QPointF(p.x(), p.y() + picture.height()/2.0f-penWidth/2));
-    poly.replace(3, QPointF(p.x() - picture.width()/2.0f+penWidth/2, p.y()));
+    poly.replace(2, QPointF(p.x(), p.y() + picture.height()/9.0f-penWidth/3));
+    poly.replace(3, QPointF(p.x() - picture.width()/9.0f+penWidth/3, p.y()));
 
-    int waypointSize = qMin(picture.width(), picture.height());
-    float rad = (waypointSize/2.0f) * 0.7f * (1/sqrt(2.0f));
+    int waypointSize = qMin(picture.width()/5.0, picture.height()/5.0);
+    float rad = (waypointSize/2.0f) * 0.1f * (1/sqrt(2.0f));
 
     // If this is not a waypoint (only the default representation)
     // or it is a waypoint, but not one where direction has no meaning

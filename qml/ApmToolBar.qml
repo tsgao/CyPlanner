@@ -15,6 +15,7 @@
 //
 
 import QtQuick 2.0
+import QtQuick.Controls 2.5
 import "./components"
 
 
@@ -173,11 +174,18 @@ Rectangle {
             id: multiFlightPlanView
             label: "Multi FLIGHT"
             image: "./resources/apmplanner/toolbar/flightplanner.png"
-            onClicked: {
-                clearHighlightedButtons()
-                globalObj.triggerMultiFlightPlanView()
-                setSelected()
-            }
+            onClicked: popup.open()
+        }
+
+        Popup {
+            id: popup
+            x :100
+            y: 100
+            width: 200
+            height: 300
+            modal: true
+            focus: true
+            closePolicy: Popup.CloseOnEscape
         }
 
         Button {
@@ -224,6 +232,7 @@ Rectangle {
                 globalObj.triggerDonateView()
                 setSelected()
                 donateHideTimer.start()
+
             }
 
             Timer {

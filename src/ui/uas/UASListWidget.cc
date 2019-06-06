@@ -40,7 +40,7 @@ This file is part of the PIXHAWK project
 #include "UASManager.h"
 #include "UAS.h"
 #include "UASView.h"
-#include "UASView3.h"
+#include "uasview3.h"
 #include "QGCUnconnectedInfoWidget.h"
 #include "MainWindow.h"
 #include "MAVLinkSimulationLink.h"

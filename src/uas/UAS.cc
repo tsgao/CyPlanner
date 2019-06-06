@@ -3160,14 +3160,7 @@ void UAS::halt()
 void UAS::go()
 {
     mavlink_message_t msg;
-    //uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-    //uint8_t target_system, uint8_t target_component, uint16_t command, uint8_t confirmation,
-    //float param1, float param2, float param3, float param4, float param5, float param6, float param7)
-
-    int aa = uasId;
-    mavlink_msg_command_long_pack(systemId, componentId, &msg,
-                                  uasId, MAV_COMP_ID_PRIMARY, MAV_CMD_OVERRIDE_GOTO, 1,
-                                  MAV_GOTO_DO_CONTINUE, MAV_GOTO_HOLD_AT_CURRENT_POSITION, 0, 0, 0, 0, 0);
+    mavlink_msg_command_long_pack(systemId, componentId, &msg, uasId, MAV_COMP_ID_PRIMARY, MAV_CMD_OVERRIDE_GOTO, 1, MAV_GOTO_DO_CONTINUE, MAV_GOTO_HOLD_AT_CURRENT_POSITION, 0, 0, 0, 0, 0);
     sendMessage(msg);
 }
 

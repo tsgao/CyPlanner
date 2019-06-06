@@ -30,6 +30,7 @@ public slots:
     void setUpdateInterval();
     void setMapType();
     void goHome();
+    void loadUASWaypointsDialogAccepted();
 
 private:
     void loadSettings();
@@ -48,6 +49,8 @@ protected:
     QActionGroup* trailSettingsGroup;
     QActionGroup* updateTimesGroup;
     QActionGroup* mapTypesGroup;
+private slots:
+    void on_pushButton_clicked();
 };
 
 #endif // QGCMAPTOOLBAR_H

@@ -76,6 +76,7 @@ public:
     UASInterface* getUASForId(int id);
 
     QList<UASInterface*> getUASList();
+
     /** @brief Get home position latitude */
     double getHomeLatitude() const {
         return homeLat;
@@ -249,6 +250,7 @@ public slots:
 protected:
     UASManager();
     QList<UASInterface*> systems;
+    //QVector<UASInterface*> UASList;
     UASInterface* activeUAS;
     UASWaypointManager *offlineUASWaypointManager;
     QMutex activeUASMutex;

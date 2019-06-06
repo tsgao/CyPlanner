@@ -37,7 +37,7 @@ This file is part of the QGROUNDCONTROL project
 #include <QVBoxLayout>
 #include "UASInterface.h"
 #include "UASView.h"
-#include "UASView3.h"
+#include "uasview3.h"
 #include "QGCUnconnectedInfoWidget.h"
 #include "ui_UASList.h"
 

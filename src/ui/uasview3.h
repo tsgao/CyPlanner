@@ -34,10 +34,6 @@ public slots:
     /** @brief Select airframe for this vehicle */
     void refreshView();
     void receiveMessage(LinkInterface* link,mavlink_message_t message);
-    void navModeChanged(int uasid, int mode, const QString& text);
-
-private slots:
-    void armingChanged(bool armed);
 
 protected:
     void changeEvent(QEvent *e);
@@ -47,8 +43,6 @@ protected:
     int timeRemaining;
     UASInterface* uas;
     bool isActive; ///< Is this MAV selected by the user?
-
-    QString modeText;
     //static const int updateInterval = 800;
     static const int errorUpdateInterval = 200;
     bool lowPowerModeEnabled; ///< Low power mode reduces update rates
@@ -78,7 +72,6 @@ private:
     QTimer *m_updateTimer;
     QTimer *m_tableRefreshTimer; //This time triggers a reorganization of the cells, for when new cells are added
     bool m_tableDirty;
-    bool iconIsGreen;
 
 private slots:
 

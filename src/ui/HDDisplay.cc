@@ -39,7 +39,7 @@ HDDisplay::HDDisplay(QStringList* plotList, QString title, QWidget *parent) :
     defaultColor(QColor(70, 200, 70)),
     setPointColor(QColor(200, 20, 200)),
     warningColor(Qt::yellow),
-    criticalColor(Qt::red),
+    criticalColor(Qt::blue),
     infoColor(QColor(20, 200, 20)),
     fuelColor(criticalColor),
     warningBlinkRate(5),

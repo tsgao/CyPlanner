@@ -136,7 +136,7 @@ public:
 
     void save(QTextStream &saveStream);
     bool load(QTextStream &loadStream);
-
+    bool load2(QString loadStream);
 
 protected:
     quint16 id;

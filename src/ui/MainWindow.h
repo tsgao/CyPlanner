@@ -433,7 +433,7 @@ protected:
 
     // Center widgets
     QPointer<SubMainWindow> plannerView;
-    QPointer<SubMainWindow> multiPlannerView;
+        QPointer<SubMainWindow> multiPlannerView;
     QPointer<SubMainWindow> pilotView;
     QPointer<SubMainWindow> configView;
     QPointer<SubMainWindow> softwareConfigView;
