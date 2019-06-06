@@ -15,7 +15,7 @@ class QGCMapTool : public QWidget
     Q_OBJECT
 
 public:
-    explicit QGCMapTool(QWidget *parent = 0);
+    explicit QGCMapTool(QWidget *parent = 0,bool tool = true);
     ~QGCMapTool();
 
 public slots:

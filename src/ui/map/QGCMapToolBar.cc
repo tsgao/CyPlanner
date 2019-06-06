@@ -5,6 +5,7 @@
 #include "ui_QGCMapToolBar.h"
 #include "WaypoIntinput.h"
 #include "QFileDialog"
+#include "MultiviewPopup.h"
 
 
 QGCMapToolBar::QGCMapToolBar(QWidget *parent) :
@@ -395,4 +396,14 @@ void QGCMapToolBar::loadUASWaypointsDialogAccepted(){
     }
 
 
+}
+
+void QGCMapToolBar::on_multiButton_clicked()
+{
+    MultiviewPopup* p = new MultiviewPopup(this);
+//    p->show();
+   //  p->setWindowModality(Qt::WindowModal);
+     //p->showMaximized();
+    p->setModal(false);
+    p->exec();
 }

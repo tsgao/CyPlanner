@@ -51,6 +51,7 @@ protected:
     QActionGroup* mapTypesGroup;
 private slots:
     void on_pushButton_clicked();
+    void on_multiButton_clicked();
 };
 
 #endif // QGCMAPTOOLBAR_H

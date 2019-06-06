@@ -10,15 +10,19 @@
 
 const static int MapToolZoomFactor = 10; // This may need to be different for win/linux/mac
 
-QGCMapTool::QGCMapTool(QWidget *parent) :
+QGCMapTool::QGCMapTool(QWidget *parent,bool tool) :
     QWidget(parent),
     ui(new Ui::QGCMapTool),
     m_uasInterface(NULL)
 {
     ui->setupUi(this);
-
+    if(tool){
     // Connect map and toolbar
+    ui->toolBar = new QGCMapToolBar(this);
+    ui->toolBar->setObjectName(QString::fromUtf8("toolBar"));
+    ui->gridLayout->addWidget(ui->toolBar, 1, 0, 1, 1);
     ui->toolBar->setMap(ui->map);
+    }
     // Connect zoom slider and map
     ui->zoomSlider->setMinimum(ui->map->MinZoom() * MapToolZoomFactor);
     ui->zoomSlider->setMaximum(ui->map->MaxZoom() * MapToolZoomFactor);
@@ -34,6 +38,8 @@ QGCMapTool::QGCMapTool(QWidget *parent) :
         activeUASSet(UASManager::instance()->getActiveUAS());
     }
 }
+
+
 
 void QGCMapTool::setMapZoom(int zoom)
 {
