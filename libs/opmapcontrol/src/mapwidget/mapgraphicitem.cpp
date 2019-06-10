@@ -34,7 +34,7 @@ namespace mapcontrol
     MapGraphicItem::MapGraphicItem(internals::Core *core, Configuration *configuration):core(core),
         config(configuration),
         MapRenderTransform(1),
-        maxZoom(17),
+        maxZoom(30),
         minZoom(2),
         zoomReal(0),
         rotation(0),

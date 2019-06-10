@@ -16,6 +16,7 @@
 #include "uasview2.h"
 #include "uasview3.h"
 #include "QGCUnconnectedInfoWidget.h"
+#include "PrimaryFlightDisplay.h"
 
 namespace Ui {
 class UASMultiView;
@@ -42,6 +43,7 @@ protected:
     QWidget* scrollAreaWidgetContents;
     QVBoxLayout* listLayout;
     QGCUnconnectedInfoWidget* uWidget;
+    PrimaryFlightDisplay* pfd;
     void changeEvent(QEvent *e);
     void resizeEvent(QResizeEvent *e);
 

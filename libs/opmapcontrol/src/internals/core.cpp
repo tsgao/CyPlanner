@@ -47,7 +47,7 @@ namespace internals {
     TooltipTextPadding(10,10),
     mapType(static_cast<MapType::Types>(0)),
     loaderLimit(5),
-    maxzoom(21),
+    maxzoom(21),/** @brief GUANG YI LIM is for zoom slider, but breaks map if goes beyond 22 **/
     runningThreads(0),
     started(false),
     Width(0),

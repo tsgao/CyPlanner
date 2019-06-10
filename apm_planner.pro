@@ -60,13 +60,13 @@ linux-g++-64 | linux-g++ {
     contains( DISTRO, "Ubuntu" ) {
         message(Ubuntu Build)
         DEFINES += Q_UBUNTU
-	CONFIG += DebianIntegration
+        CONFIG += DebianIntegration
     }
 
     contains ( Distro, "Debian" ) {
         message(Debian Build)
         DEFINES += Q_DEBIAN
-	CONFIG += DebianIntegration
+        CONFIG += DebianIntegration
     }
 
     contains( DISTRO, "Arch" ) {
@@ -500,7 +500,8 @@ FORMS += \
     src/ui/LogAnalysis.ui \
     src/ui/LogAnalysisMap.ui \
     src/ui/configuration/FrameTypeConfigOld.ui \
-    src/ui/configuration/FrameTypeConfigNew.ui
+    src/ui/configuration/FrameTypeConfigNew.ui\
+    src/ui/uasmulticontrol.ui
 
 HEADERS += \
     src/MG.h \
@@ -744,7 +745,8 @@ HEADERS += \
     src/ui/Loghandling/LogExporter.h \
     src/ui/Loghandling/LogAnalysis.h \
     src/ui/Loghandling/LogAnalysisMap.h \
-    src/ui/Loghandling/PresetManager.h
+    src/ui/Loghandling/PresetManager.h\
+    src/ui/uasmulticontrol.h
 
 SOURCES += src/main.cc \
     src/QGCCore.cc \
@@ -978,7 +980,8 @@ SOURCES += src/main.cc \
     src/ui/Loghandling/LogExporter.cpp \
     src/ui/Loghandling/LogAnalysis.cpp \
     src/ui/Loghandling/LogAnalysisMap.cpp\
-    src/ui/Loghandling/PresetManager.cpp
+    src/ui/Loghandling/PresetManager.cpp\
+    src/ui/uasmulticontrol.cpp
 
 MacBuild | WindowsBuild : contains(GOOGLEEARTH, enable) { #fix this to make sense ;)
     message(Including support for Google Earth)
@@ -1045,5 +1048,4 @@ OTHER_FILES += \
 
 DISTFILES += \
     qml/components/BarGauge.qml
-
 

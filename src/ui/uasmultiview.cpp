@@ -22,6 +22,7 @@
 #include "MainWindow.h"
 #include "MAVLinkSimulationLink.h"
 #include "LinkManager.h"
+#include "uasmulticontrol.h"
 
 
 
@@ -50,7 +51,7 @@ UASMultiView::UASMultiView(QWidget *parent) :
     mainLayout->addWidget(scrollArea);
     this->setLayout(mainLayout);
     setObjectName("MULTI_SYSTEM_LIST");
-
+    listLayout->addWidget(new UASMultiControl(this));
     // Construct initial widget
     //uWidget = new QGCUnconnectedInfoWidget(this);
     //listLayout->addWidget(uWidget);
@@ -70,6 +71,7 @@ UASMultiView::UASMultiView(QWidget *parent) :
     //QList<UASInterface*> aa = UASManager::instance()->getUASList();
 
     // Get a list of all existing UAS
+
     foreach (UASInterface* uas, UASManager::instance()->getUASList()) {
         addUAS(uas);
     }
@@ -109,6 +111,7 @@ void UASMultiView::addUAS(UASInterface* uas)
     {
         uasViews2.insert(uas, new UASView3(uas, this));
         listLayout->addWidget(uasViews2.value(uas));
+
         //connect(uas, SIGNAL(destroyed(QObject*)), this, SLOT(removeUAS(QObject*)));
     }
 }

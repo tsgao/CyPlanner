@@ -33,9 +33,12 @@ private slots:
     void gpsFixChanged(int, const QString&);
     void satelliteCountChanged(int value, const QString&);
 
+    void on_screenshot_clicked();
+
 private:
     void showEvent(QShowEvent* event);
     void hideEvent(QHideEvent* event);
+    int imageCounter;
 
 private:
     Ui::QGCMapTool *ui;

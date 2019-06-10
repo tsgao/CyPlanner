@@ -6,7 +6,7 @@
 #include "WaypoIntinput.h"
 #include "QFileDialog"
 #include "MultiviewPopup.h"
-
+#include "qlogging.h"
 
 QGCMapToolBar::QGCMapToolBar(QWidget *parent) :
     QWidget(parent),
@@ -21,6 +21,9 @@ QGCMapToolBar::QGCMapToolBar(QWidget *parent) :
     mapTypesGroup(new QActionGroup(this))
 {
     ui->setupUi(this);
+    p = NULL;
+    //p->setFocus();
+
 }
 
 static const struct {
@@ -312,7 +315,7 @@ void QGCMapToolBar::on_pushButton_clicked()
     QFileDialog *dialog = new QFileDialog(this, tr("Load File"), QGC::missionDirectory(), tr("Waypoint File (*.txt)"));
     dialog->setFileMode(QFileDialog::ExistingFile);
     connect(dialog,SIGNAL(accepted()),this,SLOT(loadUASWaypointsDialogAccepted()));
-    dialog->show();
+    dialog->exec();
 }
 /**
  * @brief QGCMapToolBar::loadUASWaypointsDialogAccepted
@@ -339,6 +342,7 @@ void QGCMapToolBar::loadUASWaypointsDialogAccepted(){
     QTextStream in(&file);
 
     QString check = in.readLine();
+    //check file signature
     if(check != "CYPLANNER"){
         return;
     }
@@ -356,15 +360,21 @@ void QGCMapToolBar::loadUASWaypointsDialogAccepted(){
         //error here if we input an invalid UASID, will crash due to accessing non existance location
         UASInterface * uas = UASManager::instance()->getUASForId(n);
 
-        if(uas== nullptr){
-            return;
+        if(!UASManager::instance()->getUASList().contains(uas)){
+//            wpm->updateStatusString(tr("Invalid UAS ID. Load operation only partly succesful."));
+            QMessageBox *q = new QMessageBox(this);
+            q->setText("Invalid UAS ID. Load operation only partly succesful");
+            q->setStandardButtons(QMessageBox::Ok);
+            q->setDefaultButton(QMessageBox::Ok);
+            q->exec();
+            break;
         }
         wpm = uas->getWaypointManager();
         qDeleteAll(wpm->getWaypointEditableList());
         wpm->waypointsEditableClear();
 
-        emit wpm->waypointEditableListChanged();
-        emit wpm->waypointViewOnlyListChanged(n);
+//        emit wpm->waypointEditableListChanged();
+//        emit wpm->waypointViewOnlyListChanged(n);
 
         while(!in.atEnd()){
             Waypoint *t = new Waypoint();
@@ -385,25 +395,26 @@ void QGCMapToolBar::loadUASWaypointsDialogAccepted(){
 
         }
         emit wpm->loadWPFile();
-        emit wpm->waypointEditableListChanged();
-        emit wpm->waypointViewOnlyListChanged(n);
+//        emit wpm->waypointEditableListChanged();
+//        emit wpm->waypointViewOnlyListChanged(n);
     }
     file.close();
     foreach (UASInterface * uas, UASManager::instance()->getUASList()){
         wpm = uas->getWaypointManager();
         emit wpm->waypointEditableListChanged();
         emit wpm->waypointEditableListChanged(uas->getUASID());
+
     }
-
-
 }
 
 void QGCMapToolBar::on_multiButton_clicked()
 {
-    MultiviewPopup* p = new MultiviewPopup(this);
-//    p->show();
+    //    p->show();
    //  p->setWindowModality(Qt::WindowModal);
-     //p->showMaximized();
-    p->setModal(false);
-    p->exec();
+    //if(p =nullptr)
+
+//    p->setModal(false);
+//    p->exec();
+    p = new MultiviewPopup(this);
+    p->show();
 }

@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QMenu>
 #include <QActionGroup>
+#include "MultiviewPopup.h"
 
 class QGCMapWidget;
 
@@ -49,6 +50,7 @@ protected:
     QActionGroup* trailSettingsGroup;
     QActionGroup* updateTimesGroup;
     QActionGroup* mapTypesGroup;
+    MultiviewPopup *p;
 private slots:
     void on_pushButton_clicked();
     void on_multiButton_clicked();

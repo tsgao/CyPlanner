@@ -4,7 +4,7 @@
 #include "UAS.h"
 #include "QGCMapTool.h"
 #include "ui_QGCMapTool.h"
-
+#include <QFileDialog>
 #include <QAction>
 #include <QMenu>
 
@@ -16,12 +16,10 @@ QGCMapTool::QGCMapTool(QWidget *parent,bool tool) :
     m_uasInterface(NULL)
 {
     ui->setupUi(this);
-    if(tool){
-    // Connect map and toolbar
-    ui->toolBar = new QGCMapToolBar(this);
-    ui->toolBar->setObjectName(QString::fromUtf8("toolBar"));
-    ui->gridLayout->addWidget(ui->toolBar, 1, 0, 1, 1);
-    ui->toolBar->setMap(ui->map);
+    if(!tool){
+        // Connect map and toolbar
+        ui->toolBar->lower();
+        ui->gridLayout->removeWidget(ui->toolBar);
     }
     // Connect zoom slider and map
     ui->zoomSlider->setMinimum(ui->map->MinZoom() * MapToolZoomFactor);
@@ -37,6 +35,7 @@ QGCMapTool::QGCMapTool(QWidget *parent,bool tool) :
     {
         activeUASSet(UASManager::instance()->getActiveUAS());
     }
+    imageCounter = 0;
 }
 
 
@@ -120,3 +119,20 @@ void QGCMapTool::satelliteCountChanged(int value, const QString &)
 {
     ui->satsLabel->setText(tr("SATS: %1").arg(value));
 }
+
+void QGCMapTool::on_screenshot_clicked()
+{
+    QPixmap p = QPixmap::grabWidget(this);
+    QString path = "test" + QString::number(imageCounter)+".png";
+    QMessageBox d(this);
+    if(p.save(path)){
+        d.setText("Screenshot taken");
+    }
+    else{
+        d.setText("Screenshot failed");
+    }
+    d.exec();
+    imageCounter++;
+}
+
+
