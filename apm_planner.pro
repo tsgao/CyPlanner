@@ -376,6 +376,7 @@ FORMS += \
     src/ui/MAVLinkSettingsWidget.ui \
     src/ui/AudioOutputWidget.ui \
     src/ui/QGCSensorSettingsWidget.ui \
+    src/ui/flight.ui \
     src/ui/map/CoordinateInput.ui \
     src/ui/map/WaypointInput.ui \
     src/ui/uasdetails.ui \
@@ -521,6 +522,7 @@ HEADERS += \
     src/ui/MultiviewPopup.h \
     src/ui/SerialConfigurationWindow.h \
     src/ui/MainWindow.h \
+    src/ui/flight.h \
     src/ui/map/CoordinateInput.h \
     src/ui/map/WaypoIntinput.h \
     src/ui/uas/UASControlWidget.h \
@@ -762,6 +764,7 @@ SOURCES += src/main.cc \
     src/ui/MultiviewPopup.cpp \
     src/ui/SerialConfigurationWindow.cc \
     src/ui/MainWindow.cc \
+    src/ui/flight.cpp \
     src/ui/map/CoordinateInput.cpp \
     src/ui/map/WaypoIntinput.cpp \
     src/ui/uas/UASControlWidget.cc \

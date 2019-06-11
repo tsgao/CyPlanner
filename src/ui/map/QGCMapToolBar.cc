@@ -416,5 +416,7 @@ void QGCMapToolBar::on_multiButton_clicked()
 //    p->setModal(false);
 //    p->exec();
     p = new MultiviewPopup(this);
-    p->show();
+    //p->setModal(true);
+    //p->setFocusPolicy(Qt::FocusPolicy::ClickFocus);
+    p->showMaximized();
 }

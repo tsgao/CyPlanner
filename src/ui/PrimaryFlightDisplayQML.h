@@ -36,8 +36,10 @@ class PrimaryFlightDisplayQML : public QWidget
     Q_OBJECT
 
 public:
-    explicit PrimaryFlightDisplayQML(QWidget *parent = 0);
+    explicit PrimaryFlightDisplayQML(QWidget *parent = 0,bool t  = true);
     ~PrimaryFlightDisplayQML();
+    QQuickView* getView();
+
 
 private slots:
     void setActiveUAS(UASInterface *uas);

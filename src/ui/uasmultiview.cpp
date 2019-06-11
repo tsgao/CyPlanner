@@ -23,7 +23,9 @@
 #include "MAVLinkSimulationLink.h"
 #include "LinkManager.h"
 #include "uasmulticontrol.h"
-
+#include "PrimaryFlightDisplayQML.h"
+#include "QDockWidget"
+#include <QQuickWidget>
 
 
 UASMultiView::UASMultiView(QWidget *parent) :
@@ -111,8 +113,28 @@ void UASMultiView::addUAS(UASInterface* uas)
     {
         uasViews2.insert(uas, new UASView3(uas, this));
         listLayout->addWidget(uasViews2.value(uas));
+        Flight *f1 = new Flight(this);
+        f1->setFixedSize(200,200);
+        listLayout->addWidget(f1);
+        f1->lower();
+
+//        PrimaryFlightDisplayQML* q = new PrimaryFlightDisplayQML(this,false);
+//        QDockWidget *widget = new QDockWidget(this);
+//        widget->setWidget(q);
+//        widget->setMinimumSize(100,100);
+//        widget->setMaximumSize(200,200);
+//        listLayout->addWidget(widget);
+
+
+//        QQuickWidget *view = new QQuickWidget;
+//        view->setSource(QUrl::fromLocalFile(QGC::shareDirectory() + "/qml/PrimaryFlightDisplayQML.qml"));
+//        QDockWidget *d = new QDockWidget;
+//        d->setWidget(view);
+
+//        listLayout->addWidget(d);
 
         //connect(uas, SIGNAL(destroyed(QObject*)), this, SLOT(removeUAS(QObject*)));
+        //setLayout(listLayout);
     }
 }
 

@@ -6,7 +6,7 @@
 #include <QTimer>
 #include <QMouseEvent>
 #include <UASInterface.h>
-
+#include "QGCRadioChannelDisplay.h"
 namespace Ui {
 class UASView3;
 }
@@ -73,6 +73,13 @@ private:
     QTimer *m_tableRefreshTimer; //This time triggers a reorganization of the cells, for when new cells are added
     bool m_tableDirty;
 
+    int m_pitchChannel;
+    int m_rollChannel;
+    int m_yawChannel;
+    int m_throttleChannel;
+
+    QGCRadioChannelDisplay * m_pitchWidget;
+    QGCRadioChannelDisplay *m_throttleWidget;
 private slots:
 
 signals:

@@ -152,9 +152,12 @@ void MultiviewPopup::resizeEvent(QResizeEvent *e)
 }
 
 void MultiviewPopup::keypressEvent(QKeyEvent *e){
-    if(e->key()== Qt::Key_A){
-        this->showMinimized();
-        e->accept();
+    if(e->key()!= Qt::Key_Escape){
+        QDialog::keyPressEvent(e);
+        this->lower();
+    }
+    else{
+
     }
 
 }

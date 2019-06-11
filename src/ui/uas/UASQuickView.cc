@@ -358,6 +358,9 @@ void UASQuickView::setActiveUAS(UASInterface* uas)
     {
         return;
     }
+    if(this->uas == uas){
+        return;
+    }
     this->uas = uas;
     connect(uas,SIGNAL(valueChanged(int,QString,QString,QVariant,quint64)),this,
             SLOT(valueChanged(int,QString,QString,QVariant,quint64)));

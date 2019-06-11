@@ -32,7 +32,7 @@ This file is part of the APM_PLANNER project
 #define ToRad(x) (x*0.01745329252)      // *pi/180
 #define ToDeg(x) (x*57.2957795131)      // *180/pi
 
-PrimaryFlightDisplayQML::PrimaryFlightDisplayQML(QWidget *parent) :
+PrimaryFlightDisplayQML::PrimaryFlightDisplayQML(QWidget *parent,bool t) :
     QWidget(parent),
     m_declarativeView(NULL),
     m_uasInterface(NULL)
@@ -54,13 +54,14 @@ PrimaryFlightDisplayQML::PrimaryFlightDisplayQML(QWidget *parent) :
 
     QLOG_DEBUG() << "QML Status:" << m_declarativeView->status();
     m_declarativeView->setResizeMode(QQuickView::SizeRootObjectToView);
-    QVBoxLayout* layout = new QVBoxLayout();
     QWidget *viewcontainer = QWidget::createWindowContainer(m_declarativeView);
-    layout->addWidget(viewcontainer);
-    setLayout(layout);
-    setContentsMargins(0,0,0,0);
-    show();
-
+    if(t){
+        QVBoxLayout* layout = new QVBoxLayout();
+        layout->addWidget(viewcontainer);
+        setLayout(layout);
+        setContentsMargins(0,0,0,0);
+        show();
+    }
     // Connect with UAS
     connect(UASManager::instance(), SIGNAL(activeUASSet(UASInterface*)), this,
             SLOT(setActiveUAS(UASInterface*)), Qt::UniqueConnection);
@@ -133,4 +134,8 @@ void PrimaryFlightDisplayQML::uasTextMessage(int uasid, int componentid, int sev
         root->setProperty("statusMessageColor", "darkgreen");
     }
 
+}
+
+QQuickView* PrimaryFlightDisplayQML::getView(){
+    return m_declarativeView;
 }
