@@ -49,6 +49,8 @@ public:
     void setFlightPlanViewAction(QAction *action);
     //added by:Xiangwei Niu
     void setMultiFlightPlanViewAction(QAction *action);
+    void setMultiFlightDisplayAction(QAction *action);
+
     void setInitialSetupViewAction(QAction *action);
     void setConfigTuningViewAction(QAction *action);
     void setPlotViewAction(QAction *action);

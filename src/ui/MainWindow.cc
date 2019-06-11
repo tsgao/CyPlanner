@@ -279,6 +279,7 @@ MainWindow::MainWindow(QWidget *parent):
     m_apmToolBar->setFlightPlanViewAction(ui.actionMissionView);
     //added by:Xiangwei Niu
     m_apmToolBar->setMultiFlightPlanViewAction(ui.actionMultiMissionView);
+    m_apmToolBar->setMultiFlightDisplayAction(ui.actionMultiFlightDisplay);
 
     m_apmToolBar->setInitialSetupViewAction(ui.actionHardwareConfig);
     m_apmToolBar->setConfigTuningViewAction(ui.actionSoftwareConfig);

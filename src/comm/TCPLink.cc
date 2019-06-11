@@ -328,6 +328,7 @@ bool TCPLink::_hardwareConnect(void)
 void TCPLink::_socketError(QAbstractSocket::SocketError socketError)
 {
     Q_UNUSED(socketError);
+    qDebug() << "Critical message: Error on socket ID:" << _linkId<< ", "<<_socket->errorString();
     emit communicationError(getName(), "Error on socket: " + _socket->errorString());
 }
 

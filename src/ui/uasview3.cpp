@@ -10,6 +10,7 @@
 #include "UAS.h"
 #include <QTimer>
 #include <QScrollBar>
+#include "ApmUiHelpers.h"
 
 #include <QGCHilFlightGearConfiguration.h>
 
@@ -39,6 +40,7 @@ UASView3::UASView3(UASInterface* uas, QWidget *parent) :
 
     m_uas = 0;
     m_ui->setupUi(this);
+    m_ui->modeComboBox->setVisible(false);
 
     // Name changes
     connect(uas, SIGNAL(nameChanged(QString)), this, SLOT(updateName(QString)));
@@ -385,6 +387,57 @@ void UASView3::refreshView()
     valueMap.clear();
     fieldMap.clear();
     sysidList.clear();
+
+//    UAS* m_uas = static_cast<UAS*>(uas);
+//    QString currentArmStatus = m_ui->armedLabel->text();
+//    if (m_uas->armMode == 1 && currentArmStatus != "ARMED"){
+//        m_uas->armSystem();
+//    }
+
+//    if (m_uas->armMode == 0 && currentArmStatus == "ARMED"){
+//        m_uas->disarmSystem();
+//    }
+
+//    if (m_uas->ModeType <=3){
+//        QString currentMode = m_ui->modeLabel->text();
+//        int commandModeID = m_uas->ModeType;
+//        QString commandMode;
+//        if (commandModeID == 0) commandMode = "Auto";
+//        if (commandModeID == 1) commandMode = "Stabilize";
+//        if (commandModeID == 2) commandMode = "RTL";
+//        if (commandModeID == 3) commandMode = "Loiter";
+
+//        if (commandMode != currentMode){
+//            setShortcutMode(m_uas, commandMode);
+//        }
+//    }
+
+//    if (m_uas->isMultirotor()){
+//        QString currentMode = m_ui->modeLabel->text();
+//        int commandModeID = m_uas->ModeType;
+//        QString commandMode;
+//        if (commandModeID == 4) commandMode = "Pos Hold";
+//        if (commandModeID == 5) commandMode = "Acro";
+//        if (commandModeID == 6) commandMode = "Alt Hold";
+//        if (commandModeID == 7) commandMode = "Land";
+
+//        if (commandMode != currentMode){
+//            setShortcutMode(m_uas, commandMode);
+//        }
+//    }
+
+//    if (m_uas->isGroundRover()){
+//        QString currentMode = m_ui->modeLabel->text();
+//        int commandModeID = m_uas->ModeType;
+//        QString commandMode;
+//        if (commandModeID == 8) commandMode = "Learn";
+//        if (commandModeID == 9) commandMode = "Steer";
+//        if (commandModeID == 10) commandMode = "Hold";
+
+//        if (commandMode != currentMode){
+//            setShortcutMode(m_uas, commandMode);
+//        }
+//    }
 
     QMap<int, mavlink_message_t* >::const_iterator ite;
 
@@ -904,4 +957,21 @@ void UASView3::addToFieldMap(int msgid, QString fieldName, QString value){
     }
 }
 
+void UASView3::setShortcutMode(UAS *m_uas,QString modeString)
+{
+    if (m_uas->isMultirotor()){
+        ApmUiHelpers::addCopterModes(m_ui->modeComboBox);
+
+    } else if (m_uas->isGroundRover()){
+        ApmUiHelpers::addRoverModes(m_ui->modeComboBox);
+    }
+
+    QString aa =modeString;
+    int index = m_ui->modeComboBox->findText(modeString);
+    //QLOG_DEBUG() << "index: " << index;
+
+    m_ui->modeComboBox->setCurrentIndex(index);
+    m_uas->setMode(MAV_MODE_FLAG_CUSTOM_MODE_ENABLED,
+                   m_ui->modeComboBox->itemData(m_ui->modeComboBox->currentIndex()).toInt());
+}
 

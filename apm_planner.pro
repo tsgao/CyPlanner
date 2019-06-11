@@ -375,6 +375,7 @@ FORMS += \
     src/ui/MAVLinkSettingsWidget.ui \
     src/ui/AudioOutputWidget.ui \
     src/ui/QGCSensorSettingsWidget.ui \
+    src/ui/multiprimaryflightdisplay.ui \
     src/ui/uasdetails.ui \
     src/ui/uasmulticontrol.ui \
     src/ui/uasmultiview.ui \
@@ -503,6 +504,7 @@ FORMS += \
 HEADERS += \
     src/MG.h \
     src/QGCCore.h \
+    src/comm/uasobject2.h \
     src/uas/UASInterface.h \
     src/uas/UAS.h \
     src/uas/UASManager.h \
@@ -517,6 +519,7 @@ HEADERS += \
     src/ui/CommConfigurationWindow.h \
     src/ui/SerialConfigurationWindow.h \
     src/ui/MainWindow.h \
+    src/ui/multiprimaryflightdisplay.h \
     src/ui/uas/UASControlWidget.h \
     src/ui/uas/UASListWidget.h \
     src/ui/uas/UASInfoWidget.h \
@@ -744,6 +747,7 @@ HEADERS += \
 
 SOURCES += src/main.cc \
     src/QGCCore.cc \
+    src/comm/uasobject2.cpp \
     src/uas/UASManager.cc \
     src/uas/UAS.cc \
     src/comm/LinkManager.cc \
@@ -755,6 +759,7 @@ SOURCES += src/main.cc \
     src/ui/CommConfigurationWindow.cc \
     src/ui/SerialConfigurationWindow.cc \
     src/ui/MainWindow.cc \
+    src/ui/multiprimaryflightdisplay.cpp \
     src/ui/uas/UASControlWidget.cc \
     src/ui/uas/UASListWidget.cc \
     src/ui/uas/UASInfoWidget.cc \

@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include "UASInterface.h"
+#include <QQueue>
 
 namespace Ui {
 class UASMultiControl;
@@ -16,6 +17,14 @@ public:
     explicit UASMultiControl( QWidget *parent = nullptr);
     ~UASMultiControl();
 
+protected:
+    int modeChangeWarningBox(const QString& modeString);
+    void setShortcutMode(UAS *m_uas, QString modeString);
+    void multiSetStabilizeMode();
+    void multiSetLoiterMode();
+    bool isArmed;
+    QQueue<UASInterface*> disarmQueue;
+
 public slots:
     void multiGo();
     void multiLaunch();
@@ -26,6 +35,16 @@ public slots:
     void multiShutdown();
     void multiArm();
     void multiDisarm();
+    void multiSetAutoMode();
+    void multiSetRTLMode();
+    void multiSetposHoldMode();
+    void multiSetAcroMode();
+    void multiSetAltHoldMode();
+    void multiSetLandMode();
+    void multiSetLearnMode();
+    void multiSetSteerMode();
+    void multiSetHoldMode();
+    //void armingChanged(bool armed);
 
 private:
     Ui::UASMultiControl *m_ui;

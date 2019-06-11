@@ -70,23 +70,31 @@ PrimaryFlightDisplayQML::PrimaryFlightDisplayQML(QWidget *parent) :
 
 PrimaryFlightDisplayQML::~PrimaryFlightDisplayQML()
 {
-//    delete ui;
+    //    delete ui;
 }
 
 void PrimaryFlightDisplayQML::setActiveUAS(UASInterface *uas)
 {
     if (m_uasInterface) {
         disconnect(m_uasInterface,SIGNAL(textMessageReceived(int,int,int,QString)),
-                this,SLOT(uasTextMessage(int,int,int,QString)));
+                   this,SLOT(uasTextMessage(int,int,int,QString)));
     }
     m_uasInterface = uas;
+    int thisID =-1;
+    if (m_uasInterface) {
+        thisID = m_uasInterface->getUASID();
+    }
 
     if (m_uasInterface) {
         connect(uas,SIGNAL(textMessageReceived(int,int,int,QString)),
                 this,SLOT(uasTextMessage(int,int,int,QString)));
+
         VehicleOverview* vehicleView = LinkManager::instance()->getUasObject(uas->getUASID())->getVehicleOverview();
         RelPositionOverview* relView = LinkManager::instance()->getUasObject(uas->getUASID())->getRelPositionOverview();
         AbsPositionOverview* absView = LinkManager::instance()->getUasObject(uas->getUASID())->getAbsPositionOverview();
+
+        UASObject* aa = LinkManager::instance()->getUasObject(uas->getUASID());
+
         if (vehicleView)
         {
             m_declarativeView->rootContext()->setContextProperty("vehicleoverview", vehicleView);
@@ -118,19 +126,22 @@ void PrimaryFlightDisplayQML::setActiveUAS(UASInterface *uas)
 
 void PrimaryFlightDisplayQML::uasTextMessage(int uasid, int componentid, int severity, QString text)
 {
-    Q_UNUSED(uasid);
+    //Q_UNUSED(uasid);
     Q_UNUSED(componentid);
-    if (text.contains("PreArm") || severity <= MAV_SEVERITY_CRITICAL)
-    {
-        QObject *root = m_declarativeView->rootObject();
-        root->setProperty("statusMessage", text);
-        root->setProperty("showStatusMessage", true);
-        root->setProperty("statusMessageColor", "red");
-    } else if (severity <= MAV_SEVERITY_INFO ){
-        QObject *root = m_declarativeView->rootObject();
-        root->setProperty("statusMessage", text);
-        root->setProperty("showStatusMessage", true);
-        root->setProperty("statusMessageColor", "darkgreen");
+    // int aa = uasid;
+    int thisID = m_uasInterface->getUASID();
+    if (thisID == uasid){
+        if (text.contains("PreArm") || severity <= MAV_SEVERITY_CRITICAL)
+        {
+            QObject *root = m_declarativeView->rootObject();
+            root->setProperty("statusMessage", text);
+            root->setProperty("showStatusMessage", true);
+            root->setProperty("statusMessageColor", "red");
+        } else if (severity <= MAV_SEVERITY_INFO ){
+            QObject *root = m_declarativeView->rootObject();
+            root->setProperty("statusMessage", text);
+            root->setProperty("showStatusMessage", true);
+            root->setProperty("statusMessageColor", "darkgreen");
+        }
     }
-
 }

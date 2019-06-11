@@ -206,6 +206,11 @@ void APMToolBar::setMultiFlightPlanViewAction(QAction *action)
 {
     connect(this, SIGNAL(triggerMultiFlightPlanView()), action, SIGNAL(triggered()));
 }
+void APMToolBar::setMultiFlightDisplayAction(QAction *action)
+{
+    connect(this, SIGNAL(triggerMultiFlightPlanView()), action, SIGNAL(triggered()));
+}
+
 
 void APMToolBar::setFlightPlanViewAction(QAction *action)
 {

@@ -50,6 +50,7 @@ This file is part of the QGROUNDCONTROL project
  * automatically updated by the comm architecture, so when writing code to e.g. control the vehicle
  * no knowledge of the communication infrastructure is needed.
  */
+
 class UAS : public UASInterface
 {
     Q_OBJECT
@@ -59,6 +60,9 @@ public:
 
     static const double lipoFull;  ///< 100% charged voltage
     static const double lipoEmpty; ///< Discharged voltage
+    //  added by Xiangwei Niu
+    bool armMode;                 /// true is arm mode, and false is disarm mode
+    int ModeType;                 //
 
     /* MANAGEMENT */
 
@@ -78,6 +82,11 @@ public:
 
     /** @brief Get the unique system id */
     int getUASID() const;
+
+    //bool getArmMode() const;
+
+    void setArmMode(bool mode);
+
     /** @brief Get the airframe */
     int getAirframe() const
     {

@@ -610,6 +610,11 @@
     <string>Multi Flight Plan</string>
    </property>
   </action>
+  <action name="actionMultiFlightDisplay">
+   <property name="text">
+    <string>Multi Flight Display</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>

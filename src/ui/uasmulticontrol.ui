@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>360</width>
-    <height>124</height>
+    <height>201</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -126,7 +126,7 @@ QPushButton {
 	border: 1px solid #999999;
 	border-radius: 8px;
 	min-width: 20px;
-	max-width: 32px;
+	max-width: 60px;
 	min-height: 16px;
 	max-height: 16px;
 	padding: 2px;
@@ -269,7 +269,7 @@ QMenu::separator {
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>130</height>
+       <height>300</height>
       </size>
      </property>
      <property name="title">
@@ -294,6 +294,38 @@ QMenu::separator {
       <property name="verticalSpacing">
        <number>2</number>
       </property>
+      <item row="2" column="0">
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QPushButton" name="armButton">
+          <property name="text">
+           <string>ARM_ALL</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="disarmButton">
+          <property name="text">
+           <string>DISA_ALL</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="armMessageLabel">
+          <property name="text">
+           <string>no arm message</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>LiftOff   Halt   Continue   Land   ShutDown   Abort    Kill</string>
+        </property>
+       </widget>
+      </item>
       <item row="1" column="0" colspan="2">
        <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,1,1,1,1,1,1">
         <property name="spacing">
@@ -312,7 +344,7 @@ QMenu::separator {
           </property>
           <property name="maximumSize">
            <size>
-            <width>38</width>
+            <width>66</width>
             <height>22</height>
            </size>
           </property>
@@ -341,7 +373,7 @@ QMenu::separator {
           </property>
           <property name="maximumSize">
            <size>
-            <width>38</width>
+            <width>66</width>
             <height>22</height>
            </size>
           </property>
@@ -370,7 +402,7 @@ QMenu::separator {
           </property>
           <property name="maximumSize">
            <size>
-            <width>38</width>
+            <width>66</width>
             <height>22</height>
            </size>
           </property>
@@ -399,7 +431,7 @@ QMenu::separator {
           </property>
           <property name="maximumSize">
            <size>
-            <width>38</width>
+            <width>66</width>
             <height>22</height>
            </size>
           </property>
@@ -422,7 +454,7 @@ QMenu::separator {
          <widget class="QPushButton" name="shutdownButton">
           <property name="maximumSize">
            <size>
-            <width>38</width>
+            <width>66</width>
             <height>22</height>
            </size>
           </property>
@@ -457,7 +489,7 @@ QMenu::separator {
           </property>
           <property name="maximumSize">
            <size>
-            <width>38</width>
+            <width>66</width>
             <height>22</height>
            </size>
           </property>
@@ -486,7 +518,7 @@ QMenu::separator {
           </property>
           <property name="maximumSize">
            <size>
-            <width>38</width>
+            <width>66</width>
             <height>22</height>
            </size>
           </property>
@@ -507,28 +539,87 @@ QMenu::separator {
         </item>
        </layout>
       </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>LiftOff   Halt   Continue   Land   ShutDown   Abort    Kill</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <layout class="QHBoxLayout" name="horizontalLayout_3">
-        <item>
-         <widget class="QPushButton" name="armButton">
+      <item row="3" column="0">
+       <layout class="QGridLayout" name="shortcutGroupBox">
+        <item row="1" column="1">
+         <widget class="QPushButton" name="acroModeButton">
           <property name="text">
-           <string>ARM</string>
+           <string>Acro</string>
           </property>
          </widget>
         </item>
-        <item>
-         <widget class="QPushButton" name="disarmButton">
+        <item row="1" column="2">
+         <widget class="QPushButton" name="altHoldModeButton">
           <property name="text">
-           <string>DISA</string>
+           <string>Alt Hold</string>
           </property>
          </widget>
+        </item>
+        <item row="1" column="3">
+         <widget class="QPushButton" name="landModeButton">
+          <property name="text">
+           <string>Land</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QPushButton" name="posHoldModeButton">
+          <property name="text">
+           <string>Pos Hold</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="3">
+         <widget class="QPushButton" name="rtlModeButton">
+          <property name="text">
+           <string>RTL</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QPushButton" name="steerModeButton">
+          <property name="text">
+           <string>Steer</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2">
+         <widget class="QPushButton" name="holdModeButton">
+          <property name="text">
+           <string>Hold</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QPushButton" name="stabilizeModeButton">
+          <property name="text">
+           <string>Stabilize</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QPushButton" name="autoModeButton">
+          <property name="text">
+           <string>Auto</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QPushButton" name="loiterModeButton">
+          <property name="text">
+           <string>Loiter</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QPushButton" name="learnModeButton">
+          <property name="text">
+           <string>Learn</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="3">
+         <widget class="QComboBox" name="modeComboBox"/>
         </item>
        </layout>
       </item>

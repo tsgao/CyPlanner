@@ -35,6 +35,7 @@ public slots:
     void refreshView();
     void receiveMessage(LinkInterface* link,mavlink_message_t message);
     void navModeChanged(int uasid, int mode, const QString& text);
+    void setShortcutMode(UAS *m_uas,QString modeString);
 
 private slots:
     void armingChanged(bool armed);
