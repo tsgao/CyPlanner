@@ -161,7 +161,7 @@ UAS::UAS(MAVLinkProtocol* protocol, int id) : UASInterface(),
     lastSendTimeSensors(0)
 {
     Q_UNUSED(protocol);
-
+    armMode =0;
     for (unsigned int i = 0; i<255;++i)
     {
         componentID[i] = -1;

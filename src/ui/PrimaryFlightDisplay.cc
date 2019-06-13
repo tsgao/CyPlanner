@@ -174,7 +174,7 @@ PrimaryFlightDisplay::PrimaryFlightDisplay(int width, int height, QWidget *paren
     setMinimumSize(120, 80);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    setActiveUAS(UASManager::instance()->getActiveUAS());
+    //setActiveUAS(UASManager::instance()->getActiveUAS());
 
     // Connect with UAS signal
     //connect(UASManager::instance(), SIGNAL(UASCreated(UASInterface*)), this, SLOT(addUAS(UASInterface*)));

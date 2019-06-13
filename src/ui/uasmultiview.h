@@ -11,12 +11,12 @@
 #include <QMap>
 #include <QScrollArea>
 #include <QVBoxLayout>
+#include <QDockWidget>
 #include "UASInterface.h"
 #include "UASView.h"
 #include "uasview2.h"
 #include "uasview3.h"
 #include "QGCUnconnectedInfoWidget.h"
-#include "flight.h"
 
 namespace Ui {
 class UASMultiView;
@@ -34,7 +34,7 @@ public slots:
 public:
     explicit UASMultiView(QWidget *parent = nullptr);
     ~UASMultiView();
-
+     QDockWidget* createDockWidget(QWidget *parent,QWidget *child,QString title,QString objectname,Qt::DockWidgetArea area,int minwidth=0,int minheight=0);
 protected:
     QMap<UASInterface*, UASView*> uasViews;
     QMap<UASInterface*, UASView3*> uasViews2;
@@ -43,7 +43,7 @@ protected:
     QWidget* scrollAreaWidgetContents;
     QVBoxLayout* listLayout;
     QGCUnconnectedInfoWidget* uWidget;
-    Flight f;
+    PrimaryFlightDisplayQML *q;
     void changeEvent(QEvent *e);
     void resizeEvent(QResizeEvent *e);
 

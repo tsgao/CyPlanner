@@ -50,6 +50,7 @@ private:
 
     QQuickView* m_declarativeView;
     UASInterface *m_uasInterface;
+    bool temp;
 };
 
 #endif // PRIMARYFLIGHTDISPLAYQML_H

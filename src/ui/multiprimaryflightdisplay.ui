@@ -2,8 +2,8 @@
  <author/>
  <comment/>
  <exportmacro/>
- <class>Flight</class>
- <widget name="Flight" class="QWidget">
+ <class>multiPrimaryFlightDisplay</class>
+ <widget class="QWidget" name="multiPrimaryFlightDisplay">
   <property name="geometry">
    <rect>
     <x>0</x>

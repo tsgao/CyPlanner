@@ -55,13 +55,14 @@ PrimaryFlightDisplayQML::PrimaryFlightDisplayQML(QWidget *parent,bool t) :
     QLOG_DEBUG() << "QML Status:" << m_declarativeView->status();
     m_declarativeView->setResizeMode(QQuickView::SizeRootObjectToView);
     QWidget *viewcontainer = QWidget::createWindowContainer(m_declarativeView);
-    if(t){
-        QVBoxLayout* layout = new QVBoxLayout();
-        layout->addWidget(viewcontainer);
-        setLayout(layout);
-        setContentsMargins(0,0,0,0);
-        show();
-    }
+   // viewcontainer->setMaximumWidth(300);
+    viewcontainer->setMinimumSize(200,200);
+    QVBoxLayout* layout = new QVBoxLayout();
+    layout->addWidget(viewcontainer);
+    setLayout(layout);
+    //setContentsMargins(0,0,0,0);
+    show();
+
     // Connect with UAS
     connect(UASManager::instance(), SIGNAL(activeUASSet(UASInterface*)), this,
             SLOT(setActiveUAS(UASInterface*)), Qt::UniqueConnection);
@@ -71,23 +72,36 @@ PrimaryFlightDisplayQML::PrimaryFlightDisplayQML(QWidget *parent,bool t) :
 
 PrimaryFlightDisplayQML::~PrimaryFlightDisplayQML()
 {
-//    delete ui;
+    //    delete ui;
 }
 
 void PrimaryFlightDisplayQML::setActiveUAS(UASInterface *uas)
 {
     if (m_uasInterface) {
         disconnect(m_uasInterface,SIGNAL(textMessageReceived(int,int,int,QString)),
-                this,SLOT(uasTextMessage(int,int,int,QString)));
+                   this,SLOT(uasTextMessage(int,int,int,QString)));
     }
     m_uasInterface = uas;
+    int thisID =-1;
+    if (m_uasInterface) {
+        thisID = m_uasInterface->getUASID();
+//        QDialog *a = new QDialog(this);
+//        QLabel *b = new QLabel(a);
+//        b->setText("CHanged to UAS" + QString::number(thisID));
+//        a->exec();
+
+    }
 
     if (m_uasInterface) {
         connect(uas,SIGNAL(textMessageReceived(int,int,int,QString)),
                 this,SLOT(uasTextMessage(int,int,int,QString)));
+
         VehicleOverview* vehicleView = LinkManager::instance()->getUasObject(uas->getUASID())->getVehicleOverview();
         RelPositionOverview* relView = LinkManager::instance()->getUasObject(uas->getUASID())->getRelPositionOverview();
         AbsPositionOverview* absView = LinkManager::instance()->getUasObject(uas->getUASID())->getAbsPositionOverview();
+
+        UASObject* aa = LinkManager::instance()->getUasObject(uas->getUASID());
+
         if (vehicleView)
         {
             m_declarativeView->rootContext()->setContextProperty("vehicleoverview", vehicleView);
@@ -119,23 +133,22 @@ void PrimaryFlightDisplayQML::setActiveUAS(UASInterface *uas)
 
 void PrimaryFlightDisplayQML::uasTextMessage(int uasid, int componentid, int severity, QString text)
 {
-    Q_UNUSED(uasid);
+    //Q_UNUSED(uasid);
     Q_UNUSED(componentid);
-    if (text.contains("PreArm") || severity <= MAV_SEVERITY_CRITICAL)
-    {
-        QObject *root = m_declarativeView->rootObject();
-        root->setProperty("statusMessage", text);
-        root->setProperty("showStatusMessage", true);
-        root->setProperty("statusMessageColor", "red");
-    } else if (severity <= MAV_SEVERITY_INFO ){
-        QObject *root = m_declarativeView->rootObject();
-        root->setProperty("statusMessage", text);
-        root->setProperty("showStatusMessage", true);
-        root->setProperty("statusMessageColor", "darkgreen");
+    // int aa = uasid;
+    int thisID = m_uasInterface->getUASID();
+    if (thisID == uasid){
+        if (text.contains("PreArm") || severity <= MAV_SEVERITY_CRITICAL)
+        {
+            QObject *root = m_declarativeView->rootObject();
+            root->setProperty("statusMessage", text);
+            root->setProperty("showStatusMessage", true);
+            root->setProperty("statusMessageColor", "red");
+        } else if (severity <= MAV_SEVERITY_INFO ){
+            QObject *root = m_declarativeView->rootObject();
+            root->setProperty("statusMessage", text);
+            root->setProperty("showStatusMessage", true);
+            root->setProperty("statusMessageColor", "darkgreen");
+        }
     }
-
-}
-
-QQuickView* PrimaryFlightDisplayQML::getView(){
-    return m_declarativeView;
 }

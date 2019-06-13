@@ -36,7 +36,15 @@ public slots:
     void multiArm();
     void multiDisarm();
     void multiSetAutoMode();
-    void armingChanged(bool armed);
+    void multiSetRTLMode();
+    void multiSetposHoldMode();
+    void multiSetAcroMode();
+    void multiSetAltHoldMode();
+    void multiSetLandMode();
+    void multiSetLearnMode();
+    void multiSetSteerMode();
+    void multiSetHoldMode();
+    //void armingChanged(bool armed);
 
 private:
     Ui::UASMultiControl *m_ui;

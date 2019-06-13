@@ -1,4 +1,4 @@
-#include "UASObject.h"
+#include "uasobject2.h"
 
 #include "VehicleOverview.h"
 #include "RelPositionOverview.h"
@@ -7,19 +7,21 @@
 
 #include <QMetaType>
 
-UASObject::UASObject(QObject *parent) : QObject(parent),
-  m_vehicleOverview(NULL),
-  m_relPositionOverview(NULL),
-  m_absPositionOverview(NULL),
-  m_missionOverview(NULL)
+UASObject2::UASObject2(QObject *parent, int uasid) : QObject(parent),
+    m_vehicleOverview(NULL),
+    m_relPositionOverview(NULL),
+    m_absPositionOverview(NULL),
+    m_missionOverview(NULL)
+
 {
     m_vehicleOverview = new VehicleOverview(this);
     m_relPositionOverview = new RelPositionOverview(this);
     m_absPositionOverview = new AbsPositionOverview(this);
     m_missionOverview = new MissionOverview(this);
+    thisid = uasid;
 }
 
-UASObject::~UASObject()
+UASObject2::~UASObject2()
 {
     delete m_vehicleOverview;
     m_vehicleOverview = NULL;
@@ -31,29 +33,32 @@ UASObject::~UASObject()
     m_missionOverview = NULL;
 }
 
-VehicleOverview* UASObject::getVehicleOverview()
+VehicleOverview* UASObject2::getVehicleOverview()
 {
     return m_vehicleOverview;
 }
 
-RelPositionOverview* UASObject::getRelPositionOverview()
+RelPositionOverview* UASObject2::getRelPositionOverview()
 {
     return m_relPositionOverview;
 }
 
-AbsPositionOverview* UASObject::getAbsPositionOverview()
+AbsPositionOverview* UASObject2::getAbsPositionOverview()
 {
     return m_absPositionOverview;
 }
 
-MissionOverview* UASObject::getMissionOverview()
+MissionOverview* UASObject2::getMissionOverview()
 {
     return m_missionOverview;
 }
 
-void UASObject::messageReceived(LinkInterface* link,mavlink_message_t message)
+void UASObject2::messageReceived(LinkInterface* link,mavlink_message_t message)
 {
-    mavlink_message_t message1 = message;
+    //mavlink_message_t message1 =  message;
+    if (message.sysid != thisid){
+        return;
+    }
     m_vehicleOverview->messageReceived(link, message);
     m_relPositionOverview->messageReceived(link, message);
     m_absPositionOverview->messageReceived(link, message);

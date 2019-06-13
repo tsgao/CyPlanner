@@ -7,6 +7,7 @@
 #include "QFileDialog"
 #include "MultiviewPopup.h"
 #include "qlogging.h"
+#include "Waypoint.h"
 
 QGCMapToolBar::QGCMapToolBar(QWidget *parent) :
     QWidget(parent),

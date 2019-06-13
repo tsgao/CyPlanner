@@ -24,6 +24,8 @@
 #include "LinkManager.h"
 #include "uasmulticontrol.h"
 #include "PrimaryFlightDisplayQML.h"
+#include "PrimaryFlightDisplay.h"
+#include "dockwidgettitlebareventfilter.h"
 #include "QDockWidget"
 #include <QQuickWidget>
 
@@ -47,6 +49,9 @@ UASMultiView::UASMultiView(QWidget *parent) :
     listLayout->setSpacing(3);
     listLayout->setAlignment(Qt::AlignTop);
 
+    //q = new PrimaryFlightDisplayQML(this);
+
+    //listLayout->addWidget(q);
     scrollAreaWidgetContents->setLayout(listLayout);
     scrollArea->setWidget(scrollAreaWidgetContents);
 
@@ -113,10 +118,6 @@ void UASMultiView::addUAS(UASInterface* uas)
     {
         uasViews2.insert(uas, new UASView3(uas, this));
         listLayout->addWidget(uasViews2.value(uas));
-        Flight *f1 = new Flight(this);
-        f1->setFixedSize(200,200);
-        listLayout->addWidget(f1);
-        f1->lower();
 
 //        PrimaryFlightDisplayQML* q = new PrimaryFlightDisplayQML(this,false);
 //        QDockWidget *widget = new QDockWidget(this);
@@ -126,15 +127,22 @@ void UASMultiView::addUAS(UASInterface* uas)
 //        listLayout->addWidget(widget);
 
 
-//        QQuickWidget *view = new QQuickWidget;
-//        view->setSource(QUrl::fromLocalFile(QGC::shareDirectory() + "/qml/PrimaryFlightDisplayQML.qml"));
-//        QDockWidget *d = new QDockWidget;
-//        d->setWidget(view);
-
-//        listLayout->addWidget(d);
-
+//
         //connect(uas, SIGNAL(destroyed(QObject*)), this, SLOT(removeUAS(QObject*)));
         //setLayout(listLayout);
+
+//        listLayout->addWidget(createDockWidget(this,new PrimaryFlightDisplay(320,240,this),tr("Primary Flight Display"),
+//                         "PRIMARY_FLIGHT_DISPLAY_QML_DOCKWIDGET",Qt::LeftDockWidgetArea));
+
+//        QDockWidget *a = new QDockWidget("smthg",new PrimaryFlightDisplay(320,240,this));
+        //a->setWidget(new PrimaryFlightDisplayQML(this));
+        PrimaryFlightDisplay *a = new PrimaryFlightDisplay(320,240,this);
+        //a->setTitleBarWidget(new QWidget());
+        a->setMinimumSize(200,200);
+        a->setActiveUAS(uas);
+        listLayout->addWidget(a);
+//        setLayout(listLayout);
+
     }
 }
 
@@ -172,4 +180,25 @@ void UASMultiView::resizeEvent(QResizeEvent *e)
         scrollAreaWidgetContents->setMaximumWidth(this->width());
     }
     update();
+}
+
+QDockWidget* UASMultiView::createDockWidget(QWidget *parent,QWidget *child,QString title,QString objectname,Qt::DockWidgetArea area,int minwidth,int minheight)
+{
+    //if (child->objectName() == "")
+    //{
+    child->setObjectName(objectname);
+    //}
+    QDockWidget *widget = new QDockWidget(title,this);
+//    QLabel *label = new QLabel(this);
+//    label->setText(title);
+//    widget->setTitleBarWidget(label);
+//    label->installEventFilter(new DockWidgetTitleBarEventFilter());
+    if (minheight != 0 || minwidth != 0)
+    {
+        widget->setMinimumHeight(minheight);
+        widget->setMinimumWidth(minwidth);
+    }
+    //addTool(qobject_cast<SubMainWindow*>(parent),view,widget,title,area);
+
+    return widget;
 }

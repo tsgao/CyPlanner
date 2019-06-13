@@ -60,6 +60,10 @@ public:
     static const double lipoFull;  ///< 100% charged voltage
     static const double lipoEmpty; ///< Discharged voltage
 
+    // added by Xiangwei Niu
+    bool armMode;
+    int ModeType;
+
     /* MANAGEMENT */
 
     /** @brief The name of the robot */
@@ -78,6 +82,8 @@ public:
 
     /** @brief Get the unique system id */
     int getUASID() const;
+
+    void setArmMode(bool mode);
     /** @brief Get the airframe */
     int getAirframe() const
     {

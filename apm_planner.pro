@@ -376,7 +376,6 @@ FORMS += \
     src/ui/MAVLinkSettingsWidget.ui \
     src/ui/AudioOutputWidget.ui \
     src/ui/QGCSensorSettingsWidget.ui \
-    src/ui/flight.ui \
     src/ui/map/CoordinateInput.ui \
     src/ui/map/WaypointInput.ui \
     src/ui/uasdetails.ui \
@@ -502,7 +501,8 @@ FORMS += \
     src/ui/LogAnalysisMap.ui \
     src/ui/configuration/FrameTypeConfigOld.ui \
     src/ui/configuration/FrameTypeConfigNew.ui\
-    src/ui/uasmulticontrol.ui
+    src/ui/uasmulticontrol.ui\
+    src/ui/multiprimaryflightdisplay.ui
 
 HEADERS += \
     src/MG.h \
@@ -522,7 +522,6 @@ HEADERS += \
     src/ui/MultiviewPopup.h \
     src/ui/SerialConfigurationWindow.h \
     src/ui/MainWindow.h \
-    src/ui/flight.h \
     src/ui/map/CoordinateInput.h \
     src/ui/map/WaypoIntinput.h \
     src/ui/uas/UASControlWidget.h \
@@ -748,7 +747,9 @@ HEADERS += \
     src/ui/Loghandling/LogAnalysis.h \
     src/ui/Loghandling/LogAnalysisMap.h \
     src/ui/Loghandling/PresetManager.h\
-    src/ui/uasmulticontrol.h
+    src/ui/uasmulticontrol.h\
+    src/ui/multiprimaryflightdisplay.h\
+    src/comm/uasobject2.h
 
 SOURCES += src/main.cc \
     src/QGCCore.cc \
@@ -764,7 +765,6 @@ SOURCES += src/main.cc \
     src/ui/MultiviewPopup.cpp \
     src/ui/SerialConfigurationWindow.cc \
     src/ui/MainWindow.cc \
-    src/ui/flight.cpp \
     src/ui/map/CoordinateInput.cpp \
     src/ui/map/WaypoIntinput.cpp \
     src/ui/uas/UASControlWidget.cc \
@@ -984,7 +984,9 @@ SOURCES += src/main.cc \
     src/ui/Loghandling/LogAnalysis.cpp \
     src/ui/Loghandling/LogAnalysisMap.cpp\
     src/ui/Loghandling/PresetManager.cpp\
-    src/ui/uasmulticontrol.cpp
+    src/ui/uasmulticontrol.cpp\
+    src/ui/multiprimaryflightdisplay.cpp\
+    src/comm/uasobject2.cpp
 
 MacBuild | WindowsBuild : contains(GOOGLEEARTH, enable) { #fix this to make sense ;)
     message(Including support for Google Earth)

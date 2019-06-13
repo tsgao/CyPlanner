@@ -593,7 +593,7 @@ QMenu::separator {
         <item row="0" column="1">
          <widget class="QPushButton" name="stabilizeModeButton">
           <property name="text">
-           <string>Stablize</string>
+           <string>Stabilize</string>
           </property>
          </widget>
         </item>

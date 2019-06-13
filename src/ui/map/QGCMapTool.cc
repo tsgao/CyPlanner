@@ -100,8 +100,8 @@ void QGCMapTool::activeUASSet(UASInterface *uasInterface)
 
 void QGCMapTool::globalPositionUpdate()
 {
-    ui->latitudeLabel->setText(tr("LAT: %1").arg(m_uasInterface->getLatitude()));
-    ui->longitudeLabel->setText(tr("LON: %1").arg(m_uasInterface->getLongitude()));
+    ui->latitudeLabel->setText(tr("LAT: %1").arg(QString::number(m_uasInterface->getLatitude(),'f',10)));//m_uasInterface->getLatitude()));
+    ui->longitudeLabel->setText(tr("LON: %1").arg(QString::number(m_uasInterface->getLongitude(),'f',10)));
 }
 
 void QGCMapTool::gpsHdopChanged(double value, const QString &)

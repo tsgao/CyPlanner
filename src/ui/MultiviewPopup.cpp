@@ -24,6 +24,7 @@
 #include "MAVLinkSimulationLink.h"
 #include "LinkManager.h"
 #include "QGCMapTool.h"
+#include "PrimaryFlightDisplay.h"
 
 /***
  * @author Guang Yi Lim
@@ -111,6 +112,9 @@ void MultiviewPopup::addUAS(UASInterface* uas)
     {
         uasViews2.insert(uas, new UASView3(uas, this));
         listLayout->addWidget(uasViews2.value(uas));
+        PrimaryFlightDisplay *a = new PrimaryFlightDisplay(320,240,this);
+        a->setActiveUAS(uas);
+        listLayout->addWidget(a);
         //connect(uas, SIGNAL(destroyed(QObject*)), this, SLOT(removeUAS(QObject*)));
     }
 }
