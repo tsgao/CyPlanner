@@ -81,8 +81,12 @@ private:
     bool m_tableDirty;
     bool iconIsGreen;
     PrimaryFlightDisplayQML *q;
+    int sendCameraSocket();
+    int receiveImage(int socket);
 
 private slots:
+
+    void on_cameraButton_clicked();
 
 signals:
     void uasInFocus(UASInterface* uas);

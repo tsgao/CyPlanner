@@ -7,7 +7,7 @@
 #include <QFileDialog>
 #include <QAction>
 #include <QMenu>
-#include "flight.h"
+
 
 const static int MapToolZoomFactor = 10; // This may need to be different for win/linux/mac
 

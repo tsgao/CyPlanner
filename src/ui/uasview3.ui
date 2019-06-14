@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>360</width>
-    <height>209</height>
+    <height>185</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -34,240 +34,400 @@
   <property name="styleSheet">
    <string notr="true"/>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <property name="spacing">
-    <number>2</number>
+  <widget class="QGroupBox" name="uasViewFrame">
+   <property name="geometry">
+    <rect>
+     <x>2</x>
+     <y>-21</y>
+     <width>356</width>
+     <height>211</height>
+    </rect>
    </property>
-   <property name="leftMargin">
-    <number>2</number>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
    </property>
-   <property name="topMargin">
-    <number>2</number>
+   <property name="minimumSize">
+    <size>
+     <width>0</width>
+     <height>0</height>
+    </size>
    </property>
-   <property name="rightMargin">
-    <number>2</number>
+   <property name="maximumSize">
+    <size>
+     <width>356</width>
+     <height>300</height>
+    </size>
    </property>
-   <property name="bottomMargin">
-    <number>0</number>
+   <property name="title">
+    <string/>
    </property>
-   <item>
-    <widget class="QGroupBox" name="uasViewFrame">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>356</width>
-       <height>300</height>
-      </size>
-     </property>
-     <property name="title">
-      <string/>
-     </property>
-     <layout class="QGridLayout" name="gridLayout">
-      <item row="4" column="5">
-       <widget class="QLabel" name="GPSHDOPNum">
-        <property name="text">
-         <string>1.0</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="C5">
-        <property name="text">
-         <string>1.0</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QLabel" name="C6">
-        <property name="text">
-         <string>1.0</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="4">
-       <widget class="QLabel" name="GPSFixName">
-        <property name="text">
-         <string>GPS Fix:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="5">
-       <widget class="QLabel" name="GPSFixNum">
-        <property name="text">
-         <string>1.0</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="4">
-       <widget class="QLabel" name="HeartbeatName">
-        <property name="text">
-         <string>Heart Beat:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="C1">
-        <property name="text">
-         <string>1.0</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="QLabel" name="armedLabel">
-        <property name="text">
-         <string>Dis/Armed</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="2">
-       <widget class="QComboBox" name="modeComboBox"/>
-      </item>
-      <item row="5" column="4">
-       <widget class="QLabel" name="RTKGPSName">
-        <property name="text">
-         <string>RTK GPS:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="2">
-       <widget class="QLabel" name="C3">
-        <property name="text">
-         <string>1.0</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="3">
-       <widget class="QLabel" name="C4">
-        <property name="text">
-         <string>1.0</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="modeLabel">
-        <property name="text">
-         <string>mode</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="5">
-       <widget class="QLabel" name="GPSSatsNum">
-        <property name="text">
-         <string>1.0</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="4">
-       <widget class="QLabel" name="GPSSatsName">
-        <property name="text">
-         <string>GPS Sats:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="5">
-       <widget class="QLabel" name="HeartbeatNum">
-        <property name="text">
-         <string>1.0</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="5">
-       <widget class="QLabel" name="RTKGPSNum">
-        <property name="text">
-         <string>1.0</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="3">
-       <widget class="QLabel" name="C8">
-        <property name="text">
-         <string>1.0</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="4">
-       <widget class="QLabel" name="AHRELName">
-        <property name="text">
-         <string>ALT REL(m):</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="nameLabel">
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>16</height>
-         </size>
-        </property>
-        <property name="font">
-         <font>
-          <weight>75</weight>
-          <italic>false</italic>
-          <bold>true</bold>
-         </font>
-        </property>
-        <property name="toolTip">
-         <string>System Name</string>
-        </property>
-        <property name="statusTip">
-         <string>System Name</string>
-        </property>
-        <property name="text">
-         <string>UAS001</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="2">
-       <widget class="QLabel" name="C7">
-        <property name="text">
-         <string>1.0</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QLabel" name="C2">
-        <property name="text">
-         <string>1.0</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="5" rowspan="2">
-       <widget class="QLabel" name="AHRELNum">
-        <property name="text">
-         <string>1.0</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="4">
-       <widget class="QLabel" name="statusLabel">
-        <property name="text">
-         <string>dis/connected</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="4">
-       <widget class="QLabel" name="GPSHDOPName">
-        <property name="text">
-         <string>GPS HDOP:</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-  </layout>
+   <widget class="QLabel" name="GPSHDOPNum">
+    <property name="geometry">
+     <rect>
+      <x>323</x>
+      <y>128</y>
+      <width>21</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>1.0</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="C5">
+    <property name="geometry">
+     <rect>
+      <x>12</x>
+      <y>78</y>
+      <width>21</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>1.0</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="C6">
+    <property name="geometry">
+     <rect>
+      <x>74</x>
+      <y>78</y>
+      <width>21</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>1.0</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="GPSFixName">
+    <property name="geometry">
+     <rect>
+      <x>249</x>
+      <y>78</y>
+      <width>54</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>GPS Fix:</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="GPSFixNum">
+    <property name="geometry">
+     <rect>
+      <x>323</x>
+      <y>78</y>
+      <width>21</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>1.0</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="HeartbeatName">
+    <property name="geometry">
+     <rect>
+      <x>249</x>
+      <y>55</y>
+      <width>68</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Heart Beat:</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="C1">
+    <property name="geometry">
+     <rect>
+      <x>12</x>
+      <y>55</y>
+      <width>21</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>1.0</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="armedLabel">
+    <property name="geometry">
+     <rect>
+      <x>74</x>
+      <y>101</y>
+      <width>68</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Dis/Armed</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="modeComboBox">
+    <property name="geometry">
+     <rect>
+      <x>148</x>
+      <y>101</y>
+      <width>68</width>
+      <height>21</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="RTKGPSName">
+    <property name="geometry">
+     <rect>
+      <x>249</x>
+      <y>151</y>
+      <width>62</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>RTK GPS:</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="C3">
+    <property name="geometry">
+     <rect>
+      <x>148</x>
+      <y>55</y>
+      <width>21</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>1.0</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="C4">
+    <property name="geometry">
+     <rect>
+      <x>222</x>
+      <y>55</y>
+      <width>21</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>1.0</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="modeLabel">
+    <property name="geometry">
+     <rect>
+      <x>12</x>
+      <y>101</y>
+      <width>39</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>mode</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="GPSSatsNum">
+    <property name="geometry">
+     <rect>
+      <x>323</x>
+      <y>101</y>
+      <width>21</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>1.0</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="GPSSatsName">
+    <property name="geometry">
+     <rect>
+      <x>249</x>
+      <y>101</y>
+      <width>63</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>GPS Sats:</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="HeartbeatNum">
+    <property name="geometry">
+     <rect>
+      <x>323</x>
+      <y>55</y>
+      <width>21</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>1.0</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="RTKGPSNum">
+    <property name="geometry">
+     <rect>
+      <x>323</x>
+      <y>151</y>
+      <width>21</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>1.0</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="C8">
+    <property name="geometry">
+     <rect>
+      <x>222</x>
+      <y>78</y>
+      <width>21</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>1.0</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="AHRELName">
+    <property name="geometry">
+     <rect>
+      <x>249</x>
+      <y>178</y>
+      <width>68</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>ALT REL(m):</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="nameLabel">
+    <property name="geometry">
+     <rect>
+      <x>12</x>
+      <y>32</y>
+      <width>56</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>16777215</width>
+      <height>16</height>
+     </size>
+    </property>
+    <property name="font">
+     <font>
+      <weight>75</weight>
+      <italic>false</italic>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>System Name</string>
+    </property>
+    <property name="statusTip">
+     <string>System Name</string>
+    </property>
+    <property name="text">
+     <string>UAS001</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="C7">
+    <property name="geometry">
+     <rect>
+      <x>148</x>
+      <y>78</y>
+      <width>21</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>1.0</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="C2">
+    <property name="geometry">
+     <rect>
+      <x>74</x>
+      <y>55</y>
+      <width>21</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>1.0</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="AHRELNum">
+    <property name="geometry">
+     <rect>
+      <x>323</x>
+      <y>178</y>
+      <width>21</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>1.0</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="statusLabel">
+    <property name="geometry">
+     <rect>
+      <x>249</x>
+      <y>32</y>
+      <width>68</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>dis/connected</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="GPSHDOPName">
+    <property name="geometry">
+     <rect>
+      <x>249</x>
+      <y>128</y>
+      <width>68</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>GPS HDOP:</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="cameraButton">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>13</x>
+      <y>127</y>
+      <width>200</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>200</width>
+      <height>30</height>
+     </size>
+    </property>
+    <property name="text">
+     <string>KACHAK</string>
+    </property>
+   </widget>
+  </widget>
  </widget>
  <resources/>
  <connections/>

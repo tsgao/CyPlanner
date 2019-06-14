@@ -215,7 +215,6 @@ void QGCMAVLinkInspector::refreshView()
 
         mavlink_message_t* msg = ite.value();
         // Ignore NULL values
-        int a = msg->msgid;
 
         if (msg->msgid == 0xFF) continue;
 

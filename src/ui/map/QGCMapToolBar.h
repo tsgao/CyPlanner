@@ -51,6 +51,7 @@ protected:
     QActionGroup* updateTimesGroup;
     QActionGroup* mapTypesGroup;
     MultiviewPopup *p;
+    void setPopupStatus();
 private slots:
     void on_pushButton_clicked();
     void on_multiButton_clicked();

@@ -24,6 +24,7 @@ public slots:
     void addUAS(UASInterface * uas);
     void activeUAS(UASInterface *uas);
     void removeUAS(UASInterface * uas);
+    void minimize1();
 
 public:
     explicit MultiviewPopup(QWidget *parent = nullptr);

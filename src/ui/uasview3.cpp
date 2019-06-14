@@ -22,6 +22,13 @@
 #include <QDockWidget>
 #include <QInputDialog>
 
+#include <stdio.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <string.h>
+#define PORT 8080
+
 const float UASView3::updateHzLowpass = 0.2f;
 const unsigned int UASView3::updateInterval = 1000U;
 
@@ -978,3 +985,127 @@ void UASView3::setShortcutMode(UAS *m_uas,QString modeString)
                    m_ui->modeComboBox->itemData(m_ui->modeComboBox->currentIndex()).toInt());
 }
 
+
+void UASView3::on_cameraButton_clicked()
+{
+    sendCameraSocket();
+}
+
+int UASView3::sendCameraSocket(){
+    int sock = 0, valread;
+    struct sockaddr_in serv_addr;
+    //char *hello = "potatoes";
+    char buffer[1024] = {0};
+    if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+    {
+        printf("\n Socket creation error \n");
+        return -1;
+    }
+
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_port = htons(PORT);
+
+    // Convert IPv4 and IPv6 addresses from text to binary form
+    if(inet_pton(AF_INET, "192.168.2.9", &serv_addr.sin_addr)<=0)
+    {
+    printf("\nInvalid address/ Address not supported \n");
+    return -1;
+    }
+
+    if (::connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
+    {
+    printf("\nConnection Failed \n");
+    return -1;
+    }
+    receiveImage(sock);
+
+    ::close(sock);
+    return 1;
+
+}
+
+int UASView3::receiveImage(int socket){
+    // Start function
+
+    int size =0,buffersize = 0, recv_size = 0,packet_index =1,stat,read_size=0,write_size=0; /*read_size, write_size*/
+    char tempSize[1024] = {0};
+    char imagearray[1024] ={0},verify = '1';
+    FILE *image;
+
+    //Find the size of the image
+    do{
+    stat = read(socket, &tempSize, 1024);
+    }while(stat<0);
+
+    printf("Packet received.\n");
+    printf("Packet size: %i\n",stat);
+    printf("Image size: %s\n",tempSize);
+    //converts tempSize to int
+    size = atoi(tempSize);
+
+    char buffer[] = "Got it";
+
+    //Send our verification signal
+    do{
+        stat = write(socket, &buffer, sizeof(int));
+    }while(stat<0);
+
+    printf("Reply sent\n");
+    printf(" \n");
+
+    image = fopen("capture2.jpg ", "w");
+
+    if( image == NULL) {
+    printf("Error has occurred. Image file could not be opened\n");
+    return -1; }
+
+    //Loop while we have not received the entire file yet
+
+
+    int need_exit = 0;
+    struct timeval timeout = {10,0};
+
+    fd_set fds;
+    int buffer_fd, buffer_out;
+
+    while(recv_size < size) {
+    //while(packet_index < 2){
+        FD_ZERO(&fds);
+        FD_SET(socket,&fds);
+
+        buffer_fd = select(FD_SETSIZE,&fds,NULL,NULL,&timeout);
+
+        if (buffer_fd < 0)
+           printf("error: bad file descriptor set.\n");
+
+        if (buffer_fd == 0)
+           printf("error: buffer read timeout expired.\n");
+
+        if (buffer_fd > 0)
+        {
+            do{
+                   read_size = read(socket,imagearray, 1024);
+                   printf("Loadingg...\n");
+
+                }while(read_size <0);
+
+            printf("Packet number received: %i\n",packet_index);
+            printf("Packet size: %i\n",read_size);
+
+
+            //Write the currently read data into our image file
+            write_size = fwrite(imagearray,1,read_size, image);
+            printf("Written image size: %i\n",write_size);
+
+            if(read_size !=write_size) {
+                printf("error in read write\n");    }
+                //Increment the total number of bytes read
+                recv_size +=read_size;
+                packet_index++;
+                printf("Total received image size: %i\n",recv_size);
+                printf(" \n");
+                printf(" \n");
+            }
+            //sleep(1);
+    }
+}

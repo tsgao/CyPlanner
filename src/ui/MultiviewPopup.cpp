@@ -25,6 +25,7 @@
 #include "LinkManager.h"
 #include "QGCMapTool.h"
 #include "PrimaryFlightDisplay.h"
+#include <QShortcut>
 
 /***
  * @author Guang Yi Lim
@@ -76,10 +77,12 @@ MultiviewPopup::MultiviewPopup(QWidget *parent) :
         addUAS(uas);
     }
 
+    new QShortcut(QKeySequence(Qt::Key_Space),this,SLOT(minimize1 ()));
 }
 
 MultiviewPopup::~MultiviewPopup()
 {
+
     delete ui;
 }
 
@@ -155,14 +158,13 @@ void MultiviewPopup::resizeEvent(QResizeEvent *e)
     update();
 }
 
-void MultiviewPopup::keypressEvent(QKeyEvent *e){
-    if(e->key()!= Qt::Key_Escape){
-        QDialog::keyPressEvent(e);
-        this->lower();
+
+void MultiviewPopup::minimize1(){
+    if(!this->windowState().testFlag(Qt::WindowMinimized)){
+        this->hide();
     }
     else{
-
+        this->showMaximized();
     }
-
 }
 

@@ -22,7 +22,7 @@ QGCMapToolBar::QGCMapToolBar(QWidget *parent) :
     mapTypesGroup(new QActionGroup(this))
 {
     ui->setupUi(this);
-    p = NULL;
+    p = nullptr;
     //p->setFocus();
 
 }
@@ -410,14 +410,15 @@ void QGCMapToolBar::loadUASWaypointsDialogAccepted(){
 
 void QGCMapToolBar::on_multiButton_clicked()
 {
-    //    p->show();
-   //  p->setWindowModality(Qt::WindowModal);
-    //if(p =nullptr)
+    if(p == nullptr){
+        p = new MultiviewPopup(this);
+        p->show();
+    }
+    //p->show();
+}
 
-//    p->setModal(false);
-//    p->exec();
-    p = new MultiviewPopup(this);
-    //p->setModal(true);
-    //p->setFocusPolicy(Qt::FocusPolicy::ClickFocus);
-    p->showMaximized();
+void QGCMapToolBar::setPopupStatus(){
+    if(p != nullptr){
+        p = nullptr;
+    }
 }
