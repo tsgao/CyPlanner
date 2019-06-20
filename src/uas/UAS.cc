@@ -1986,7 +1986,7 @@ void UAS::forwardMessage(mavlink_message_t message)
                     {
                         if (link->isConnected()) {
                             QLOG_TRACE()<<"Antenna tracking: Forwarding Over link: "<<serial->getName()<<" "<<serial;
-                            sendMessage(serial, message);
+                            (serial, message);
                         }
                     }
                 }
@@ -3981,3 +3981,4 @@ void UAS::receiveLossChangedRec(int id,float value)
 {
     emit receiveLossChanged(id,value);
 }
+

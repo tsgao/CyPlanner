@@ -1356,7 +1356,7 @@ void MainWindow::storeSettings()
         settings.setValue(getWindowGeometryKey(), saveGeometry());
         // Save the last current view in any case
         settings.setValue("CURRENT_VIEW", currentView);
-        int ccc = currentView;
+        //int ccc = currentView;
         QString aa = getWindowStateKey();
         // Save the current window state, but only if a system is connected (else no real number of widgets would be present))
         if (UASManager::instance()->getUASList().length() > 0) settings.setValue(getWindowStateKey(), saveState(QGC::applicationVersion()));

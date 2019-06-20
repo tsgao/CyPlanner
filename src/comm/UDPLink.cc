@@ -48,7 +48,7 @@ UDPLink::UDPLink(QHostAddress host, quint16 port) :
     _shouldRestartConnection(false),
     _running(false)
 {
-    this->host = host;
+    this->host = host;///@brief Guang Yi Lim might look into this for host
     this->port = port;
     // Set unique ID and add link to the list of links
     this->id = getNextLinkId();
@@ -303,11 +303,35 @@ void UDPLink::readBytes()
 #endif
 
         // Add host to broadcast list if not yet present
+        //GUANG YI LIM THIS IS WHERE THEY ADD THE PORT TO THE PORT LIST
         if (!hosts.contains(sender))
         {
             hosts.append(sender);
             ports.append(senderPort);
-            //        ports->insert(sender, senderPort);
+
+            mavlink_message_t message;
+            memset(&message, 0, sizeof(mavlink_message_t));
+            mavlink_status_t status;
+            bool decodedFirstPacket = false;
+
+            for(const auto &data : datagram)
+            {
+                unsigned int decodeState = mavlink_parse_char(MAVLINK_COMM_0, static_cast<quint8>(data), &message, &status);
+                if (decodeState == 1)
+                {
+                    mavlink_status_t* mavlinkStatus = mavlink_get_channel_status(MAVLINK_COMM_0);
+                    if (!decodedFirstPacket)
+                    {
+                        decodedFirstPacket = true;
+                    }
+
+                }
+            }
+            UASIp t;
+            t.IpAddress = sender;
+            t.uasId = message.sysid;
+            this->ipMap.append(t);
+            //printf("HI MAYBE IT WORKS HAHAHAHA");
         }
         else
         {
@@ -318,6 +342,8 @@ void UDPLink::readBytes()
             break;
     }
 }
+
+
 
 
 /**
@@ -402,6 +428,7 @@ QString UDPLink::getShortName() const
 QString UDPLink::getDetail() const
 {
     return QString::number(port);
+    //return UASIp;
 }
 
 void UDPLink::setName(QString name)

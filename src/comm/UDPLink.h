@@ -42,6 +42,12 @@ This file is part of the QGROUNDCONTROL project
 #include <QByteArray>
 #include <QNetworkProxy>
 
+
+typedef struct uasip{
+    QHostAddress IpAddress;
+    uint8_t uasId;
+} UASIp;
+
 class UDPLink : public LinkInterface
 {
     Q_OBJECT
@@ -91,6 +97,8 @@ public:
     int getId() const;
 
     LinkType getLinkType() { return UDP_LINK; }
+
+    QList<UASIp> ipMap;///TODO make private
 
 public slots:
     void setAddress(QHostAddress host);

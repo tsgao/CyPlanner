@@ -10,6 +10,7 @@ INCLUDEPATH += $$PWD/src/core $$PWD/src/internals $$PWD/src/internals/projection
 
 # Input
 HEADERS += libs/opmapcontrol/opmapcontrol.h \
+           $$PWD/src/mapwidget/imageitem.h \
            libs/opmapcontrol/src/core/accessmode.h \
            libs/opmapcontrol/src/core/alllayersoftype.h \
            libs/opmapcontrol/src/core/cache.h \
@@ -66,6 +67,7 @@ HEADERS += libs/opmapcontrol/opmapcontrol.h \
            libs/opmapcontrol/src/mapwidget/graphicsusertypes.h
 FORMS += libs/opmapcontrol/src/mapwidget/mapripform.ui
 SOURCES += libs/opmapcontrol/src/core/alllayersoftype.cpp \
+           $$PWD/src/mapwidget/imageitem.cpp \
            libs/opmapcontrol/src/core/cache.cpp \
            libs/opmapcontrol/src/core/cacheitemqueue.cpp \
            libs/opmapcontrol/src/core/diagnostics.cpp \

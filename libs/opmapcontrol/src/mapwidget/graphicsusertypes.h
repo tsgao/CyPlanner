@@ -40,6 +40,7 @@ namespace mapcontrol
         constexpr int GPSITEM          = QGraphicsItem::UserType + 5;
         constexpr int WAYPOINTLINEITEM = QGraphicsItem::UserType + 6;
         constexpr int TRAILLINEITEM    = QGraphicsItem::UserType + 7;
+        constexpr int IMAGEITEM        = QGraphicsItem::UserType + 8;
     } // namespace usertypes
 } // namespace mapcontrol
 

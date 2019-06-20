@@ -99,6 +99,7 @@ UASView3::UASView3(UASInterface* uas, QWidget *parent) :
 //    m_ui->dockWidget = new QDockWidget("smthg",new PrimaryFlightDisplayQML(this));
 
     //a->setMinimumSize(200,200);
+    m_ui->cameraButton->setText(uas->getIpAddress());
 }
 
 UASView3::~UASView3()
@@ -988,7 +989,29 @@ void UASView3::setShortcutMode(UAS *m_uas,QString modeString)
 
 void UASView3::on_cameraButton_clicked()
 {
-    sendCameraSocket();
+
+    sendCameraCommand();
+    //sendCameraSocket();
+}
+
+void UASView3::sendCameraCommand(){
+    MAV_CMD command = MAV_CMD_DO_DIGICAM_CONTROL;
+    int confirm = 1;
+    float param1 = 0.0;/// | Session control e.g. show/hide lens
+    float param2 = 0.0;/// | Zoom's absolute position
+    float param3 = 0.0;/// | Zooming step value to offset zoom from current position
+    float param4 = 0.0;/// | Focus Locking, Unlocking or Re-locking
+    float param5 = 1.0;/// | Shooting Command
+    float param6 = 0.0;/// | Command Identity
+    float param7 = 0.0;/// | Empty
+    int component = MAV_COMP_ID_PRIMARY;
+    uas->executeCommand(command, confirm,
+                        param1,param2,param3,param4,
+                        param5,param6,param7,component);
+    QDialog *q = new QDialog(this);
+    QLabel *a = new QLabel(q);
+    a->setText("CMD SUCCESFULLY SENT");
+    q->exec();
 }
 
 int UASView3::sendCameraSocket(){
@@ -1004,9 +1027,9 @@ int UASView3::sendCameraSocket(){
 
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(PORT);
-
+    //QString ip = uas->getIpAddress();
     // Convert IPv4 and IPv6 addresses from text to binary form
-    if(inet_pton(AF_INET, "192.168.2.9", &serv_addr.sin_addr)<=0)
+    if(inet_pton(AF_INET, "192.168.0.254", &serv_addr.sin_addr)<=0)
     {
     printf("\nInvalid address/ Address not supported \n");
     return -1;

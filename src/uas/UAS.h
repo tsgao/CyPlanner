@@ -63,6 +63,7 @@ public:
     // added by Xiangwei Niu
     bool armMode;
     int ModeType;
+    QString ipAddress;
 
     /* MANAGEMENT */
 
@@ -438,6 +439,7 @@ protected: //COMMENTS FOR TEST UNIT
     quint64 lastHeartbeat;        ///< Time of the last heartbeat message
     QTimer* statusTimeout;        ///< Timer for various status timeouts
 
+
     /// BASIC UAS TYPE, NAME AND STATE
     QString name;                 ///< Human-friendly name of the vehicle, e.g. bravo
     unsigned char type;           ///< UAS type (from type enum)
@@ -560,6 +562,10 @@ protected: //COMMENTS FOR TEST UNIT
     QGCHilLink* simulation;         ///< Hardware in the loop simulation link
 
 public:
+    ///added by:Guang Yi Lim
+    void setIpAddress(QString q){ipAddress = q;}
+    QString getIpAddress(){return ipAddress;}
+
     void setHeartbeatEnabled(bool enabled) { m_heartbeatsEnabled = enabled; }
     /** @brief Set the current battery type */
     void setBattery(BatteryType type, int cells);

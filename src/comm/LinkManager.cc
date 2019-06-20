@@ -500,7 +500,6 @@ UASInterface* LinkManager::createUAS(MAVLinkProtocol* mavlink, LinkInterface* li
     QPointer<QObject> p (parent ? parent : mavlink );
 
     UASInterface* uas;
-
     switch (heartbeat->autopilot)
     {
     case MAV_AUTOPILOT_GENERIC:
@@ -595,6 +594,26 @@ UASInterface* LinkManager::createUAS(MAVLinkProtocol* mavlink, LinkInterface* li
     // Make UAS aware that this link can be used to communicate with the actual robot
     uas->addLink(link);
 
+    /// added by:Guang Yi Lim
+    /// get IP address from link manager and add to UAS
+    //cast link to udp link, loops through ipMap to get correct Ip
+    UDPLink *u = (UDPLink*)(link);
+    int i;
+    for(i = 0; i < u->ipMap.size();i++){
+        if(u->ipMap[i].uasId == uas->getUASID()){
+            uas->setIpAddress(u->ipMap[i].IpAddress.toString());
+        }
+    }
+    //if statement to check if the ip not map correctly
+    //maps the correct UAS id to the ip and vice versa
+    if(uas->getIpAddress() == ""){
+        for(i = 0; i < u->ipMap.size();i++){
+            if(u->ipMap[i].uasId == 0){
+                uas->setIpAddress(u->ipMap[i].IpAddress.toString());
+                u->ipMap[i].uasId =uas->getUASID();
+            }
+        }
+    }
     // Now add UAS to "official" list, which makes the whole application aware of it
     UASManager::instance()->addUAS(uas);
 

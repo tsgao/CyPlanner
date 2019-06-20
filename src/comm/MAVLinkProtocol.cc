@@ -35,6 +35,7 @@ This file is part of the APM_PLANNER project
 
 #include "MAVLinkProtocol.h"
 #include "LinkManager.h"
+#include "UDPLink.h"
 
 #include <cstring>
 #include <QDataStream>
@@ -244,10 +245,11 @@ void MAVLinkProtocol::receiveBytes(LinkInterface* link, const QByteArray &dataBy
 
             if (m_isOnline)
             {
-                 handleMessage(link, message);
+                handleMessage(link, message);
             }
         }
     }
+    uint8_t temp = message.sysid;
 }
 
 void MAVLinkProtocol::handleMessage(LinkInterface *link, const mavlink_message_t &message)
@@ -308,6 +310,7 @@ void MAVLinkProtocol::handleMessage(LinkInterface *link, const mavlink_message_t
 
         // Create a new UAS object
         uas = m_connectionManager->createUAS(this,link,message.sysid,&heartbeat);
+        //uas->setIpAddress(link->getDetail());
     }
 
     // Only count message if UAS exists for this message

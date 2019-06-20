@@ -81,6 +81,7 @@ private:
     bool m_tableDirty;
     bool iconIsGreen;
     PrimaryFlightDisplayQML *q;
+    void sendCameraCommand();
     int sendCameraSocket();
     int receiveImage(int socket);
 
