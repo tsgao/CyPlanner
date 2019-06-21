@@ -37,6 +37,8 @@ This file is part of the APM_PLANNER project
 #include "LinkManager.h"
 #include "UDPLink.h"
 
+#include <QLabel>
+#include <QDialog>
 #include <cstring>
 #include <QDataStream>
 
@@ -62,6 +64,18 @@ void MAVLinkProtocol::sendMessage(mavlink_message_t msg)
 
 void MAVLinkProtocol::receiveBytes(LinkInterface* link, const QByteArray &dataBytes)
 {
+    //add function to forward message to image storing thing somewhere in here
+    //something like save image etc.
+   // saveSomewhere(dataBytes);
+
+//    if(dataBytes[0] != -2/254){
+//        QDialog *q = new QDialog();
+//        QLabel *a = new QLabel(q);
+//        a->setText("OH SHIT!!!");
+//        q->show();
+
+//    }
+
     static int nonmavlinkCount = 0;
     static int radioVersionMismatchCount = 0;
     static bool decodedFirstPacket = false;
@@ -252,6 +266,17 @@ void MAVLinkProtocol::receiveBytes(LinkInterface* link, const QByteArray &dataBy
     uint8_t temp = message.sysid;
 }
 
+
+void MAVLinkProtocol::saveSomewhere(const QByteArray q){
+    FILE *image = fopen("test.txt","w");
+    if( image == NULL) {
+        printf("Error has occurred. Image file could not be opened\n");
+    }
+
+
+
+
+}
 void MAVLinkProtocol::handleMessage(LinkInterface *link, const mavlink_message_t &message)
 {
     // ORDER MATTERS HERE!

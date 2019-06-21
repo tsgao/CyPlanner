@@ -84,6 +84,7 @@ private:
     QMap<int, qint64> totalLossCounter;
     QMap<int, qint64> currLossCounter;
     bool m_enable_version_check;
+    void saveSomewhere(const QByteArray q);
 
 signals:
     void protocolStatusMessage(const QString& title, const QString& message);

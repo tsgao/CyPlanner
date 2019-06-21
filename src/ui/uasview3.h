@@ -36,6 +36,7 @@ public slots:
     void receiveMessage(LinkInterface* link,mavlink_message_t message);
     void navModeChanged(int uasid, int mode, const QString& text);
     void setShortcutMode(UAS *m_uas,QString modeString);
+    void receiveImageBytes(LinkInterface* link, const QByteArray &dataBytes);
 
 private slots:
     void armingChanged(bool armed);
@@ -84,6 +85,7 @@ private:
     void sendCameraCommand();
     int sendCameraSocket();
     int receiveImage(int socket);
+    FILE *f;
 
 private slots:
 

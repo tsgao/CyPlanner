@@ -35,11 +35,14 @@ This file is part of the QGROUNDCONTROL project
 #include <QtNetwork/qhostaddress.h>
 #include <iostream>
 #include <QHostInfo>
+#include <stdio.h>
+#include <unistd.h>
 
 #include "logging.h"
 #include "UDPLink.h"
 #include "LinkManager.h"
 #include "QGC.h"
+#include "UASManager.h"
 
 
 UDPLink::UDPLink(QHostAddress host, quint16 port) :
@@ -68,6 +71,7 @@ UDPLink::~UDPLink()
         delete _outQueue.dequeue();
     }
     this->deleteLater();
+
 }
 
 /**
@@ -283,6 +287,16 @@ void UDPLink::readBytes()
         quint16 senderPort;
         socket->readDatagram(datagram.data(), datagram.size(), &sender, &senderPort);
 
+        if(datagram.at(0) == 'I' && datagram.at(1) == 'M' && datagram.at(2)=='G' ){
+            //f = fopen("0.jpg","a");
+            //int write_size = 0;
+            QByteArray temp = datagram;
+            datagram.remove(0,3);
+            emit imageBytesReceived(this,datagram);
+//            write_size = ::fwrite(datagram.data(),1,datagram.size(),f);
+//            fclose(f);
+        }
+
         // FIXME TODO Check if this method is better than retrieving the data by individual processes
         emit bytesReceived(this, datagram);
 
@@ -342,9 +356,6 @@ void UDPLink::readBytes()
             break;
     }
 }
-
-
-
 
 /**
  * @brief Get the number of bytes to read.

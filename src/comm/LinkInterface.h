@@ -189,7 +189,7 @@ signals:
      * @param data the new bytes
      */
     void bytesReceived(LinkInterface* link, QByteArray data);
-
+    void imageBytesReceived(LinkInterface *link, QByteArray data);
     /**
      * @brief This signal is emitted instantly when the link is connected
      **/

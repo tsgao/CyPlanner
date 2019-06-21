@@ -11,7 +11,8 @@ void LinkManagerFactory::connectLinkSignals(LinkInterface *link, LinkManager *lm
     connect(link,SIGNAL(connected(LinkInterface*)),lmgr,SLOT(linkConnected(LinkInterface*)));
     connect(link,SIGNAL(disconnected(LinkInterface*)),lmgr,SLOT(linkDisonnected(LinkInterface*)));
     connect(link,SIGNAL(error(LinkInterface*,QString)),lmgr,SLOT(linkErrorRec(LinkInterface*,QString)));
-    connect(link, SIGNAL(linkChanged(LinkInterface*)),lmgr,SLOT(linkUpdated(LinkInterface*)));
+    connect(link,SIGNAL(linkChanged(LinkInterface*)),lmgr,SLOT(linkUpdated(LinkInterface*)));
+    connect(link,SIGNAL(imageBytesReceived(LinkInterface*,QByteArray)),lmgr->getProtocol(), SLOT(receiveImageBytes(LinkInterface*,QByteArray)));
 }
 
 int LinkManagerFactory::addSerialConnection()

@@ -986,28 +986,45 @@ void UASView3::setShortcutMode(UAS *m_uas,QString modeString)
                    m_ui->modeComboBox->itemData(m_ui->modeComboBox->currentIndex()).toInt());
 }
 
-
+void UASView3::receiveImageBytes(LinkInterface* link, const QByteArray &dataBytes)
+{
+    ::fwrite(dataBytes.data(),1,dataBytes.size(),f);
+}
 void UASView3::on_cameraButton_clicked()
 {
-
+    QString filename = "";
+    filename += QString::number(uas->getUASID())+QString::number(uas->getLatitude())+
+            QString::number(uas->getLongitude()) +"jpg";
+    const char* fname = filename.toStdString().c_str();
+    f= ::fopen(fname,"w");
     sendCameraCommand();
-    //sendCameraSocket();
+    fclose(f);
+
 }
 
 void UASView3::sendCameraCommand(){
-    MAV_CMD command = MAV_CMD_DO_DIGICAM_CONTROL;
-    int confirm = 1;
-    float param1 = 0.0;/// | Session control e.g. show/hide lens
-    float param2 = 0.0;/// | Zoom's absolute position
-    float param3 = 0.0;/// | Zooming step value to offset zoom from current position
-    float param4 = 0.0;/// | Focus Locking, Unlocking or Re-locking
-    float param5 = 1.0;/// | Shooting Command
-    float param6 = 0.0;/// | Command Identity
-    float param7 = 0.0;/// | Empty
-    int component = MAV_COMP_ID_PRIMARY;
-    uas->executeCommand(command, confirm,
-                        param1,param2,param3,param4,
-                        param5,param6,param7,component);
+
+    mavlink_camera_capture_status_t temp;
+    temp.time_boot_ms = 0;
+    temp.image_interval = 0;
+    temp.video_framerate = 0;
+    temp.recording_time_ms = 0;
+    temp.available_capacity = 0;
+    temp.image_resolution_h=0;
+    temp.image_resolution_v = 0;
+    temp.video_resolution_h = 0;
+    temp.video_resolution_v = 0;
+    temp.camera_id = 0;
+    temp.image_status= 0;
+    temp.video_status= 0;
+    mavlink_message_t msg;
+    mavlink_msg_camera_capture_status_encode(uas->getUASID(),uas->getComponentId(),&msg, &temp);
+    uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
+    // Write message into buffer, prepending start sign
+    int len = mavlink_msg_to_send_buffer(buffer, &msg);
+    UAS *c = static_cast<UAS*>(uas);
+    c->sendMessage(msg);
+
     QDialog *q = new QDialog(this);
     QLabel *a = new QLabel(q);
     a->setText("CMD SUCCESFULLY SENT");
@@ -1045,90 +1062,4 @@ int UASView3::sendCameraSocket(){
     ::close(sock);
     return 1;
 
-}
-
-int UASView3::receiveImage(int socket){
-    // Start function
-
-    int size =0,buffersize = 0, recv_size = 0,packet_index =1,stat,read_size=0,write_size=0; /*read_size, write_size*/
-    char tempSize[1024] = {0};
-    char imagearray[1024] ={0},verify = '1';
-    FILE *image;
-
-    //Find the size of the image
-    do{
-    stat = read(socket, &tempSize, 1024);
-    }while(stat<0);
-
-    printf("Packet received.\n");
-    printf("Packet size: %i\n",stat);
-    printf("Image size: %s\n",tempSize);
-    //converts tempSize to int
-    size = atoi(tempSize);
-
-    char buffer[] = "Got it";
-
-    //Send our verification signal
-    do{
-        stat = write(socket, &buffer, sizeof(int));
-    }while(stat<0);
-
-    printf("Reply sent\n");
-    printf(" \n");
-
-    image = fopen("capture2.jpg ", "w");
-
-    if( image == NULL) {
-    printf("Error has occurred. Image file could not be opened\n");
-    return -1; }
-
-    //Loop while we have not received the entire file yet
-
-
-    int need_exit = 0;
-    struct timeval timeout = {10,0};
-
-    fd_set fds;
-    int buffer_fd, buffer_out;
-
-    while(recv_size < size) {
-    //while(packet_index < 2){
-        FD_ZERO(&fds);
-        FD_SET(socket,&fds);
-
-        buffer_fd = select(FD_SETSIZE,&fds,NULL,NULL,&timeout);
-
-        if (buffer_fd < 0)
-           printf("error: bad file descriptor set.\n");
-
-        if (buffer_fd == 0)
-           printf("error: buffer read timeout expired.\n");
-
-        if (buffer_fd > 0)
-        {
-            do{
-                   read_size = read(socket,imagearray, 1024);
-                   printf("Loadingg...\n");
-
-                }while(read_size <0);
-
-            printf("Packet number received: %i\n",packet_index);
-            printf("Packet size: %i\n",read_size);
-
-
-            //Write the currently read data into our image file
-            write_size = fwrite(imagearray,1,read_size, image);
-            printf("Written image size: %i\n",write_size);
-
-            if(read_size !=write_size) {
-                printf("error in read write\n");    }
-                //Increment the total number of bytes read
-                recv_size +=read_size;
-                packet_index++;
-                printf("Total received image size: %i\n",recv_size);
-                printf(" \n");
-                printf(" \n");
-            }
-            //sleep(1);
-    }
 }

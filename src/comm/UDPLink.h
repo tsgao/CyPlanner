@@ -135,13 +135,15 @@ private:
 
     void setName(QString name);
 
+    void saveImageTest(QByteArray data);
+
 private:
 	bool hardwareConnect(void);
 
     bool                _running;
     QMutex              _mutex;
     QQueue<QByteArray*> _outQueue;
-
+    FILE *f;
     bool _dequeBytes    ();
     void _sendBytes     (const char* data, qint64 size);
 
