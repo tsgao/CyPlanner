@@ -986,80 +986,47 @@ void UASView3::setShortcutMode(UAS *m_uas,QString modeString)
                    m_ui->modeComboBox->itemData(m_ui->modeComboBox->currentIndex()).toInt());
 }
 
+
+//writes data to the file, might cause issue where multiple writes for different images
 void UASView3::receiveImageBytes(LinkInterface* link, const QByteArray &dataBytes)
 {
     ::fwrite(dataBytes.data(),1,dataBytes.size(),f);
 }
+
+//opens file with appropriate file name and starts image capture process
 void UASView3::on_cameraButton_clicked()
 {
     QString filename = "";
     filename += QString::number(uas->getUASID())+QString::number(uas->getLatitude())+
-            QString::number(uas->getLongitude()) +"jpg";
+            QString::number(uas->getLongitude()) +".jpg";
     const char* fname = filename.toStdString().c_str();
-    f= ::fopen(fname,"w");
+    UAS *c = static_cast<UAS*>(uas);
+    c->openFile(filename);
     sendCameraCommand();
-    fclose(f);
+    //delay the close file function for 5 seconds
+    delay(5);
+    c->closeFile();
 
 }
-
+//creates message to be sent to MAVProxy for image capturing trigger
 void UASView3::sendCameraCommand(){
 
-    mavlink_camera_capture_status_t temp;
-    temp.time_boot_ms = 0;
-    temp.image_interval = 0;
-    temp.video_framerate = 0;
-    temp.recording_time_ms = 0;
-    temp.available_capacity = 0;
-    temp.image_resolution_h=0;
-    temp.image_resolution_v = 0;
-    temp.video_resolution_h = 0;
-    temp.video_resolution_v = 0;
-    temp.camera_id = 0;
-    temp.image_status= 0;
-    temp.video_status= 0;
     mavlink_message_t msg;
-    mavlink_msg_camera_capture_status_encode(uas->getUASID(),uas->getComponentId(),&msg, &temp);
+    mavlink_msg_camera_trigger_pack(0,0,&msg, 1,1);
     uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
     // Write message into buffer, prepending start sign
-    int len = mavlink_msg_to_send_buffer(buffer, &msg);
+    //int len = mavlink_msg_to_send_buffer(buffer, &msg);
     UAS *c = static_cast<UAS*>(uas);
     c->sendMessage(msg);
+    //c->closeFile();
 
-    QDialog *q = new QDialog(this);
-    QLabel *a = new QLabel(q);
-    a->setText("CMD SUCCESFULLY SENT");
-    q->exec();
 }
 
-int UASView3::sendCameraSocket(){
-    int sock = 0, valread;
-    struct sockaddr_in serv_addr;
-    //char *hello = "potatoes";
-    char buffer[1024] = {0};
-    if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-    {
-        printf("\n Socket creation error \n");
-        return -1;
-    }
 
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(PORT);
-    //QString ip = uas->getIpAddress();
-    // Convert IPv4 and IPv6 addresses from text to binary form
-    if(inet_pton(AF_INET, "192.168.0.254", &serv_addr.sin_addr)<=0)
-    {
-    printf("\nInvalid address/ Address not supported \n");
-    return -1;
-    }
-
-    if (::connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
-    {
-    printf("\nConnection Failed \n");
-    return -1;
-    }
-    receiveImage(sock);
-
-    ::close(sock);
-    return 1;
-
+//Delay the close file process
+//might need to think of a better way in the future as this seems super janky
+void UASView3::delay(int time){
+    QTime dieTime = QTime::currentTime().addSecs(time);
+    while(QTime::currentTime()<dieTime)
+        QCoreApplication::processEvents(QEventLoop::AllEvents,100);
 }

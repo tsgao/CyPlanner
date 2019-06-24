@@ -42,6 +42,7 @@ private slots:
     void armingChanged(bool armed);
 
 protected:
+    void delay(int time);
     void changeEvent(QEvent *e);
     QTimer* refreshTimer;
     quint64 startTime;

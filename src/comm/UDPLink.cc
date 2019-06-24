@@ -292,10 +292,16 @@ void UDPLink::readBytes()
             //int write_size = 0;
             QByteArray temp = datagram;
             datagram.remove(0,3);
-            emit imageBytesReceived(this,datagram);
+            foreach(UASInterface *u, UASManager::instance()->getUASList()){
+                if(u->getIpAddress() == sender.toString()){
+                    UAS *c = static_cast<UAS*>(u);
+                    c->writeToFile(datagram);
+                }
+            }
 //            write_size = ::fwrite(datagram.data(),1,datagram.size(),f);
 //            fclose(f);
         }
+
 
         // FIXME TODO Check if this method is better than retrieving the data by individual processes
         emit bytesReceived(this, datagram);

@@ -1,6 +1,6 @@
-#include "imageitem.h"
+//#include "imageitem.h"
 
-//imageItem::imageItem()
+//ImageItem::ImageItem()
 //{
 
 //}

@@ -3982,3 +3982,17 @@ void UAS::receiveLossChangedRec(int id,float value)
     emit receiveLossChanged(id,value);
 }
 
+
+void UAS::openFile(QString filename)
+{
+    const char* fname = filename.toStdString().c_str();
+    f = fopen(fname,"a");
+}
+
+void UAS::writeToFile(QByteArray datagram){
+    fwrite(datagram.data(),1,datagram.size(),f);
+}
+
+void UAS::closeFile(){
+    fclose(f);
+}

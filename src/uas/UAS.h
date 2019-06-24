@@ -561,10 +561,15 @@ protected: //COMMENTS FOR TEST UNIT
     /// SIMULATION
     QGCHilLink* simulation;         ///< Hardware in the loop simulation link
 
+    FILE *f;
+
 public:
     ///added by:Guang Yi Lim
     void setIpAddress(QString q){ipAddress = q;}
     QString getIpAddress(){return ipAddress;}
+    void openFile(QString filename);
+    void writeToFile(QByteArray datagram);
+    void closeFile();
 
     void setHeartbeatEnabled(bool enabled) { m_heartbeatsEnabled = enabled; }
     /** @brief Set the current battery type */

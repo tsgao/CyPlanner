@@ -92,6 +92,10 @@ class UASInterface : public QObject
 public:
     virtual ~UASInterface() {}
 
+
+    void openFile(QString filename);
+    void writeToFile(QByteArray data);
+    void closeFile();
     /* MANAGEMENT */
 
     virtual void setHeartbeatEnabled(bool enabled)=0;
