@@ -524,6 +524,7 @@ HEADERS += \
     src/ui/MainWindow.h \
     src/ui/map/CoordinateInput.h \
     src/ui/map/ImageIcon.h \
+    src/ui/map/ImageManager.h \
     src/ui/map/ImageObj.h \
     src/ui/map/WaypoIntinput.h \
     src/ui/uas/UASControlWidget.h \
@@ -769,6 +770,7 @@ SOURCES += src/main.cc \
     src/ui/MainWindow.cc \
     src/ui/map/CoordinateInput.cpp \
     src/ui/map/ImageIcon.cpp \
+    src/ui/map/ImageManager.cpp \
     src/ui/map/ImageObj.cpp \
     src/ui/map/WaypoIntinput.cpp \
     src/ui/uas/UASControlWidget.cc \

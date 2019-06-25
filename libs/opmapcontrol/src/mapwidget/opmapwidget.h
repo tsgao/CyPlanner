@@ -44,6 +44,7 @@
 #include "waypointlineitem.h"
 #include "mapripper.h"
 #include "uavtrailtype.h"
+#include "imageitem.h"
 namespace mapcontrol
 {
     class UAVItem;

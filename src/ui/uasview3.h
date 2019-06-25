@@ -93,6 +93,7 @@ private slots:
     void on_cameraButton_clicked();
 
 signals:
+    void cameraButton_clicked();
     void uasInFocus(UASInterface* uas);
     void uasOutFocus(UASInterface* uas);
 };

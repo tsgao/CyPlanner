@@ -11,6 +11,8 @@
 #include <QTimer>
 #include <QScrollBar>
 #include "ApmUiHelpers.h"
+#include "ImageObj.h"
+#include "QGCMapWidget.h"
 
 #include <QGCHilFlightGearConfiguration.h>
 
@@ -100,6 +102,7 @@ UASView3::UASView3(UASInterface* uas, QWidget *parent) :
 
     //a->setMinimumSize(200,200);
     m_ui->cameraButton->setText(uas->getIpAddress());
+
 }
 
 UASView3::~UASView3()
@@ -997,15 +1000,17 @@ void UASView3::receiveImageBytes(LinkInterface* link, const QByteArray &dataByte
 void UASView3::on_cameraButton_clicked()
 {
     QString filename = "";
-    filename += QString::number(uas->getUASID())+QString::number(uas->getLatitude())+
-            QString::number(uas->getLongitude()) +".jpg";
-    const char* fname = filename.toStdString().c_str();
-    UAS *c = static_cast<UAS*>(uas);
-    c->openFile(filename);
-    sendCameraCommand();
-    //delay the close file function for 5 seconds
-    delay(5);
-    c->closeFile();
+    filename +=  QString::number(uas->getUASID()) +QString::number(uas->getLatitude())+
+             QString::number(uas->getLongitude()) +".jpg";
+    imageObj* i = new imageObj(0,uas->getLatitude(),uas->getLongitude(),filename,"Hi");
+    ImageManager::instance()->createImageObject();
+//    const char* fname = filename.toStdString().c_str();
+//    UAS *c = static_cast<UAS*>(uas);
+//    c->openFile(filename);
+//    sendCameraCommand();
+//    //delay the close file function for 5 seconds
+//    delay(500);
+//    c->closeFile();
 
 }
 //creates message to be sent to MAVProxy for image capturing trigger
@@ -1018,8 +1023,6 @@ void UASView3::sendCameraCommand(){
     //int len = mavlink_msg_to_send_buffer(buffer, &msg);
     UAS *c = static_cast<UAS*>(uas);
     c->sendMessage(msg);
-    //c->closeFile();
-
 }
 
 

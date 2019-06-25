@@ -1,30 +1,33 @@
-//#ifndef IMAGEICON_H
-//#define IMAGEICON_H
+#ifndef IMAGEICON_H
+#define IMAGEICON_H
 
-//#include "ImageObj.h"
-//#include "opmapcontrol.h"
-//#include <QString>
-//class imageIcon :public mapcontroL::imageItem
-//{
-//public:
-//    imageIcon(mapcontrol::MapGraphicItem* map, mapcontrol::OPMapWidget* parent, qreal latitude, qreal longtiude,QString path =QString(), int radius  = 30);
+#include "ImageObj.h"
+#include "opmapcontrol.h"
+#include <QString>
+#include <QGraphicsItem>
 
-//    imageIcon(mapcontrol::MapGraphicItem* map, mapcontrol::OPMapWidget *parent, imageObj *img, const QColor& color, int radius =31);
 
-//    virtual ~imageIcon();
+class imageIcon : public mapcontrol::ImageItem
+{
+public:
+    imageIcon(mapcontrol::MapGraphicItem* map, mapcontrol::OPMapWidget* parent, qreal latitude, qreal longtiude, int radius  = 30);
 
-//    QRectF boudingRect() const;
+   imageIcon(mapcontrol::MapGraphicItem* map, mapcontrol::OPMapWidget *parent, imageObj *img, const QColor& color, int index, int radius =31);
 
-//    void drawIcon();
+    virtual ~imageIcon();
 
-//    void paint(QPainter * painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    QRectF boundingRect() const;
 
-//protected:
-//    mapcontrol::OPMapWidget* parent;
-//    imageObj *img;
-//    int radius;
-//    QColor color;
-//    QString path;
-//};
+    void drawIcon();
 
-//#endif // IMAGEICON_H
+    //void paint(QPainter * painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+
+protected:
+    mapcontrol::OPMapWidget* parent;
+    imageObj *img;
+    int radius;
+    QColor color;
+    QString path;
+};
+
+#endif // IMAGEICON_H

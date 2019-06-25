@@ -8,6 +8,8 @@
 #include "UASWaypointManager.h"
 #include "ArduPilotMegaMAV.h"
 #include "WaypointNavigation.h"
+#include "uasview3.h"
+#include "ImageIcon.h"
 #include <QInputDialog>
 
 QGCMapWidget::QGCMapWidget(QWidget *parent) :
@@ -55,7 +57,12 @@ QGCMapWidget::QGCMapWidget(QWidget *parent) :
     cameraaction->setText("Point Camera Here");
     connect(cameraaction,SIGNAL(triggered()),this,SLOT(cameraActionTriggered()));
     this->addAction(cameraaction);
+
+    imgManager = ImageManager::instance();
+    bool success = connect(imgManager,SIGNAL(newImageAdded()),this, SLOT(addImageIcon()));
+    Q_ASSERT(success);
 }
+
 void QGCMapWidget::guidedActionTriggered()
 {
     if (!uas)
@@ -930,4 +937,9 @@ void QGCMapWidget::updateWaypointList(int uas)
             }
         }
     }
+}
+
+
+void QGCMapWidget::addImageIcon(){
+    imageIcon* img = new imageIcon(map, this,0,0 ,0);
 }

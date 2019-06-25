@@ -1,6 +1,7 @@
 #ifndef QGCMAPWIDGET_H
 #define QGCMAPWIDGET_H
 
+#include "ImageManager.h"
 #include <QMap>
 #include <QTimer>
 #include "../../../libs/opmapcontrol/opmapcontrol.h"
@@ -40,6 +41,8 @@ signals:
     void waypointChanged(Waypoint* wp);
 
 public slots:
+    void addImageIcon();
+
     /** @brief Action triggered with point-camera action is selected from the context menu */
     void cameraActionTriggered();
     /** @brief Action triggered when guided action is selected from the context menu */
@@ -154,6 +157,7 @@ protected:
     void mouseDoubleClickEvent(QMouseEvent* event);
 
     UASWaypointManager* currWPManager; ///< The current waypoint manager
+    ImageManager* imgManager;
     bool offlineMode;
     QMap<Waypoint* , mapcontrol::WayPointItem*> waypointsToIcons;
     QMap<mapcontrol::WayPointItem*, Waypoint*> iconsToWaypoints;

@@ -13,6 +13,21 @@ class ImageItem : public GraphicsItem
 public:
     ImageItem(internals::PointLatLng const& img_coord,MapGraphicItem* map, OPMapWidget* parent);
 
+    virtual ~ImageItem();
+
+    internals::PointLatLng getCoord() const {return coord;}
+
+    void setCoord(internals::PointLatLng const& value);
+
+    virtual QRectF boundingRect() const;
+
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    void RefreshPos();
+
+protected:
+    QTransform transf;
+
+
 };
 
 }
