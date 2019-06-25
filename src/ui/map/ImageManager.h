@@ -9,7 +9,7 @@ class ImageManager : public QObject
     Q_OBJECT
 public:
     static ImageManager* instance();
-    imageObj* createImageObject();
+    imageObj* createImageObject(imageObj* i);
 //    int getCurrentId(){return curr_id;}
 //    QList<imageObj *> getImageList(){return imgList;}
 
@@ -18,7 +18,7 @@ private:
     QList<imageObj *> imgList;
 
 signals:
-    void newImageAdded();
+    void newImageAdded(imageObj*);
 };
 
 #endif // IMAGEMANAGER_H

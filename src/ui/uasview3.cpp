@@ -1003,7 +1003,7 @@ void UASView3::on_cameraButton_clicked()
     filename +=  QString::number(uas->getUASID()) +QString::number(uas->getLatitude())+
              QString::number(uas->getLongitude()) +".jpg";
     imageObj* i = new imageObj(0,uas->getLatitude(),uas->getLongitude(),filename,"Hi");
-    ImageManager::instance()->createImageObject();
+    ImageManager::instance()->createImageObject(i);
 //    const char* fname = filename.toStdString().c_str();
 //    UAS *c = static_cast<UAS*>(uas);
 //    c->openFile(filename);

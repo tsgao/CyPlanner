@@ -18,7 +18,7 @@ namespace mapcontrol{
     }
 
     ImageItem::~ImageItem(){
-        delete this;
+        //delete this;
     }
 
     QRectF ImageItem::boundingRect() const

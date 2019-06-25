@@ -5,14 +5,14 @@
 #include "opmapcontrol.h"
 #include <QString>
 #include <QGraphicsItem>
-
+#include <QGraphicsSceneMouseEvent>
 
 class imageIcon : public mapcontrol::ImageItem
 {
 public:
     imageIcon(mapcontrol::MapGraphicItem* map, mapcontrol::OPMapWidget* parent, qreal latitude, qreal longtiude, int radius  = 30);
 
-   imageIcon(mapcontrol::MapGraphicItem* map, mapcontrol::OPMapWidget *parent, imageObj *img, const QColor& color, int index, int radius =31);
+    imageIcon(mapcontrol::MapGraphicItem* map, mapcontrol::OPMapWidget *parent, imageObj *img, const QColor& color, int index, int radius =31);
 
     virtual ~imageIcon();
 
@@ -20,12 +20,15 @@ public:
 
     void drawIcon();
 
-    //void paint(QPainter * painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    void paint(QPainter * painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
+    void mousePressEvent(QGraphicsSceneMouseEvent *even);
 protected:
     mapcontrol::OPMapWidget* parent;
     imageObj *img;
     int radius;
+    int x;
+    int y;
     QColor color;
     QString path;
 };

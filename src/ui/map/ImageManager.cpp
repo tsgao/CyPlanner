@@ -11,7 +11,7 @@ ImageManager* ImageManager::instance(){
     }
     return _instance;
 }
-imageObj* ImageManager::createImageObject(){
-    emit newImageAdded();
+imageObj* ImageManager::createImageObject(imageObj* i){
+    emit newImageAdded(i);
 }
 

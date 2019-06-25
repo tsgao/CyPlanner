@@ -59,8 +59,9 @@ QGCMapWidget::QGCMapWidget(QWidget *parent) :
     this->addAction(cameraaction);
 
     imgManager = ImageManager::instance();
-    bool success = connect(imgManager,SIGNAL(newImageAdded()),this, SLOT(addImageIcon()));
-    Q_ASSERT(success);
+    bool success = connect(imgManager,SIGNAL(newImageAdded(imageObj* )),this, SLOT(addImageIcon(imageObj* )));
+    //Q_ASSERT(success);
+    printf("hi");
 }
 
 void QGCMapWidget::guidedActionTriggered()
@@ -940,6 +941,19 @@ void QGCMapWidget::updateWaypointList(int uas)
 }
 
 
-void QGCMapWidget::addImageIcon(){
+void QGCMapWidget::addImageIcon(imageObj* i){
+
+    //new imageIcon, add to list
+    if(!imgObjToIcons.contains(i)){
+        QLOG_TRACE() << "UPDATING NEW IMAGE OBJECT" <<i->getId() << "IN 2D MAP";
+
+        QColor imgColor(Qt::red);
+        imageIcon* icon = new imageIcon(map,this,i,imgColor,i->getId());
+
+        icon->setParentItem(map);
+        imgObjToIcons.append(i);
+        IconsToObj.append(icon);
+
+    }
     imageIcon* img = new imageIcon(map, this,0,0 ,0);
 }
