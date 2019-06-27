@@ -18,9 +18,6 @@ imageIcon::imageIcon(mapcontrol::MapGraphicItem* map, mapcontrol::OPMapWidget* p
     this->setFlag(QGraphicsItem::ItemIsSelectable,true);\
     setAcceptedMouseButtons(Qt::LeftButton);
     picture = QPixmap(picture.width(),picture.height());
-    x = latitude;
-    y = longitude;
-    drawIcon();
 }
 
 imageIcon::imageIcon(mapcontrol::MapGraphicItem* map, mapcontrol::OPMapWidget* parent, imageObj* obj, const QColor& color, int index, int radius )
@@ -32,15 +29,12 @@ imageIcon::imageIcon(mapcontrol::MapGraphicItem* map, mapcontrol::OPMapWidget* p
     this->setFlag(QGraphicsItem::ItemIgnoresTransformations,true);
     this->setFlag(QGraphicsItem::ItemIsSelectable,true);
     setAcceptedMouseButtons(Qt::LeftButton);
-    picture = QPixmap(picture.width(),picture.height());
-//    internals::PointLatLng q(obj->getX(),obj->getY());
-//    core::Point pos = map->FromLatLngToLocal(q);
-//    x = pos.X();
-//    y = pos.Y();
-    x = obj->getX();
-    y = obj->getY();
+    //picture = QPixmap(picture.width(),picture.height());
+    QPixmap p("/home/rmasl/Desktop/workspace/CyPlanner/libs/opmapcontrol/src/mapwidget/images/camera.png");
+
+    picture = p.scaled(30,30);
+
     img = obj;
-    drawIcon();
 }
 
 imageIcon::~imageIcon(){}
@@ -49,26 +43,12 @@ QRectF imageIcon::boundingRect() const
 {
     internals::PointLatLng coord = (internals::PointLatLng)getCoord();
 
-//    int width = picture.width()/35;
-//    int height = picture.height()/35;
 
-       int width = picture.width();
-       int height = picture.height();
+    int width = picture.width();
+    int height = picture.height();
     return QRectF(-width,-height,2*width,2*height);
 }
 
-void imageIcon::drawIcon()
-{
-    picture.fill(Qt::transparent);
-    QPainter painter(&picture);
-    painter.setRenderHint(QPainter::Antialiasing,true);
-    painter.setRenderHint(QPainter::HighQualityAntialiasing,true);
-
-
-    QPixmap p("/home/rmasl/Desktop/workspace/CyPlanner/libs/opmapcontrol/src/mapwidget/images/marker.png");
-    //draws the icon size?
-    painter.drawPixmap(0,0,p);
-}
 
 void imageIcon::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget){
     Q_UNUSED(option);

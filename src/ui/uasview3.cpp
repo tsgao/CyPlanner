@@ -1000,18 +1000,22 @@ void UASView3::receiveImageBytes(LinkInterface* link, const QByteArray &dataByte
 void UASView3::on_cameraButton_clicked()
 {
     QString filename = "";
-    double lat = uas->getLatitude();
-    filename +=  QString::number(uas->getUASID())+"_"+QString::number(uas->getLatitude())+"_"+
+    filename += "MAV"+ QString::number(uas->getUASID())+"_"+QString::number(uas->getLatitude())+"_"+
              QString::number(uas->getLongitude()) +".jpg";
-    imageObj* i = new imageObj(0,10,0,filename,"Hi");
+    imageObj* i = new imageObj(0,uas->getLatitude(),uas->getLongitude(),filename,"Hi");
     //imageObj* i = new imageObj(0,42.0104,-93.7333,filename,"Hi");
     ImageManager::instance()->createImageObject(i);
-//    UAS *c = static_cast<UAS*>(uas);
-//    c->openFile(filename);
+    UAS *c = static_cast<UAS*>(uas);
+    c->openFile(filename);
 //    sendCameraCommand();
 //    //delay the close file function for 5 seconds
 //    delay(1000);
-//    c->closeFile();
+
+    /**
+    *   TODO: FIGURE A WAY TO CLOSE THE FILE ONLY AFTER ENTIRE IMAGE IS SENT
+    *   POTENTIALLY COULD ADD A HEADER LIKE THING TO CHECK IF IT IS THE LAST PACKET OR SMTHG LIKE THAT
+    **/
+    c->closeFile();
 
 }
 //creates message to be sent to MAVProxy for image capturing trigger

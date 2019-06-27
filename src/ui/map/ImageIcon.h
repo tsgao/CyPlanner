@@ -18,8 +18,6 @@ public:
 
     QRectF boundingRect() const;
 
-    void drawIcon();
-
     void paint(QPainter * painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
     void mousePressEvent(QGraphicsSceneMouseEvent *even);
@@ -27,8 +25,6 @@ protected:
     mapcontrol::OPMapWidget* parent;
     imageObj *img;
     int radius;
-    int x;
-    int y;
     QColor color;
     QString path;
 };
