@@ -4,6 +4,9 @@
 #include "QGC.h"
 #include <QPainter>
 #include <QLabel>
+#include <QPalette>
+#include <QLayout>
+
 
 imageIcon::imageIcon(mapcontrol::MapGraphicItem* map, mapcontrol::OPMapWidget* parent, qreal latitude, qreal longitude, int radius)
     : mapcontrol::ImageItem(internals::PointLatLng(latitude,longitude), map,parent),
@@ -14,7 +17,7 @@ imageIcon::imageIcon(mapcontrol::MapGraphicItem* map, mapcontrol::OPMapWidget* p
     this->setFlag(QGraphicsItem::ItemIgnoresTransformations,true);
     this->setFlag(QGraphicsItem::ItemIsSelectable,true);\
     setAcceptedMouseButtons(Qt::LeftButton);
-    picture = QPixmap(100,100);
+    picture = QPixmap(picture.width(),picture.height());
     x = latitude;
     y = longitude;
     drawIcon();
@@ -29,9 +32,14 @@ imageIcon::imageIcon(mapcontrol::MapGraphicItem* map, mapcontrol::OPMapWidget* p
     this->setFlag(QGraphicsItem::ItemIgnoresTransformations,true);
     this->setFlag(QGraphicsItem::ItemIsSelectable,true);
     setAcceptedMouseButtons(Qt::LeftButton);
-    picture = QPixmap(100,100);
+    picture = QPixmap(picture.width(),picture.height());
+//    internals::PointLatLng q(obj->getX(),obj->getY());
+//    core::Point pos = map->FromLatLngToLocal(q);
+//    x = pos.X();
+//    y = pos.Y();
     x = obj->getX();
     y = obj->getY();
+    img = obj;
     drawIcon();
 }
 
@@ -44,8 +52,8 @@ QRectF imageIcon::boundingRect() const
 //    int width = picture.width()/35;
 //    int height = picture.height()/35;
 
-       int width = 100;
-       int height =100;
+       int width = picture.width();
+       int height = picture.height();
     return QRectF(-width,-height,2*width,2*height);
 }
 
@@ -56,41 +64,10 @@ void imageIcon::drawIcon()
     painter.setRenderHint(QPainter::Antialiasing,true);
     painter.setRenderHint(QPainter::HighQualityAntialiasing,true);
 
-    QPen pen1(Qt::red);
-    pen1.setWidth(2);
-    QBrush brush(Qt::cyan,Qt::CrossPattern);
-    painter.setPen(pen1);
-    QRectF f(this->x,this->y,20,20);
-    painter.drawRect(f);
-    painter.fillRect(f,brush);
 
-//    QPixmap p("/home/rmasl/Desktop/workspace/CyPlanner/libs/opmapcontrol/src/mapwidget/images");
-//    painter.drawPixmap(this->x,this->y,p);
-//    painter.setBrush(Qt::NoBrush);
-
-//    int penWidth = pen1.width();
-
-//    // DRAW WAYPOINT
-//    QPointF p(picture.width()/2, picture.height()/2);
-
-//    /** @brief Guang Yi Lim this is where you change the size of the diamond**/
-//    QPolygonF poly(4);
-//    // Top point
-//    poly.replace(0, QPointF(p.x(), p.y()-picture.height()/3.0f+penWidth/3));
-//    // Right point
-//    poly.replace(1, QPointF(p.x()+picture.width()/3.0f-penWidth/3, p.y()));
-//    // Bottom point
-//    poly.replace(2, QPointF(p.x(), p.y() + picture.height()/3.0f-penWidth/3));
-//    poly.replace(3, QPointF(p.x() - picture.width()/3.0f+penWidth/3, p.y()));
-
-//    int waypointSize = qMin(picture.width(), picture.height());
-//    float rad = (waypointSize/2.0f) * 0.1f * (1/sqrt(2.0f));
-
-//    painter.setPen(pen1);
-//    painter.drawPolygon(poly);
-//    painter.setPen(pen2);
-//    painter.drawPolygon(poly);
-
+    QPixmap p("/home/rmasl/Desktop/workspace/CyPlanner/libs/opmapcontrol/src/mapwidget/images/marker.png");
+    //draws the icon size?
+    painter.drawPixmap(0,0,p);
 }
 
 void imageIcon::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget){
@@ -98,6 +75,7 @@ void imageIcon::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
     Q_UNUSED(widget);
     QPen pen = painter->pen();
     pen.setWidth(2);
+    //draw image location
     painter->drawPixmap(-picture.width()/2,-picture.height()/2,picture);
     if (this->isSelected())
     {
@@ -109,17 +87,27 @@ void imageIcon::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
     penBlack.setWidth(4);
     pen.setColor(color);
 }
-
+/**
+ * @brief imageIcon::mousePressEvent opens a dialog showing the image which was taken at the location
+ * TODO:: seems to work fine if doing manual testing, will try with Rover tomorrow
+ * @param event
+ */
 void imageIcon::mousePressEvent(QGraphicsSceneMouseEvent *event){
     QDialog* q = new QDialog(parent);
-
     QLabel* a = new QLabel(q);
-    QPixmap image("/home/rmasl/Desktop/workspace/build-apm_planner-Desktop_Qt_5_12_3_GCC_64bit-Debug/debug/capture2.png");
+    QVBoxLayout* layout = new QVBoxLayout(q);
+    QString path = "/home/rmasl/Desktop/workspace/build-apm_planner-Desktop_Qt_5_12_3_GCC_64bit-Debug/debug/";
+    path += img->getPath();
+
+    //TODO: SET THIS AS A PATH TO STORE IMG
+    QPixmap image(path);
     q->setFixedSize(image.width()+50,image.height()+50);
+    q->setStyleSheet("background-color:black");
+    q->setWindowTitle(img->getPath());
+
     a->setPixmap(image);
-    //a->setText("WOW!!!");
+    a->setAlignment(Qt::AlignCenter);
+    layout->addWidget(a);
+    q->setLayout(layout);
     q->show();
-//    coord = map->FromLocalToLatLng(this->pos().x(),this->pos().y());
-//    QString coord_str = " " + QString::number(coord.Lat(), 'f', 6) + "   " + QString::number(coord.Lng(), 'f', 6);
-//    QGraphicsItem::mouseMoveEvent(event);
 }

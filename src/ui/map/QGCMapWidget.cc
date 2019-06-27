@@ -955,5 +955,5 @@ void QGCMapWidget::addImageIcon(imageObj* i){
         IconsToObj.append(icon);
 
     }
-    imageIcon* img = new imageIcon(map, this,0,0 ,0);
+    //imageIcon* img = new imageIcon(map, this,0,0 ,0);
 }

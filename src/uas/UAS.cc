@@ -3985,8 +3985,8 @@ void UAS::receiveLossChangedRec(int id,float value)
 
 void UAS::openFile(QString filename)
 {
-    const char* fname = filename.toStdString().c_str();
-    f = fopen(fname,"a");
+    const char* fname = filename.toLocal8Bit().data();
+    f = fopen(fname,"w");
 }
 
 void UAS::writeToFile(QByteArray datagram){

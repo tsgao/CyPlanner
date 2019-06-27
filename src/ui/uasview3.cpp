@@ -1000,16 +1000,17 @@ void UASView3::receiveImageBytes(LinkInterface* link, const QByteArray &dataByte
 void UASView3::on_cameraButton_clicked()
 {
     QString filename = "";
-    filename +=  QString::number(uas->getUASID()) +QString::number(uas->getLatitude())+
+    double lat = uas->getLatitude();
+    filename +=  QString::number(uas->getUASID())+"_"+QString::number(uas->getLatitude())+"_"+
              QString::number(uas->getLongitude()) +".jpg";
-    imageObj* i = new imageObj(0,uas->getLatitude(),uas->getLongitude(),filename,"Hi");
+    imageObj* i = new imageObj(0,10,0,filename,"Hi");
+    //imageObj* i = new imageObj(0,42.0104,-93.7333,filename,"Hi");
     ImageManager::instance()->createImageObject(i);
-//    const char* fname = filename.toStdString().c_str();
 //    UAS *c = static_cast<UAS*>(uas);
 //    c->openFile(filename);
 //    sendCameraCommand();
 //    //delay the close file function for 5 seconds
-//    delay(500);
+//    delay(1000);
 //    c->closeFile();
 
 }
