@@ -1,11 +1,10 @@
 #include "ImageObj.h"
 
-imageObj::imageObj(uint16_t id, double x, double y, QString path, QString desc)
+imageObj::imageObj(uint16_t id, double x, double y, QString path)
     : id(id),
       x(x),
       y(y),
-      path(path),
-      description(desc)
+      path(path)
 {
 
 }
@@ -28,7 +27,4 @@ void imageObj::setY(double y){
 
 void imageObj::setPath(QString path){
     this->path = path;
-}
-void imageObj::setDescription(QString desc){
-    this->description = desc;
 }

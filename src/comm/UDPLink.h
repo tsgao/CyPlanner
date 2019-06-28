@@ -46,6 +46,7 @@ This file is part of the QGROUNDCONTROL project
 typedef struct uasip{
     QHostAddress IpAddress;
     uint8_t uasId;
+    quint16 port;
 } UASIp;
 
 class UDPLink : public LinkInterface
@@ -54,6 +55,9 @@ class UDPLink : public LinkInterface
     //Q_INTERFACES(UDPLinkInterface:LinkInterface)
 
 public:
+
+    int counter1;
+    int counter2;
     UDPLink(QHostAddress host = QHostAddress::Any, quint16 port = 14550);
 
     ~UDPLink();
@@ -145,7 +149,7 @@ private:
     QQueue<QByteArray*> _outQueue;
     FILE *f;
     bool _dequeBytes    ();
-    void _sendBytes     (const char* data, qint64 size);
+    void _sendBytes     (const char* data, qint64 size,uint8_t sysid);
 
 
 };

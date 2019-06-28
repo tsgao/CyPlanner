@@ -24,6 +24,7 @@
 #include <QDockWidget>
 #include <QInputDialog>
 
+#include <sstream>
 #include <stdio.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
@@ -48,9 +49,9 @@ UASView3::UASView3(UASInterface* uas, QWidget *parent) :
     // FIXME XXX
     lowPowerModeEnabled = MainWindow::instance()->lowPowerModeEnabled();
 
-    m_uas = 0;
+    //m_uas = 0;
     m_ui->setupUi(this);
-    m_ui->modeComboBox->setVisible(false);
+   // m_ui->modeComboBox->setVisible(false);
 
     // Name changes
     connect(uas, SIGNAL(nameChanged(QString)), this, SLOT(updateName(QString)));
@@ -101,7 +102,7 @@ UASView3::UASView3(UASInterface* uas, QWidget *parent) :
 //    m_ui->dockWidget = new QDockWidget("smthg",new PrimaryFlightDisplayQML(this));
 
     //a->setMinimumSize(200,200);
-    m_ui->cameraButton->setText(uas->getIpAddress());
+   // m_ui->cameraButton->setText(uas->getIpAddress());
 
 }
 
@@ -973,20 +974,20 @@ void UASView3::addToFieldMap(int msgid, QString fieldName, QString value){
 
 void UASView3::setShortcutMode(UAS *m_uas,QString modeString)
 {
-    if (m_uas->isMultirotor()){
-        ApmUiHelpers::addCopterModes(m_ui->modeComboBox);
+//    if (m_uas->isMultirotor()){
+//        ApmUiHelpers::addCopterModes(m_ui->modeComboBox);
 
-    } else if (m_uas->isGroundRover()){
-        ApmUiHelpers::addRoverModes(m_ui->modeComboBox);
-    }
+//    } else if (m_uas->isGroundRover()){
+//        ApmUiHelpers::addRoverModes(m_ui->modeComboBox);
+//    }
 
-    QString aa =modeString;
-    int index = m_ui->modeComboBox->findText(modeString);
-    //QLOG_DEBUG() << "index: " << index;
+//    QString aa =modeString;
+//    int index = m_ui->modeComboBox->findText(modeString);
+//    //QLOG_DEBUG() << "index: " << index;
 
-    m_ui->modeComboBox->setCurrentIndex(index);
-    m_uas->setMode(MAV_MODE_FLAG_CUSTOM_MODE_ENABLED,
-                   m_ui->modeComboBox->itemData(m_ui->modeComboBox->currentIndex()).toInt());
+//    m_ui->modeComboBox->setCurrentIndex(index);
+//    m_uas->setMode(MAV_MODE_FLAG_CUSTOM_MODE_ENABLED,
+//                   m_ui->modeComboBox->itemData(m_ui->modeComboBox->currentIndex()).toInt());
 }
 
 
@@ -1000,22 +1001,24 @@ void UASView3::receiveImageBytes(LinkInterface* link, const QByteArray &dataByte
 void UASView3::on_cameraButton_clicked()
 {
     QString filename = "";
-    filename += "MAV"+ QString::number(uas->getUASID())+"_"+QString::number(uas->getLatitude())+"_"+
-             QString::number(uas->getLongitude()) +".jpg";
-    imageObj* i = new imageObj(0,uas->getLatitude(),uas->getLongitude(),filename,"Hi");
+    filename += "MAV"+ QString::number(uas->getUASID())+"_"+QString::number(uas->getLatitude(),'g',11)+"_"+
+             QString::number(uas->getLongitude(),'g',11) +".jpg";
+//    filename += "MAV"+ QString::number(uas->getUASID())+"_"+QString::number(uas->getLatitude())+"_"+
+//             QString::number(uas->getLongitude()) +".jpg";
+    imageObj* i = new imageObj(0,uas->getLatitude(),uas->getLongitude(),filename);
     //imageObj* i = new imageObj(0,42.0104,-93.7333,filename,"Hi");
     ImageManager::instance()->createImageObject(i);
     UAS *c = static_cast<UAS*>(uas);
     c->openFile(filename);
-//    sendCameraCommand();
-//    //delay the close file function for 5 seconds
+    sendCameraCommand();
+    //delay the close file function for 5 seconds
 //    delay(1000);
 
-    /**
-    *   TODO: FIGURE A WAY TO CLOSE THE FILE ONLY AFTER ENTIRE IMAGE IS SENT
-    *   POTENTIALLY COULD ADD A HEADER LIKE THING TO CHECK IF IT IS THE LAST PACKET OR SMTHG LIKE THAT
-    **/
-    c->closeFile();
+//    /**
+//    *   TODO: FIGURE A WAY TO CLOSE THE FILE ONLY AFTER ENTIRE IMAGE IS SENT
+//    *   POTENTIALLY COULD ADD A HEADER LIKE THING TO CHECK IF IT IS THE LAST PACKET OR SMTHG LIKE THAT
+//    **/
+//    c->closeFile();
 
 }
 //creates message to be sent to MAVProxy for image capturing trigger
@@ -1028,6 +1031,8 @@ void UASView3::sendCameraCommand(){
     //int len = mavlink_msg_to_send_buffer(buffer, &msg);
     UAS *c = static_cast<UAS*>(uas);
     c->sendMessage(msg);
+    printf("CMD SENT");
+
 }
 
 

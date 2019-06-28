@@ -75,7 +75,7 @@ protected:
 
 private:
     Ui::UASView3 *m_ui;
-    UASInterface *m_uas;
+    //UASInterface *m_uas;
     //QMap<QString,double> valueMap;
     QMap<QString,QString> nameToUpdateWidgetMap;
     QTimer *m_updateTimer;

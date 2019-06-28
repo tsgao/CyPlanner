@@ -58,6 +58,8 @@ UDPLink::UDPLink(QHostAddress host, quint16 port) :
     this->name = tr("UDP Link (port:%1)").arg(this->port);
     emit nameChanged(this->name);
     QLOG_INFO() << "UDP Created " << name;
+    counter1 = 0;
+    counter2 = 0;
 }
 
 UDPLink::~UDPLink()
@@ -226,47 +228,82 @@ bool UDPLink::_dequeBytes()
     QMutexLocker lock(&_mutex);
     if(_outQueue.count() > 0) {
         QByteArray* qdata = _outQueue.dequeue();
+
+
+        mavlink_message_t message;
+        memset(&message, 0, sizeof(mavlink_message_t));
+        mavlink_status_t status;
+        bool decodedFirstPacket = false;
+        for(const auto &data : *qdata)
+        {
+            unsigned int decodeState = mavlink_parse_char(MAVLINK_COMM_0, static_cast<quint8>(data), &message, &status);
+            if (decodeState == 1)
+            {
+                mavlink_status_t* mavlinkStatus = mavlink_get_channel_status(MAVLINK_COMM_0);
+                if (!decodedFirstPacket)
+                {
+                    decodedFirstPacket = true;
+                }
+
+            }
+        }
         lock.unlock();
-        _sendBytes(qdata->data(), qdata->size());
+        _sendBytes(qdata->data(), qdata->size(),message.sysid);
         delete qdata;
         lock.relock();
     }
     return (_outQueue.count() > 0);
 }
 
-void UDPLink::_sendBytes(const char* data, qint64 size)
+void UDPLink::_sendBytes(const char* data, qint64 size,uint8_t sysid)
 {
-    // Broadcast to all connected systems
-    for (int h = 0; h < hosts.size(); h++)
-    {
-        QHostAddress currentHost = hosts.at(h);
-        quint16 currentPort = ports.at(h);
-//#define UDPLINK_DEBUG
-#ifdef UDPLINK_DEBUG
-        QString bytes;
-        QString ascii;
-        for (int i=0; i<size; i++)
-        {
-            unsigned char v = data[i];
-            bytes.append(QString().sprintf("%02x ", v));
-            if (data[i] > 31 && data[i] < 127)
-            {
-                ascii.append(data[i]);
-            }
-            else
-            {
-                ascii.append(219);
-            }
-        }
-        QLOG_TRACE() << "Sent" << size << "bytes to" << currentHost.toString() << ":" << currentPort << "data:";
-        QLOG_TRACE() << bytes;
-        QLOG_TRACE() << "ASCII:" << ascii;
-#endif
-        socket->writeDatagram(data, size, currentHost, currentPort);
+    /***
+     * modified this to try filter out certain messages
+     * will filter messages if MAVLink contains the sysid
+     ***/
+    bool sent = false;
+    foreach(uasip i, this->ipMap){
+        if(i.uasId == sysid){
 
-        // Log the amount and time written out for future data rate calculations.
-        QMutexLocker dataRateLocker(&dataRateMutex);
-        logDataRateToBuffer(outDataWriteAmounts, outDataWriteTimes, &outDataIndex, size, QDateTime::currentMSecsSinceEpoch());
+            socket->writeDatagram(data,size,i.IpAddress,i.port);
+            sent = true;
+            QMutexLocker dataRateLocker(&dataRateMutex);
+            logDataRateToBuffer(outDataWriteAmounts, outDataWriteTimes, &outDataIndex, size, QDateTime::currentMSecsSinceEpoch());
+        }
+    }
+    if(sent!= true){
+        // Broadcast to all connected systems
+        for (int h = 0; h < hosts.size(); h++)
+        {
+            QHostAddress currentHost = hosts.at(h);
+            quint16 currentPort = ports.at(h);
+    //#define UDPLINK_DEBUG
+    #ifdef UDPLINK_DEBUG
+            QString bytes;
+            QString ascii;
+            for (int i=0; i<size; i++)
+            {
+                unsigned char v = data[i];
+                bytes.append(QString().sprintf("%02x ", v));
+                if (data[i] > 31 && data[i] < 127)
+                {
+                    ascii.append(data[i]);
+                }
+                else
+                {
+                    ascii.append(219);
+                }
+            }
+            QLOG_TRACE() << "Sent" << size << "bytes to" << currentHost.toString() << ":" << currentPort << "data:";
+            QLOG_TRACE() << bytes;
+            QLOG_TRACE() << "ASCII:" << ascii;
+    #endif
+            socket->writeDatagram(data, size, currentHost, currentPort);
+
+            // Log the amount and time written out for future data rate calculations.
+            QMutexLocker dataRateLocker(&dataRateMutex);
+            logDataRateToBuffer(outDataWriteAmounts, outDataWriteTimes, &outDataIndex, size, QDateTime::currentMSecsSinceEpoch());
+        }
     }
 }
 
@@ -280,6 +317,7 @@ void UDPLink::readBytes()
 {
     while (socket->hasPendingDatagrams())
     {
+
         QByteArray datagram;
         datagram.resize(socket->pendingDatagramSize());
 
@@ -290,16 +328,30 @@ void UDPLink::readBytes()
         if(datagram.at(0) == 'I' && datagram.at(1) == 'M' && datagram.at(2)=='G' ){
             //f = fopen("0.jpg","a");
             //int write_size = 0;
+            //counter1 ++;
             QByteArray temp = datagram;
             datagram.remove(0,3);
             foreach(UASInterface *u, UASManager::instance()->getUASList()){
                 if(u->getIpAddress() == sender.toString()){
                     UAS *c = static_cast<UAS*>(u);
                     c->writeToFile(datagram);
+              //      counter2++;
                 }
             }
 //            write_size = ::fwrite(datagram.data(),1,datagram.size(),f);
 //            fclose(f);
+        }
+        if(datagram.at(0)=='C' && datagram.at(1)=='L' &&datagram.at(2)=='O' &&datagram.at(3)=='S' &&datagram.at(4)=='E'){
+            QByteArray temp = datagram;
+            datagram.remove(0,5);
+            foreach(UASInterface *u, UASManager::instance()->getUASList()){
+                if(u->getIpAddress() == sender.toString()){
+                    UAS *c = static_cast<UAS*>(u);
+                    c->writeToFile(datagram);
+                    c->closeFile();
+              //      counter2++;
+                }
+            }
         }
 
 
@@ -350,6 +402,7 @@ void UDPLink::readBytes()
             UASIp t;
             t.IpAddress = sender;
             t.uasId = message.sysid;
+            t,port = senderPort;
             this->ipMap.append(t);
             //printf("HI MAYBE IT WORKS HAHAHAHA");
         }

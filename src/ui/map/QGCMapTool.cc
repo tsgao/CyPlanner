@@ -17,6 +17,7 @@ QGCMapTool::QGCMapTool(QWidget *parent,bool tool) :
     m_uasInterface(NULL)
 {
     ui->setupUi(this);
+    ui->toolBar->setMap(ui->map);
     if(!tool){
         // Connect map and toolbar
         ui->toolBar->lower();

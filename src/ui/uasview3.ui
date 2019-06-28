@@ -19,7 +19,7 @@
   <property name="minimumSize">
    <size>
     <width>260</width>
-    <height>166</height>
+    <height>185</height>
    </size>
   </property>
   <property name="maximumSize">
@@ -67,9 +67,9 @@
    <widget class="QLabel" name="GPSHDOPNum">
     <property name="geometry">
      <rect>
-      <x>323</x>
+      <x>230</x>
       <y>128</y>
-      <width>21</width>
+      <width>25</width>
       <height>17</height>
      </rect>
     </property>
@@ -80,10 +80,10 @@
    <widget class="QLabel" name="C5">
     <property name="geometry">
      <rect>
-      <x>12</x>
+      <x>10</x>
       <y>78</y>
-      <width>21</width>
-      <height>17</height>
+      <width>20</width>
+      <height>15</height>
      </rect>
     </property>
     <property name="text">
@@ -93,10 +93,10 @@
    <widget class="QLabel" name="C6">
     <property name="geometry">
      <rect>
-      <x>74</x>
+      <x>45</x>
       <y>78</y>
-      <width>21</width>
-      <height>17</height>
+      <width>20</width>
+      <height>15</height>
      </rect>
     </property>
     <property name="text">
@@ -106,10 +106,10 @@
    <widget class="QLabel" name="GPSFixName">
     <property name="geometry">
      <rect>
-      <x>249</x>
+      <x>150</x>
       <y>78</y>
       <width>54</width>
-      <height>17</height>
+      <height>15</height>
      </rect>
     </property>
     <property name="text">
@@ -119,9 +119,9 @@
    <widget class="QLabel" name="GPSFixNum">
     <property name="geometry">
      <rect>
-      <x>323</x>
+      <x>230</x>
       <y>78</y>
-      <width>21</width>
+      <width>25</width>
       <height>17</height>
      </rect>
     </property>
@@ -132,10 +132,10 @@
    <widget class="QLabel" name="HeartbeatName">
     <property name="geometry">
      <rect>
-      <x>249</x>
+      <x>150</x>
       <y>55</y>
       <width>68</width>
-      <height>17</height>
+      <height>15</height>
      </rect>
     </property>
     <property name="text">
@@ -145,10 +145,10 @@
    <widget class="QLabel" name="C1">
     <property name="geometry">
      <rect>
-      <x>12</x>
+      <x>10</x>
       <y>55</y>
-      <width>21</width>
-      <height>17</height>
+      <width>20</width>
+      <height>15</height>
      </rect>
     </property>
     <property name="text">
@@ -158,9 +158,9 @@
    <widget class="QLabel" name="armedLabel">
     <property name="geometry">
      <rect>
-      <x>74</x>
+      <x>65</x>
       <y>101</y>
-      <width>68</width>
+      <width>75</width>
       <height>21</height>
      </rect>
     </property>
@@ -168,23 +168,13 @@
      <string>Dis/Armed</string>
     </property>
    </widget>
-   <widget class="QComboBox" name="modeComboBox">
-    <property name="geometry">
-     <rect>
-      <x>148</x>
-      <y>101</y>
-      <width>68</width>
-      <height>21</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QLabel" name="RTKGPSName">
     <property name="geometry">
      <rect>
-      <x>249</x>
+      <x>150</x>
       <y>151</y>
       <width>62</width>
-      <height>17</height>
+      <height>15</height>
      </rect>
     </property>
     <property name="text">
@@ -194,10 +184,10 @@
    <widget class="QLabel" name="C3">
     <property name="geometry">
      <rect>
-      <x>148</x>
+      <x>80</x>
       <y>55</y>
-      <width>21</width>
-      <height>17</height>
+      <width>20</width>
+      <height>15</height>
      </rect>
     </property>
     <property name="text">
@@ -207,10 +197,10 @@
    <widget class="QLabel" name="C4">
     <property name="geometry">
      <rect>
-      <x>222</x>
+      <x>115</x>
       <y>55</y>
-      <width>21</width>
-      <height>17</height>
+      <width>20</width>
+      <height>15</height>
      </rect>
     </property>
     <property name="text">
@@ -233,9 +223,9 @@
    <widget class="QLabel" name="GPSSatsNum">
     <property name="geometry">
      <rect>
-      <x>323</x>
+      <x>230</x>
       <y>101</y>
-      <width>21</width>
+      <width>25</width>
       <height>17</height>
      </rect>
     </property>
@@ -246,10 +236,10 @@
    <widget class="QLabel" name="GPSSatsName">
     <property name="geometry">
      <rect>
-      <x>249</x>
+      <x>150</x>
       <y>101</y>
       <width>63</width>
-      <height>17</height>
+      <height>15</height>
      </rect>
     </property>
     <property name="text">
@@ -259,9 +249,9 @@
    <widget class="QLabel" name="HeartbeatNum">
     <property name="geometry">
      <rect>
-      <x>323</x>
+      <x>230</x>
       <y>55</y>
-      <width>21</width>
+      <width>25</width>
       <height>17</height>
      </rect>
     </property>
@@ -272,9 +262,9 @@
    <widget class="QLabel" name="RTKGPSNum">
     <property name="geometry">
      <rect>
-      <x>323</x>
+      <x>230</x>
       <y>151</y>
-      <width>21</width>
+      <width>25</width>
       <height>17</height>
      </rect>
     </property>
@@ -285,10 +275,10 @@
    <widget class="QLabel" name="C8">
     <property name="geometry">
      <rect>
-      <x>222</x>
+      <x>115</x>
       <y>78</y>
-      <width>21</width>
-      <height>17</height>
+      <width>20</width>
+      <height>15</height>
      </rect>
     </property>
     <property name="text">
@@ -298,7 +288,7 @@
    <widget class="QLabel" name="AHRELName">
     <property name="geometry">
      <rect>
-      <x>249</x>
+      <x>150</x>
       <y>178</y>
       <width>68</width>
       <height>17</height>
@@ -311,7 +301,7 @@
    <widget class="QLabel" name="nameLabel">
     <property name="geometry">
      <rect>
-      <x>12</x>
+      <x>10</x>
       <y>32</y>
       <width>56</width>
       <height>16</height>
@@ -343,10 +333,10 @@
    <widget class="QLabel" name="C7">
     <property name="geometry">
      <rect>
-      <x>148</x>
+      <x>80</x>
       <y>78</y>
-      <width>21</width>
-      <height>17</height>
+      <width>20</width>
+      <height>15</height>
      </rect>
     </property>
     <property name="text">
@@ -356,10 +346,10 @@
    <widget class="QLabel" name="C2">
     <property name="geometry">
      <rect>
-      <x>74</x>
+      <x>45</x>
       <y>55</y>
-      <width>21</width>
-      <height>17</height>
+      <width>20</width>
+      <height>15</height>
      </rect>
     </property>
     <property name="text">
@@ -369,9 +359,9 @@
    <widget class="QLabel" name="AHRELNum">
     <property name="geometry">
      <rect>
-      <x>323</x>
+      <x>230</x>
       <y>178</y>
-      <width>21</width>
+      <width>25</width>
       <height>17</height>
      </rect>
     </property>
@@ -382,7 +372,7 @@
    <widget class="QLabel" name="statusLabel">
     <property name="geometry">
      <rect>
-      <x>249</x>
+      <x>150</x>
       <y>32</y>
       <width>68</width>
       <height>17</height>
@@ -395,10 +385,10 @@
    <widget class="QLabel" name="GPSHDOPName">
     <property name="geometry">
      <rect>
-      <x>249</x>
+      <x>150</x>
       <y>128</y>
       <width>68</width>
-      <height>17</height>
+      <height>15</height>
      </rect>
     </property>
     <property name="text">
@@ -411,20 +401,20 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>13</x>
+      <x>10</x>
       <y>127</y>
-      <width>200</width>
+      <width>120</width>
       <height>30</height>
      </rect>
     </property>
     <property name="minimumSize">
      <size>
-      <width>200</width>
+      <width>100</width>
       <height>30</height>
      </size>
     </property>
     <property name="text">
-     <string>KACHAK</string>
+     <string>Take Picture</string>
     </property>
    </widget>
   </widget>

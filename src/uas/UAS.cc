@@ -1953,7 +1953,7 @@ void UAS::sendMessage(mavlink_message_t message)
         //if (LinkManager::instance()->getLinks().contains(link))
         //{
             if (link->isConnected())
-                sendMessage(link, message);
+                                sendMessage(link, message);
         //}
         //else
         //{
@@ -3986,7 +3986,7 @@ void UAS::receiveLossChangedRec(int id,float value)
 void UAS::openFile(QString filename)
 {
     const char* fname = filename.toLocal8Bit().data();
-    f = fopen(fname,"a");
+    f = fopen(fname,"w");
 }
 
 void UAS::writeToFile(QByteArray datagram){
