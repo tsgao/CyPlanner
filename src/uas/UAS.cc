@@ -18,6 +18,7 @@
 #include "QGCMAVLink.h"
 #include "LinkManager.h"
 #include "MainWindow.h"
+#include "UDPLink.h"
 
 #include <QList>
 #include <QMessageBox>
@@ -2027,7 +2028,13 @@ void UAS::sendMessage(LinkInterface* link, mavlink_message_t message)
     if (link->isConnected())
     {
         // Send the portion of the buffer now occupied by the message
-        link->writeBytes((const char*)buffer, len);
+        if(link->getLinkType() == LinkInterface::UDP_LINK){
+            UDPLink *u = static_cast<UDPLink*>(link);
+            u->customWriteBytes((const char*)buffer,len,this->getUASID());
+
+        }else{
+            link->writeBytes((const char*)buffer, len);
+        }
     }
     else
     {

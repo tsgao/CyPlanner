@@ -1028,10 +1028,8 @@ void UASView3::sendCameraCommand(){
     mavlink_msg_camera_trigger_pack(0,0,&msg, 1,1);
     uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
     // Write message into buffer, prepending start sign
-    //int len = mavlink_msg_to_send_buffer(buffer, &msg);
     UAS *c = static_cast<UAS*>(uas);
     c->sendMessage(msg);
-    printf("CMD SENT");
 
 }
 

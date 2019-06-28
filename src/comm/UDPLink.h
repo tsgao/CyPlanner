@@ -45,10 +45,15 @@ This file is part of the QGROUNDCONTROL project
 
 typedef struct uasip{
     QHostAddress IpAddress;
-    uint8_t uasId;
+    int uasId;
     quint16 port;
 } UASIp;
 
+
+typedef struct customMessage{
+    uint8_t uasId;
+    QByteArray* data;
+} customMessage;
 class UDPLink : public LinkInterface
 {
     Q_OBJECT
@@ -121,6 +126,15 @@ public slots:
      * @param size The size of the bytes array
      **/
     void writeBytes(const char* data, qint64 length);
+    /**
+     * Added by: Guang Yi Lim
+     * @brief write bytes with UAS ID to filter connection
+     * @param data
+     * @param length
+     * @param uasId
+     */
+    void customWriteBytes(const char* data, qint64 length, int uasId);
+
     bool connect();
     bool disconnect();
 
@@ -146,10 +160,12 @@ private:
 
     bool                _running;
     QMutex              _mutex;
-    QQueue<QByteArray*> _outQueue;
+    QQueue<customMessage*> _outQueue;
     FILE *f;
     bool _dequeBytes    ();
     void _sendBytes     (const char* data, qint64 size,uint8_t sysid);
+
+    void custom_sendBytes(customMessage *c);
 
 
 };

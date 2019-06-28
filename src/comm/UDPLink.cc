@@ -218,23 +218,49 @@ void UDPLink::writeBytes(const char* data, qint64 size)
     if (!socket) {
         return;
     }
-    QByteArray* qdata = new QByteArray(data, size);
-    QMutexLocker lock(&_mutex);
-    _outQueue.enqueue(qdata);
+//    QByteArray* qdata = new QByteArray(data, size);
+//    QMutexLocker lock(&_mutex);
+
+//    _outQueue.enqueue(qdata);
 }
 
+
+void UDPLink::customWriteBytes(const char* data, qint64 size, int uasId){
+    if (!socket) {
+        return;
+    }
+    QByteArray* qdata = new QByteArray(data, size);
+    QMutexLocker lock(&_mutex);
+
+    customMessage *c = new customMessage;
+    c->uasId = uasId;
+    c->data = qdata;
+    _outQueue.enqueue(c);
+}
+
+void UDPLink::custom_sendBytes(customMessage *c){
+    foreach(uasip i, this->ipMap){
+        if(i.uasId == c->uasId){
+
+            socket->writeDatagram(c->data->data(),c->data->size(),i.IpAddress,i.port);
+            QMutexLocker dataRateLocker(&dataRateMutex);
+            logDataRateToBuffer(outDataWriteAmounts, outDataWriteTimes, &outDataIndex, c->data->size(), QDateTime::currentMSecsSinceEpoch());
+        }
+    }
+}
 bool UDPLink::_dequeBytes()
 {
     QMutexLocker lock(&_mutex);
     if(_outQueue.count() > 0) {
-        QByteArray* qdata = _outQueue.dequeue();
+        customMessage *c =_outQueue.dequeue();
+        //QByteArray* qdata = _outQueue.dequeue();
 
 
         mavlink_message_t message;
         memset(&message, 0, sizeof(mavlink_message_t));
         mavlink_status_t status;
         bool decodedFirstPacket = false;
-        for(const auto &data : *qdata)
+        for(const auto &data : *c->data)
         {
             unsigned int decodeState = mavlink_parse_char(MAVLINK_COMM_0, static_cast<quint8>(data), &message, &status);
             if (decodeState == 1)
@@ -248,8 +274,8 @@ bool UDPLink::_dequeBytes()
             }
         }
         lock.unlock();
-        _sendBytes(qdata->data(), qdata->size(),message.sysid);
-        delete qdata;
+        custom_sendBytes(c);
+        delete c;
         lock.relock();
     }
     return (_outQueue.count() > 0);
@@ -402,7 +428,7 @@ void UDPLink::readBytes()
             UASIp t;
             t.IpAddress = sender;
             t.uasId = message.sysid;
-            t,port = senderPort;
+            t.port = senderPort;
             this->ipMap.append(t);
             //printf("HI MAYBE IT WORKS HAHAHAHA");
         }
