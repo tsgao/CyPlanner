@@ -26,6 +26,7 @@
 */
 #include "core.h"
 
+
 #ifdef DEBUG_CORE
 qlonglong internals::Core::debugcounter=0;
 #endif
@@ -61,6 +62,8 @@ namespace internals {
         dragPoint=Point(0,0);
         CanDragMap=true;
         tilesToload=0;
+        imgDir = new QDir("/home/rmasl/Desktop/workspace/build-apm_planner-Desktop_Qt_5_12_3_GCC_64bit-Debug/mock_map");
+        imgList = imgDir->entryList();
         OPMaps::Instance();
     }
     Core::~Core()
@@ -148,6 +151,34 @@ namespace internals {
                                     qDebug()<<"start getting image"<<" ID="<<debug;
 #endif //DEBUG_CORE
                                     img = OPMaps::Instance()->GetImageFrom(tl, task.Pos, task.Zoom);
+                                    //could add a control statement to check if zoom level hits 21
+                                    //need to know the specific location of the zooom area
+                                    if(task.Zoom >=21){
+                                        //QDir *q = new QDir("/home/rmasl/Desktop/workspace/build-apm_planner-Desktop_Qt_5_12_3_GCC_64bit-Debug/mock_map");
+
+                                        int i = 0;
+                                        for(i = 0; i < imgList.size();i++){
+                                            if(imgList.at(i)[0]== 'M'){//check to make sure is MAP file
+                                                double lat, lng;
+                                                QStringList  l = imgList.at(i).split("_");
+                                                lat = l[1].toDouble();
+                                                l[2].chop(4);//remove jpg file name from string
+                                                lng = l[2].toDouble();
+                                                //create PointLatLng object and convert it to tile value
+                                                PointLatLng center (lat,lng);
+                                                Point centerPixel = Projection()->FromLatLngToPixel(center, Zoom());
+                                                Point temp = Projection()->FromPixelToTileXY(centerPixel);
+                                                //if tile position and this position is the same, replace tile with image
+                                                if(task.Pos.X() == temp.X() && task.Pos.Y() == temp.Y()){
+                                                        QString path  = "/home/rmasl/Desktop/workspace/build-apm_planner-Desktop_Qt_5_12_3_GCC_64bit-Debug/mock_map/";
+                                                        QPixmap p(path + imgList.at(i));
+                                                        QBuffer buffer(&img);
+                                                         buffer.open(QIODevice::WriteOnly);
+                                                        p.save(&buffer,"JPG");
+                                                    }
+                                            }
+                                        }
+                                    }
 #ifdef DEBUG_CORE
                                     qDebug()<<"Core::run:gotimage size:"<<img.count()<<" ID="<<debug<<" time="<<t.elapsed();
 #endif //DEBUG_CORE

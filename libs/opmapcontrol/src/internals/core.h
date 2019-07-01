@@ -34,6 +34,7 @@
 #include "../core/size.h"
 #include "../core/point.h"
 
+
 #include "../core/maptype.h"
 #include "rectangle.h"
 #include "QThreadPool"
@@ -263,6 +264,8 @@ namespace internals {
         QMutex MrunningThreads;
         int runningThreads;
         diagnostics diag;
+        QDir *imgDir ;
+        QStringList imgList;
 
     protected:
         bool started;

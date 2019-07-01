@@ -141,6 +141,7 @@ namespace core {
                 case MapType::GoogleHybrid:
                     {
                         qheader.setRawHeader("Referrer", "https://maps.google.com/");
+                    //qheader.setRawHeader("Referrer", "http://maps.yahoo.com/");
                     }
                     break;
 
@@ -205,10 +206,10 @@ namespace core {
                                     }
                                     break;
                 case MapType::Eniro_Topo:
-					{
-						qheader.setRawHeader("Referrer", "http://eniro.se/");
-					}
-					break;
+                    {
+                        qheader.setRawHeader("Referrer", "http://eniro.se/");
+                    }
+                    break;
                 default:
                     break;
                 }
