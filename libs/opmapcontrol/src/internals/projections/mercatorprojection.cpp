@@ -44,8 +44,8 @@ Point MercatorProjection::FromLatLngToPixel(double lat, double lng, const int &z
     double y = 0.5 - log((1 + sinLatitude) / (1 - sinLatitude)) / (4 * M_PI);
 
     Size s = GetTileMatrixSizePixel(zoom);
-    int mapSizeX = s.Width();
-    int mapSizeY = s.Height();
+    long int mapSizeX = s.Width();
+    long int mapSizeY = s.Height();
 
     ret.SetX((int) Clip(x * mapSizeX + 0.5, 0, mapSizeX - 1));
     ret.SetY((int) Clip(y * mapSizeY + 0.5, 0, mapSizeY - 1));
@@ -87,7 +87,16 @@ double MercatorProjection::Flattening() const
 Size MercatorProjection::GetTileMatrixMaxXY(const int &zoom)
 {
     Q_UNUSED(zoom);
-    int xy = (1 << zoom);
+    int xy;
+
+//doesnt work as accuracy does not increase, just the zoom level
+//    if(zoom <23){
+        xy = (1 << zoom);
+//    }
+//    else{
+//        xy =(1 <<22);
+//    }
+    //goes too high for zoom level over 23 as 2^23 is too high
     return  Size(xy - 1, xy - 1);
 }
 Size MercatorProjection::GetTileMatrixMinXY(const int &zoom)

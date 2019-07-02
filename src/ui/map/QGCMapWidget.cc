@@ -59,9 +59,7 @@ QGCMapWidget::QGCMapWidget(QWidget *parent) :
     this->addAction(cameraaction);
 
     imgManager = ImageManager::instance();
-    bool success = connect(imgManager,SIGNAL(newImageAdded(imageObj* )),this, SLOT(addImageIcon(imageObj* )));
-    //Q_ASSERT(success);
-    printf("hi");
+    connect(imgManager,SIGNAL(newImageAdded(imageObj* )),this, SLOT(addImageIcon(imageObj* )));
 }
 
 void QGCMapWidget::guidedActionTriggered()

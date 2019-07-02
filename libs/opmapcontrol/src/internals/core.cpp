@@ -48,7 +48,7 @@ namespace internals {
     TooltipTextPadding(10,10),
     mapType(static_cast<MapType::Types>(0)),
     loaderLimit(5),
-    maxzoom(21),/** @brief GUANG YI LIM is for zoom slider, but breaks map if goes beyond 22 **/
+    maxzoom(30),/** @brief GUANG YI LIM is for zoom slider, but breaks map if goes beyond 22 **/
     runningThreads(0),
     started(false),
     Width(0),
@@ -62,6 +62,8 @@ namespace internals {
         dragPoint=Point(0,0);
         CanDragMap=true;
         tilesToload=0;
+
+        //load directory used to store custom image
         imgDir = new QDir("/home/rmasl/Desktop/workspace/build-apm_planner-Desktop_Qt_5_12_3_GCC_64bit-Debug/mock_map");
         imgList = imgDir->entryList();
         OPMaps::Instance();
@@ -150,7 +152,7 @@ namespace internals {
 #ifdef DEBUG_CORE
                                     qDebug()<<"start getting image"<<" ID="<<debug;
 #endif //DEBUG_CORE
-                                    img = OPMaps::Instance()->GetImageFrom(tl, task.Pos, task.Zoom);
+
                                     //could add a control statement to check if zoom level hits 21
                                     //need to know the specific location of the zooom area
                                     if(task.Zoom >=21){
@@ -178,6 +180,13 @@ namespace internals {
                                                     }
                                             }
                                         }
+//                                        QPixmap p("/home/rmasl/Desktop/workspace/build-apm_planner-Desktop_Qt_5_12_3_GCC_64bit-Debug/mock_map/pika.jpg");
+//                                        QBuffer buffer(&img);
+//                                        buffer.open(QIODevice::WriteOnly);
+//                                        p.save(&buffer,"JPG");
+                                    }
+                                    else{
+                                        img = OPMaps::Instance()->GetImageFrom(tl, task.Pos, task.Zoom);
                                     }
 #ifdef DEBUG_CORE
                                     qDebug()<<"Core::run:gotimage size:"<<img.count()<<" ID="<<debug<<" time="<<t.elapsed();
@@ -212,7 +221,7 @@ namespace internals {
                                     }
                                 }
                             }
-                            while(++retry < OPMaps::Instance()->RetryLoadTile);
+                            while(retry+=10 < OPMaps::Instance()->RetryLoadTile);
                         }
 
                         if(t->Overlays.count() > 0)
@@ -433,8 +442,10 @@ namespace internals {
     void Core::UpdateCenterTileXYLocation()
     {
         PointLatLng center = FromLocalToLatLng(Width/2, Height/2);
+        //PointLatLng center(42.0408,-93.6638);
         Point centerPixel = Projection()->FromLatLngToPixel(center, Zoom());
         centerTileXYLocation = Projection()->FromPixelToTileXY(centerPixel);
+
     }
 
     void Core::OnMapSizeChanged(int const& width, int const& height)
