@@ -48,7 +48,7 @@ namespace internals {
     TooltipTextPadding(10,10),
     mapType(static_cast<MapType::Types>(0)),
     loaderLimit(5),
-    maxzoom(30),/** @brief GUANG YI LIM is for zoom slider, but breaks map if goes beyond 22 **/
+    maxzoom(24),/** @brief GUANG YI LIM is for zoom slider, but breaks map if goes beyond 22 **/
     runningThreads(0),
     started(false),
     Width(0),
@@ -152,40 +152,38 @@ namespace internals {
 #ifdef DEBUG_CORE
                                     qDebug()<<"start getting image"<<" ID="<<debug;
 #endif //DEBUG_CORE
-
-                                    //could add a control statement to check if zoom level hits 21
-                                    //need to know the specific location of the zooom area
-                                    if(task.Zoom >=21){
-                                        //QDir *q = new QDir("/home/rmasl/Desktop/workspace/build-apm_planner-Desktop_Qt_5_12_3_GCC_64bit-Debug/mock_map");
-
+                                    //check if zoom level is over n
+                                    if(task.Zoom >21){
                                         int i = 0;
+                                        //loops through the imgList to find the appropriate image
                                         for(i = 0; i < imgList.size();i++){
                                             if(imgList.at(i)[0]== 'M'){//check to make sure is MAP file
-                                                double lat, lng;
+                                                double lat, lng,level;
                                                 QStringList  l = imgList.at(i).split("_");
-                                                lat = l[1].toDouble();
-                                                l[2].chop(4);//remove jpg file name from string
-                                                lng = l[2].toDouble();
-                                                //create PointLatLng object and convert it to tile value
-                                                PointLatLng center (lat,lng);
-                                                Point centerPixel = Projection()->FromLatLngToPixel(center, Zoom());
-                                                Point temp = Projection()->FromPixelToTileXY(centerPixel);
-                                                //if tile position and this position is the same, replace tile with image
-                                                if(task.Pos.X() == temp.X() && task.Pos.Y() == temp.Y()){
+                                                level = l[0].mid(1,2).toDouble();
+                                                //check for the correct zoom level
+                                                if(task.Zoom == level){
+                                                    lat = l[1].toDouble();
+                                                    l[2].chop(4);//remove jpg file name from string
+                                                    lng = l[2].toDouble();
+                                                    //create PointLatLng object and convert it to tile value
+                                                    PointLatLng center (lat,lng);
+                                                    Point centerPixel = Projection()->FromLatLngToPixel(center, Zoom());
+                                                    Point temp = Projection()->FromPixelToTileXY(centerPixel);
+                                                    //if tile position and this position is the same, replace tile with image
+                                                    if(task.Pos.X() == temp.X() && task.Pos.Y() == temp.Y()){
+                                                        //reads the image from the saved location
                                                         QString path  = "/home/rmasl/Desktop/workspace/build-apm_planner-Desktop_Qt_5_12_3_GCC_64bit-Debug/mock_map/";
                                                         QPixmap p(path + imgList.at(i));
                                                         QBuffer buffer(&img);
-                                                         buffer.open(QIODevice::WriteOnly);
+                                                        buffer.open(QIODevice::WriteOnly);
                                                         p.save(&buffer,"JPG");
                                                     }
+                                                }
                                             }
                                         }
-//                                        QPixmap p("/home/rmasl/Desktop/workspace/build-apm_planner-Desktop_Qt_5_12_3_GCC_64bit-Debug/mock_map/pika.jpg");
-//                                        QBuffer buffer(&img);
-//                                        buffer.open(QIODevice::WriteOnly);
-//                                        p.save(&buffer,"JPG");
                                     }
-                                    else{
+                                    else{//if zoom level is above treshold use image from default source
                                         img = OPMaps::Instance()->GetImageFrom(tl, task.Pos, task.Zoom);
                                     }
 #ifdef DEBUG_CORE
@@ -221,7 +219,7 @@ namespace internals {
                                     }
                                 }
                             }
-                            while(retry+=10 < OPMaps::Instance()->RetryLoadTile);
+                            while(++retry < OPMaps::Instance()->RetryLoadTile);
                         }
 
                         if(t->Overlays.count() > 0)
