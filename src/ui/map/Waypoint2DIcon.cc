@@ -297,9 +297,9 @@ void Waypoint2DIcon::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
         if (acceptance <= 0)
             return;
         painter->setPen(penBlack);
-        painter->drawEllipse(QPointF(0, 0), acceptance, acceptance);
+        //painter->drawEllipse(QPointF(0, 0), acceptance, acceptance);
         painter->setPen(redPen);
-        painter->drawEllipse(QPointF(0, 0), acceptance, acceptance);
+        //painter->drawEllipse(QPointF(0, 0), acceptance, acceptance);
     }
     if ((waypoint) && ((waypoint->getAction() == (int)MAV_CMD_NAV_LOITER_TO_ALT) || (waypoint->getAction() == (int)MAV_CMD_NAV_LOITER_UNLIM) || (waypoint->getAction() == (int)MAV_CMD_NAV_LOITER_TIME) || (waypoint->getAction() == (int)MAV_CMD_NAV_LOITER_TURNS)))
     {

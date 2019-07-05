@@ -37,7 +37,7 @@ namespace core {
 
         Size();
         Size(Point pt){width=pt.X(); height=pt.Y();};
-        Size(long int Width,long int Height){width=Width; height=Height;};
+        Size(long long int Width,long long int Height){width=Width; height=Height;};
         friend uint qHash(Size const& size);
         //  friend bool operator==(Size const& lhs,Size const& rhs);
         Size operator-(const Size &sz1){return Size(width-sz1.width,height-sz1.height);}
@@ -46,13 +46,13 @@ namespace core {
         int GetHashCode(){return width^height;}
         uint qHash(Size const& /*rect*/){return width^height;}
         QString ToString(){return "With="+QString::number(width)+" ,Height="+QString::number(height);}
-        long int Width()const {return width;}
-        long int Height()const {return height;}
+        long long int Width()const {return width;}
+        long long int Height()const {return height;}
         void SetWidth(int const& value){width=value;}
         void SetHeight(int const& value){height=value;}
     private:
-        long int width;
-        long int height;
+        long long int width;
+        long long int height;
     };
 }
 #endif // SIZE_H

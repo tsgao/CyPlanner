@@ -48,13 +48,13 @@ namespace mapcontrol
         coord = wp_coord;
         picture.load(QString::fromUtf8(":/markers/images/marker.png"));
         number=WayPointItem::snumber++;
-        setFlag(QGraphicsItem::ItemIsMovable,true);
+        setFlag(QGraphicsItem::ItemIsMovable,false);
         setFlag(QGraphicsItem::ItemIgnoresTransformations,true);
-        setFlag(QGraphicsItem::ItemIsSelectable,true);
+        setFlag(QGraphicsItem::ItemIsSelectable,false);
         SetShowNumber(shownumber);
         RefreshToolTip();
         RefreshPos();
-        setAcceptedMouseButtons(Qt::LeftButton);
+        //setAcceptedMouseButtons(Qt::LeftButton);
 
         text = new QGraphicsSimpleTextItem(this);
         text->setPos(10,-picture.height());

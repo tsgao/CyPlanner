@@ -38,5 +38,4 @@ void WaypointInput::on_pushButton_clicked()
     cordIn.setModal(true);
     cordIn.exec();
 
-
 }
