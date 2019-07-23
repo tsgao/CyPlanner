@@ -208,7 +208,6 @@ namespace internals {
 
     private:
 
-
         PointLatLng currentPosition;
         core::Point currentPositionPixel;
         core::Point renderOffset;
@@ -222,6 +221,7 @@ namespace internals {
         PointLatLng LastLocationInBounds;
         core::Point mouseLastZoom;
 
+        core::Point curTaskPos;
         MouseWheelZoomType::Types mousewheelzoomtype;
 
 
@@ -265,7 +265,7 @@ namespace internals {
         int runningThreads;
         diagnostics diag;
         QDir *imgDir ;
-        QStringList imgList;
+        //QStringList imgList;
 
     protected:
         bool started;

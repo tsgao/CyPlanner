@@ -89,14 +89,8 @@ Size MercatorProjection::GetTileMatrixMaxXY(const int &zoom)
     Q_UNUSED(zoom);
     int xy;
 
-//doesnt work as accuracy does not increase, just the zoom level
-//    if(zoom <23){
-        xy = (1 << zoom);
-//    }
-//    else{
-//        xy =(1 <<22);
-//    }
-    //goes too high for zoom level over 23 as 2^23 is too high
+    xy = (1 << zoom);
+
     return  Size(xy - 1, xy - 1);
 }
 Size MercatorProjection::GetTileMatrixMinXY(const int &zoom)

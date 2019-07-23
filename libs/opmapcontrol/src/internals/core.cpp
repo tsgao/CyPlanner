@@ -34,7 +34,7 @@ qlonglong internals::Core::debugcounter=0;
 using namespace projections;
 
 namespace internals {
-    Core::Core() :
+Core::Core() :
     MouseWheelZooming(false),
     currentPosition(0,0),
     currentPositionPixel(0,0),
@@ -53,64 +53,64 @@ namespace internals {
     started(false),
     Width(0),
     Height(0)
-    {
-        mousewheelzoomtype=MouseWheelZoomType::MousePositionAndCenter;
-        SetProjection(new MercatorProjection());
-        this->setAutoDelete(false);
-        ProcessLoadTaskCallback.setMaxThreadCount(10);
-        renderOffset=Point(0,0);
-        dragPoint=Point(0,0);
-        CanDragMap=true;
-        tilesToload=0;
+{
+    mousewheelzoomtype=MouseWheelZoomType::MousePositionAndCenter;
+    SetProjection(new MercatorProjection());
+    this->setAutoDelete(false);
+    ProcessLoadTaskCallback.setMaxThreadCount(10);
+    renderOffset=Point(0,0);
+    dragPoint=Point(0,0);
+    CanDragMap=true;
+    tilesToload=0;
 
-        //load directory used to store custom image
-        imgDir = new QDir("/home/rmasl/Desktop/workspace/build-apm_planner-Desktop_Qt_5_12_3_GCC_64bit-Debug/mock_map");
-        imgList = imgDir->entryList();
-        OPMaps::Instance();
-    }
-    Core::~Core()
-    {
-        ProcessLoadTaskCallback.waitForDone();
-        Matrix.Clear();
-        delete projection;
-        projection = 0;
-    }
+    //load directory used to store custom image
+    imgDir = new QDir("/Users/xiangweiniu/Documents/pictest1/result5");
+    //imgList = imgDir->entryList();
+    OPMaps::Instance();
+}
+Core::~Core()
+{
+    ProcessLoadTaskCallback.waitForDone();
+    Matrix.Clear();
+    delete projection;
+    projection = 0;
+}
 
-    void Core::run()
-    {
-        MrunningThreads.lock();
-        ++runningThreads;
-        MrunningThreads.unlock();
+void Core::run()
+{
+    MrunningThreads.lock();
+    ++runningThreads;
+    MrunningThreads.unlock();
 #ifdef DEBUG_CORE
-        qlonglong debug;
-        Mdebug.lock();
-        debug=++debugcounter;
-        Mdebug.unlock();
-        qDebug()<<"core:run"<<" ID="<<debug;
+    qlonglong debug;
+    Mdebug.lock();
+    debug=++debugcounter;
+    Mdebug.unlock();
+    qDebug()<<"core:run"<<" ID="<<debug;
 #endif //DEBUG_CORE
-        bool last = false;
+    bool last = false;
 
-        LoadTask task;
+    LoadTask task;
 
-        MtileLoadQueue.lock();
+    MtileLoadQueue.lock();
+    {
+        if(tileLoadQueue.count() > 0)
         {
-            if(tileLoadQueue.count() > 0)
+            task = tileLoadQueue.dequeue();
             {
-                task = tileLoadQueue.dequeue();
-                {
 
-                    last = (tileLoadQueue.count() == 0);
+                last = (tileLoadQueue.count() == 0);
 #ifdef DEBUG_CORE
-                    qDebug()<<"TileLoadQueue: " << tileLoadQueue.count()<<" Point:"<<task.Pos.ToString()<<" ID="<<debug;;
+                qDebug()<<"TileLoadQueue: " << tileLoadQueue.count()<<" Point:"<<task.Pos.ToString()<<" ID="<<debug;;
 #endif //DEBUG_CORE
-                }
             }
         }
-        MtileLoadQueue.unlock();
+    }
+    MtileLoadQueue.unlock();
 
-        if(task.HasValue())
-            if(loaderLimit.tryAcquire(1,OPMaps::Instance()->Timeout))
-            {
+    if(task.HasValue())
+        if(loaderLimit.tryAcquire(1,OPMaps::Instance()->Timeout))
+        {
             MtileToload.lock();
             --tilesToload;
             MtileToload.unlock();
@@ -131,17 +131,24 @@ namespace internals {
 #ifdef DEBUG_CORE
                         qDebug()<<"Fill empty TileMatrix: " + task.ToString()<<" ID="<<debug;;
 #endif //DEBUG_CORE
-
-                        Tile* t = new Tile(task.Zoom, task.Pos);
+                        curTaskPos = task.Pos;
+                        Tile* t = new Tile(task.Zoom, curTaskPos);
+                        //Tile* t = new Tile(task.Zoom, task.Pos);
                         QVector<MapType::Types> layers= OPMaps::Instance()->GetAllLayersOfType(GetMapType());
 
-                        foreach(MapType::Types tl,layers)
+                        //foreach(MapType::Types tl,layers)
+                        for (int k = 0; k<layers.size(); k++)
                         {
+                            MapType::Types tl = layers.at(k);
+                            //                            if (k == layers.size() - 1)
+                            //                                break;
+                            int justCount = 0;
                             int retry = 0;
+                            int tileNum = 0;
                             do
                             {
                                 QByteArray img;
-
+                                justCount++;
                                 // tile number inversion(BottomLeft -> TopLeft) for pergo maps
                                 if(tl == MapType::PergoTurkeyMap)
                                 {
@@ -153,33 +160,56 @@ namespace internals {
                                     qDebug()<<"start getting image"<<" ID="<<debug;
 #endif //DEBUG_CORE
                                     //check if zoom level is over n
-                                    if(task.Zoom >21){
-                                        int i = 0;
+                                    if(task.Zoom >18 && task.Zoom <= 24 && k == 0){
+                                        //load directory used to store custom image
+                                        QString loadPath = "/Users/xiangweiniu/Documents/pictest1/result7/" + QString::number(task.Zoom);
+                                        imgDir = new QDir(loadPath);
+                                        QStringList imgFolderList = imgDir->entryList();
+
                                         //loops through the imgList to find the appropriate image
-                                        for(i = 0; i < imgList.size();i++){
-                                            if(imgList.at(i)[0]== 'M'){//check to make sure is MAP file
-                                                double lat, lng,level;
-                                                QStringList  l = imgList.at(i).split("_");
-                                                level = l[0].mid(1,2).toDouble();
+                                        for(int i = 0; i < imgFolderList.size();i++){
+                                            if(imgFolderList.at(i)[0]== 'F'){//check to make sure is MAP folder
+                                                double lat1, lng1;
+                                                lat1 = 10.0;
+                                                int tileX = imgFolderList.at(i).mid(1).toInt();
+
                                                 //check for the correct zoom level
-                                                if(task.Zoom == level){
-                                                    lat = l[1].toDouble();
-                                                    l[2].chop(4);//remove jpg file name from string
-                                                    lng = l[2].toDouble();
-                                                    //create PointLatLng object and convert it to tile value
-                                                    PointLatLng center (lat,lng);
-                                                    Point centerPixel = Projection()->FromLatLngToPixel(center, Zoom());
-                                                    Point temp = Projection()->FromPixelToTileXY(centerPixel);
-                                                    //if tile position and this position is the same, replace tile with image
-                                                    if(task.Pos.X() == temp.X() && task.Pos.Y() == temp.Y()){
-                                                        //reads the image from the saved location
-                                                        QString path  = "/home/rmasl/Desktop/workspace/build-apm_planner-Desktop_Qt_5_12_3_GCC_64bit-Debug/mock_map/";
-                                                        QPixmap p(path + imgList.at(i));
-                                                        QBuffer buffer(&img);
-                                                        buffer.open(QIODevice::WriteOnly);
-                                                        p.save(&buffer,"JPG");
+                                                //if(task.Pos.X() == center_temp_tile.X()){
+                                                if(task.Pos.X() == tileX){
+                                                    QString loadPath2 = loadPath + "/" + imgFolderList.at(i);
+                                                    imgDir = new QDir(loadPath2);
+                                                    QStringList imgList = imgDir->entryList();
+
+                                                    for (int j = 0; j < imgList.size(); j++){
+                                                        if(imgList.at(j)[0]== 'M'){
+                                                            //double lat, lng;
+                                                            QStringList  l = imgList.at(j).split("_");
+                                                            //                                                            lng = l[1].toDouble();
+                                                            //                                                            l[2].chop(4);//remove jpg file name from string
+                                                            //                                                            lat = l[2].toDouble();
+
+                                                            int tileY = l[2].toInt();
+                                                            if(task.Pos.Y()== tileY){
+                                                                QString path = loadPath2 + "/";
+                                                                QString file = path + imgList.at(j);
+                                                                QPixmap p(file);
+                                                                QBuffer buffer(&img);
+                                                                buffer.open(QIODevice::WriteOnly);
+                                                                p.save(&buffer,"JPG");
+                                                            }
+                                                        }
                                                     }
+
+                                                    //                                                    QList<core::Point> aaa = tileDrawingList;
+                                                    //                                                    QList<PointLatLng> bbb;
+                                                    //                                                    for (int k = 0; k< aaa.size(); k++){
+                                                    //                                                        Point pi = Projection()->FromTileXYToPixel(aaa.at(k));
+                                                    //                                                        PointLatLng pp = Projection()->FromPixelToLatLng(pi,Zoom());
+                                                    //                                                        bbb.append(pp);
+                                                    //                                                    }
+
                                                 }
+
                                             }
                                         }
                                     }
@@ -190,8 +220,10 @@ namespace internals {
                                     qDebug()<<"Core::run:gotimage size:"<<img.count()<<" ID="<<debug<<" time="<<t.elapsed();
 #endif //DEBUG_CORE
                                 }
+                                if (img.length() == 0)
+                                    img = OPMaps::Instance()->GetImageFrom(tl, task.Pos, task.Zoom);
 
-                                if(img.length()!=0)
+                                if(img.length()!=0 )
                                 {
                                     Moverlays.lock();
                                     {
@@ -219,7 +251,8 @@ namespace internals {
                                     }
                                 }
                             }
-                            while(++retry < OPMaps::Instance()->RetryLoadTile);
+                            while(++retry < OPMaps::Instance()->RetryLoadTile); // RetryLoadTile = 2
+                            tileNum++;
                         }
 
                         if(t->Overlays.count() > 0)
@@ -278,479 +311,483 @@ namespace internals {
             emit OnTilesStillToLoad(tilesToload<0? 0:tilesToload);
             loaderLimit.release();
         }
-        MrunningThreads.lock();
-        --runningThreads;
-        MrunningThreads.unlock();
-    }
-    diagnostics Core::GetDiagnostics()
+    MrunningThreads.lock();
+    --runningThreads;
+    MrunningThreads.unlock();
+}
+diagnostics Core::GetDiagnostics()
+{
+    MrunningThreads.lock();
+    diag=OPMaps::Instance()->GetDiagnostics();
+    diag.runningThreads=runningThreads;
+    MrunningThreads.unlock();
+    return diag;
+}
+
+void Core::SetZoom(const int &value)
+{
+    if (!isDragging)
     {
-        MrunningThreads.lock();
-        diag=OPMaps::Instance()->GetDiagnostics();
-        diag.runningThreads=runningThreads;
-        MrunningThreads.unlock();
-        return diag;
-    }
-
-    void Core::SetZoom(const int &value)
-    {
-        if (!isDragging)
-        {
-            zoom=value;
-            minOfTiles=Projection()->GetTileMatrixMinXY(value);
-            maxOfTiles=Projection()->GetTileMatrixMaxXY(value);
-            currentPositionPixel=Projection()->FromLatLngToPixel(currentPosition,value);
-            if(started)
-            {
-                MtileLoadQueue.lock();
-                tileLoadQueue.clear();
-                MtileLoadQueue.unlock();
-                MtileToload.lock();
-                tilesToload=0;
-                MtileToload.unlock();
-                Matrix.Clear();
-                GoToCurrentPositionOnZoom();
-                UpdateBounds();
-                emit OnMapDrag();
-                emit OnMapZoomChanged();
-                emit OnNeedInvalidation();
-            }
-        }
-    }
-
-    void Core::SetCurrentPosition(const PointLatLng &value)
-    {
-        if(!IsDragging())
-        {
-            currentPosition = value;
-            SetCurrentPositionGPixel(Projection()->FromLatLngToPixel(value, Zoom()));
-
-            if(started)
-            {
-                GoToCurrentPosition();
-                emit OnCurrentPositionChanged(currentPosition);
-            }
-        }
-        else
-        {
-            currentPosition = value;
-            SetCurrentPositionGPixel(Projection()->FromLatLngToPixel(value, Zoom()));
-
-            if(started)
-            {
-                emit OnCurrentPositionChanged(currentPosition);
-            }
-        }
-    }
-    void Core::SetMapType(const MapType::Types &value)
-    {
-
-        if(value != GetMapType())
-        {
-            mapType = value;
-
-            switch(value)
-            {
-
-
-            case MapType::ArcGIS_Map:
-            case MapType::ArcGIS_Satellite:
-            case MapType::ArcGIS_ShadedRelief:
-            case MapType::ArcGIS_Terrain:
-                {
-                    if(Projection()->Type()!="PlateCarreeProjection")
-                    {
-                        SetProjection(new PlateCarreeProjection());
-                        maxzoom=13;
-                    }
-                }
-                break;
-
-            case MapType::ArcGIS_MapsLT_Map_Hybrid:
-            case MapType::ArcGIS_MapsLT_Map_Labels:
-            case MapType::ArcGIS_MapsLT_Map:
-            case MapType::ArcGIS_MapsLT_OrtoFoto:
-                {
-                    if(Projection()->Type()!="LKS94Projection")
-                    {
-                        SetProjection(new LKS94Projection());
-                        maxzoom=11;
-                    }
-                }
-                break;
-
-            case MapType::PergoTurkeyMap:
-                {
-                    if(Projection()->Type()!="PlateCarreeProjectionPergo")
-                    {
-                        SetProjection(new PlateCarreeProjectionPergo());
-                        maxzoom=17;
-                    }
-                }
-                break;
-
-            case MapType::YandexMapRu:
-                {
-                    if(Projection()->Type()!="MercatorProjectionYandex")
-                    {
-                        SetProjection(new MercatorProjectionYandex());
-                        maxzoom=13;
-                    }
-                }
-                break;
-
-            default:
-                {
-                    if(Projection()->Type()!="MercatorProjection")
-                    {
-                        SetProjection(new MercatorProjection());
-                        maxzoom=21;
-                    }
-                }
-                break;
-            }
-
-            minOfTiles = Projection()->GetTileMatrixMinXY(Zoom());
-            maxOfTiles = Projection()->GetTileMatrixMaxXY(Zoom());
-            SetCurrentPositionGPixel(Projection()->FromLatLngToPixel(CurrentPosition(), Zoom()));
-
-            if(started)
-            {
-                CancelAsyncTasks();
-                OnMapSizeChanged(Width, Height);
-                GoToCurrentPosition();
-                ReloadMap();
-                GoToCurrentPosition();
-                emit OnMapTypeChanged(value);
-
-            }
-        }
-
-    }
-    void Core::StartSystem()
-    {
-        if(!started)
-        {
-            started = true;
-
-            ReloadMap();
-            GoToCurrentPosition();
-        }
-    }
-
-    void Core::UpdateCenterTileXYLocation()
-    {
-        PointLatLng center = FromLocalToLatLng(Width/2, Height/2);
-        //PointLatLng center(42.0408,-93.6638);
-        Point centerPixel = Projection()->FromLatLngToPixel(center, Zoom());
-        centerTileXYLocation = Projection()->FromPixelToTileXY(centerPixel);
-
-    }
-
-    void Core::OnMapSizeChanged(int const& width, int const& height)
-    {
-        Width = width;
-        Height = height;
-
-        sizeOfMapArea.SetWidth(1 + (Width/Projection()->TileSize().Width())/2);
-        sizeOfMapArea.SetHeight(1 + (Height/Projection()->TileSize().Height())/2);
-
-        UpdateCenterTileXYLocation();
-
+        zoom=value;
+        minOfTiles=Projection()->GetTileMatrixMinXY(value);
+        maxOfTiles=Projection()->GetTileMatrixMaxXY(value);
+        currentPositionPixel=Projection()->FromLatLngToPixel(currentPosition,value);
         if(started)
         {
-            UpdateBounds();
-
-            emit OnCurrentPositionChanged(currentPosition);
-        }
-    }
-    void Core::OnMapClose()
-    {
-        //        if(waitOnEmptyTasks != null)
-        //        {
-        //           try
-        //           {
-        //              waitOnEmptyTasks.Set();
-        //              waitOnEmptyTasks.Close();
-        //           }
-        //           catch
-        //           {
-        //           }
-        //        }
-
-        CancelAsyncTasks();
-    }
-    GeoCoderStatusCode::Types Core::SetCurrentPositionByKeywords(QString const& keys)
-    {
-        GeoCoderStatusCode::Types status = GeoCoderStatusCode::Unknow;
-        PointLatLng pos = OPMaps::Instance()->GetLatLngFromGeodecoder(keys, status);
-        if(!pos.IsEmpty() && (status == GeoCoderStatusCode::G_GEO_SUCCESS))
-        {
-            SetCurrentPosition(pos);
-        }
-
-        return status;
-    }
-    RectLatLng Core::CurrentViewArea()
-    {
-        PointLatLng p = Projection()->FromPixelToLatLng(-renderOffset.X(), -renderOffset.Y(), Zoom());
-        double rlng = Projection()->FromPixelToLatLng(-renderOffset.X() + Width, -renderOffset.Y(), Zoom()).Lng();
-        double blat = Projection()->FromPixelToLatLng(-renderOffset.X(), -renderOffset.Y() + Height, Zoom()).Lat();
-        return RectLatLng::FromLTRB(p.Lng(), p.Lat(), rlng, blat);
-
-    }
-    PointLatLng Core::FromLocalToLatLng(int const& x, int const& y)
-    {
-        return Projection()->FromPixelToLatLng(Point(x - renderOffset.X(), y - renderOffset.Y()), Zoom());
-    }
-
-
-    Point Core::FromLatLngToLocal(PointLatLng const& latlng)
-    {
-        Point pLocal = Projection()->FromLatLngToPixel(latlng, Zoom());
-        pLocal.Offset(renderOffset);
-        return pLocal;
-    }
-    int Core::GetMaxZoomToFitRect(RectLatLng const& rect)
-    {
-        int zoom = 0;
-
-        for(int i = 1; i <= MaxZoom(); i++)
-        {
-            Point p1 = Projection()->FromLatLngToPixel(rect.LocationTopLeft(), i);
-            Point p2 = Projection()->FromLatLngToPixel(rect.Bottom(), rect.Right(), i);
-
-            if(((p2.X() - p1.X()) <= Width+10) && (p2.Y() - p1.Y()) <= Height+10)
-            {
-                zoom = i;
-            }
-            else
-            {
-                break;
-            }
-        }
-
-        return zoom;
-    }
-    void Core::BeginDrag(Point const& pt)
-    {
-        dragPoint.SetX(pt.X() - renderOffset.X());
-        dragPoint.SetY(pt.Y() - renderOffset.Y());
-        isDragging = true;
-    }
-    void Core::EndDrag()
-    {
-        isDragging = false;
-        emit OnNeedInvalidation();
-
-    }
-    void Core::ReloadMap()
-    {
-        if(started)
-        {
-#ifdef DEBUG_CORE
-            qDebug()<<"------------------";
-#endif //DEBUG_CORE
-
             MtileLoadQueue.lock();
-            {
-                tileLoadQueue.clear();
-            }
+            tileLoadQueue.clear();
             MtileLoadQueue.unlock();
             MtileToload.lock();
             tilesToload=0;
             MtileToload.unlock();
             Matrix.Clear();
-
+            GoToCurrentPositionOnZoom();
+            UpdateBounds();
+            emit OnMapDrag();
+            emit OnMapZoomChanged();
             emit OnNeedInvalidation();
+        }
+    }
+}
+
+void Core::SetCurrentPosition(const PointLatLng &value)
+{
+    if(!IsDragging())
+    {
+        currentPosition = value;
+        SetCurrentPositionGPixel(Projection()->FromLatLngToPixel(value, Zoom()));
+
+        if(started)
+        {
+            GoToCurrentPosition();
+            emit OnCurrentPositionChanged(currentPosition);
+        }
+    }
+    else
+    {
+        currentPosition = value;
+        SetCurrentPositionGPixel(Projection()->FromLatLngToPixel(value, Zoom()));
+
+        if(started)
+        {
+            emit OnCurrentPositionChanged(currentPosition);
+        }
+    }
+}
+void Core::SetMapType(const MapType::Types &value)
+{
+
+    if(value != GetMapType())
+    {
+        mapType = value;
+
+        switch(value)
+        {
+
+
+        case MapType::ArcGIS_Map:
+        case MapType::ArcGIS_Satellite:
+        case MapType::ArcGIS_ShadedRelief:
+        case MapType::ArcGIS_Terrain:
+        {
+            if(Projection()->Type()!="PlateCarreeProjection")
+            {
+                SetProjection(new PlateCarreeProjection());
+                maxzoom=13;
+            }
+        }
+            break;
+
+        case MapType::ArcGIS_MapsLT_Map_Hybrid:
+        case MapType::ArcGIS_MapsLT_Map_Labels:
+        case MapType::ArcGIS_MapsLT_Map:
+        case MapType::ArcGIS_MapsLT_OrtoFoto:
+        {
+            if(Projection()->Type()!="LKS94Projection")
+            {
+                SetProjection(new LKS94Projection());
+                maxzoom=11;
+            }
+        }
+            break;
+
+        case MapType::PergoTurkeyMap:
+        {
+            if(Projection()->Type()!="PlateCarreeProjectionPergo")
+            {
+                SetProjection(new PlateCarreeProjectionPergo());
+                maxzoom=17;
+            }
+        }
+            break;
+
+        case MapType::YandexMapRu:
+        {
+            if(Projection()->Type()!="MercatorProjectionYandex")
+            {
+                SetProjection(new MercatorProjectionYandex());
+                maxzoom=13;
+            }
+        }
+            break;
+
+        default:
+        {
+            if(Projection()->Type()!="MercatorProjection")
+            {
+                SetProjection(new MercatorProjection());
+                maxzoom=21;
+            }
+        }
+            break;
+        }
+
+        minOfTiles = Projection()->GetTileMatrixMinXY(Zoom());
+        maxOfTiles = Projection()->GetTileMatrixMaxXY(Zoom());
+        SetCurrentPositionGPixel(Projection()->FromLatLngToPixel(CurrentPosition(), Zoom()));
+
+        if(started)
+        {
+            CancelAsyncTasks();
+            OnMapSizeChanged(Width, Height);
+            GoToCurrentPosition();
+            ReloadMap();
+            GoToCurrentPosition();
+            emit OnMapTypeChanged(value);
 
         }
     }
-    void Core::GoToCurrentPosition()
-    {
-        // reset stuff
-        renderOffset = Point::Empty;
-        centerTileXYLocationLast = Point::Empty;
-        dragPoint = Point::Empty;
 
-        // goto location
-        Drag(Point(-(GetcurrentPositionGPixel().X() - Width/2), -(GetcurrentPositionGPixel().Y() - Height/2)));
+}
+void Core::StartSystem()
+{
+    if(!started)
+    {
+        started = true;
+
+        ReloadMap();
+        GoToCurrentPosition();
     }
-    void Core::GoToCurrentPositionOnZoom()
+}
+
+void Core::UpdateCenterTileXYLocation()
+{
+    int w = Width; int h = Height;
+    PointLatLng center = FromLocalToLatLng(Width/2, Height/2);
+    //PointLatLng center(42.0408,-93.6638);
+    Point centerPixel = Projection()->FromLatLngToPixel(center, Zoom());
+    centerTileXYLocation = Projection()->FromPixelToTileXY(centerPixel);
+
+}
+
+void Core::OnMapSizeChanged(int const& width, int const& height)
+{
+    Width = width;
+    Height = height;
+    Size aa = Projection()->TileSize();
+
+    sizeOfMapArea.SetWidth(1 + (Width/Projection()->TileSize().Width())/2);
+    sizeOfMapArea.SetHeight(1 + (Height/Projection()->TileSize().Height())/2);
+
+    UpdateCenterTileXYLocation();
+
+    if(started)
     {
-        // reset stuff
-        renderOffset = Point::Empty;
-        centerTileXYLocationLast = Point::Empty;
-        dragPoint = Point::Empty;
+        UpdateBounds();
 
-        // goto location and centering
-        if(MouseWheelZooming)
+        emit OnCurrentPositionChanged(currentPosition);
+    }
+}
+void Core::OnMapClose()
+{
+    //        if(waitOnEmptyTasks != null)
+    //        {
+    //           try
+    //           {
+    //              waitOnEmptyTasks.Set();
+    //              waitOnEmptyTasks.Close();
+    //           }
+    //           catch
+    //           {
+    //           }
+    //        }
+
+    CancelAsyncTasks();
+}
+GeoCoderStatusCode::Types Core::SetCurrentPositionByKeywords(QString const& keys)
+{
+    GeoCoderStatusCode::Types status = GeoCoderStatusCode::Unknow;
+    PointLatLng pos = OPMaps::Instance()->GetLatLngFromGeodecoder(keys, status);
+    if(!pos.IsEmpty() && (status == GeoCoderStatusCode::G_GEO_SUCCESS))
+    {
+        SetCurrentPosition(pos);
+    }
+
+    return status;
+}
+RectLatLng Core::CurrentViewArea()
+{
+    PointLatLng p = Projection()->FromPixelToLatLng(-renderOffset.X(), -renderOffset.Y(), Zoom());
+    double rlng = Projection()->FromPixelToLatLng(-renderOffset.X() + Width, -renderOffset.Y(), Zoom()).Lng();
+    double blat = Projection()->FromPixelToLatLng(-renderOffset.X(), -renderOffset.Y() + Height, Zoom()).Lat();
+    return RectLatLng::FromLTRB(p.Lng(), p.Lat(), rlng, blat);
+
+}
+PointLatLng Core::FromLocalToLatLng(int const& x, int const& y)
+{
+    return Projection()->FromPixelToLatLng(Point(x - renderOffset.X(), y - renderOffset.Y()), Zoom());
+}
+
+
+Point Core::FromLatLngToLocal(PointLatLng const& latlng)
+{
+    Point pLocal = Projection()->FromLatLngToPixel(latlng, Zoom());
+    pLocal.Offset(renderOffset);
+    return pLocal;
+}
+int Core::GetMaxZoomToFitRect(RectLatLng const& rect)
+{
+    int zoom = 0;
+
+    for(int i = 1; i <= MaxZoom(); i++)
+    {
+        Point p1 = Projection()->FromLatLngToPixel(rect.LocationTopLeft(), i);
+        Point p2 = Projection()->FromLatLngToPixel(rect.Bottom(), rect.Right(), i);
+
+        if(((p2.X() - p1.X()) <= Width+10) && (p2.Y() - p1.Y()) <= Height+10)
         {
-            if(mousewheelzoomtype != MouseWheelZoomType::MousePositionWithoutCenter)
-            {
-                Point pt = Point(-(GetcurrentPositionGPixel().X() - Width/2), -(GetcurrentPositionGPixel().Y() - Height/2));
-                renderOffset.SetX(pt.X() - dragPoint.X());
-                renderOffset.SetY(pt.Y() - dragPoint.Y());
-            }
-            else // without centering
-            {
-                renderOffset.SetX(-GetcurrentPositionGPixel().X() - dragPoint.X());
-                renderOffset.SetY(-GetcurrentPositionGPixel().Y() - dragPoint.Y());
-                renderOffset.Offset(mouseLastZoom);
-            }
+            zoom = i;
         }
-        else // use current map center
+        else
         {
-            mouseLastZoom = Point::Empty;
+            break;
+        }
+    }
 
+    return zoom;
+}
+void Core::BeginDrag(Point const& pt)
+{
+    dragPoint.SetX(pt.X() - renderOffset.X());
+    dragPoint.SetY(pt.Y() - renderOffset.Y());
+    isDragging = true;
+}
+void Core::EndDrag()
+{
+    isDragging = false;
+    emit OnNeedInvalidation();
+
+}
+void Core::ReloadMap()
+{
+    if(started)
+    {
+#ifdef DEBUG_CORE
+        qDebug()<<"------------------";
+#endif //DEBUG_CORE
+
+        MtileLoadQueue.lock();
+        {
+            tileLoadQueue.clear();
+        }
+        MtileLoadQueue.unlock();
+        MtileToload.lock();
+        tilesToload=0;
+        MtileToload.unlock();
+        Matrix.Clear();
+
+        emit OnNeedInvalidation();
+
+    }
+}
+void Core::GoToCurrentPosition()
+{
+    // reset stuff
+    renderOffset = Point::Empty;
+    centerTileXYLocationLast = Point::Empty;
+    dragPoint = Point::Empty;
+
+    // goto location
+    Drag(Point(-(GetcurrentPositionGPixel().X() - Width/2), -(GetcurrentPositionGPixel().Y() - Height/2)));
+}
+void Core::GoToCurrentPositionOnZoom()
+{
+    // reset stuff
+    renderOffset = Point::Empty;
+    centerTileXYLocationLast = Point::Empty;
+    dragPoint = Point::Empty;
+
+    // goto location and centering
+    if(MouseWheelZooming)
+    {
+        if(mousewheelzoomtype != MouseWheelZoomType::MousePositionWithoutCenter)
+        {
             Point pt = Point(-(GetcurrentPositionGPixel().X() - Width/2), -(GetcurrentPositionGPixel().Y() - Height/2));
             renderOffset.SetX(pt.X() - dragPoint.X());
             renderOffset.SetY(pt.Y() - dragPoint.Y());
         }
-
-        UpdateCenterTileXYLocation();
-    }
-    void Core::DragOffset(Point const& offset)
-    {
-        renderOffset.Offset(offset);
-
-        UpdateCenterTileXYLocation();
-
-        if(centerTileXYLocation != centerTileXYLocationLast)
+        else // without centering
         {
-            centerTileXYLocationLast = centerTileXYLocation;
-            UpdateBounds();
+            renderOffset.SetX(-GetcurrentPositionGPixel().X() - dragPoint.X());
+            renderOffset.SetY(-GetcurrentPositionGPixel().Y() - dragPoint.Y());
+            renderOffset.Offset(mouseLastZoom);
         }
-
-        {
-            LastLocationInBounds = CurrentPosition();
-            SetCurrentPosition (FromLocalToLatLng((int) Width/2, (int) Height/2));
-        }
-
-        emit OnNeedInvalidation();
-        emit OnMapDrag();
     }
-    void Core::Drag(Point const& pt)
+    else // use current map center
     {
+        mouseLastZoom = Point::Empty;
+
+        Point pt = Point(-(GetcurrentPositionGPixel().X() - Width/2), -(GetcurrentPositionGPixel().Y() - Height/2));
         renderOffset.SetX(pt.X() - dragPoint.X());
         renderOffset.SetY(pt.Y() - dragPoint.Y());
-
-        UpdateCenterTileXYLocation();
-
-        if(centerTileXYLocation != centerTileXYLocationLast)
-        {
-            centerTileXYLocationLast = centerTileXYLocation;
-            UpdateBounds();
-        }
-
-        if(IsDragging())
-        {
-            LastLocationInBounds = CurrentPosition();
-            SetCurrentPosition(FromLocalToLatLng((int) Width/2, (int) Height/2));
-        }
-
-        emit OnNeedInvalidation();
-
-
-        emit OnMapDrag();
-
     }
-    void Core::CancelAsyncTasks()
+
+    UpdateCenterTileXYLocation();
+}
+void Core::DragOffset(Point const& offset)
+{
+    renderOffset.Offset(offset);
+
+    UpdateCenterTileXYLocation();
+
+    if(centerTileXYLocation != centerTileXYLocationLast)
     {
-        if(started)
-        {
-            ProcessLoadTaskCallback.waitForDone();
-            MtileLoadQueue.lock();
-            {
-                tileLoadQueue.clear();
-                //tilesToload=0;
-            }
-            MtileLoadQueue.unlock();
-            MtileToload.lock();
-            tilesToload=0;
-            MtileToload.unlock();
-            //  ProcessLoadTaskCallback.waitForDone();
-        }
+        centerTileXYLocationLast = centerTileXYLocation;
+        UpdateBounds();
     }
-    void Core::UpdateBounds()
+
     {
-        MtileDrawingList.lock();
+        LastLocationInBounds = CurrentPosition();
+        SetCurrentPosition (FromLocalToLatLng((int) Width/2, (int) Height/2));
+    }
+
+    emit OnNeedInvalidation();
+    emit OnMapDrag();
+}
+void Core::Drag(Point const& pt)
+{
+    renderOffset.SetX(pt.X() - dragPoint.X());
+    renderOffset.SetY(pt.Y() - dragPoint.Y());
+
+    UpdateCenterTileXYLocation();
+
+    if(centerTileXYLocation != centerTileXYLocationLast)
+    {
+        centerTileXYLocationLast = centerTileXYLocation;
+        UpdateBounds();
+    }
+
+    if(IsDragging())
+    {
+        LastLocationInBounds = CurrentPosition();
+        SetCurrentPosition(FromLocalToLatLng((int) Width/2, (int) Height/2));
+    }
+
+    emit OnNeedInvalidation();
+
+
+    emit OnMapDrag();
+
+}
+void Core::CancelAsyncTasks()
+{
+    if(started)
+    {
+        ProcessLoadTaskCallback.waitForDone();
+        MtileLoadQueue.lock();
         {
-            FindTilesAround(tileDrawingList);
+            tileLoadQueue.clear();
+            //tilesToload=0;
+        }
+        MtileLoadQueue.unlock();
+        MtileToload.lock();
+        tilesToload=0;
+        MtileToload.unlock();
+        //  ProcessLoadTaskCallback.waitForDone();
+    }
+}
+void Core::UpdateBounds()
+{
+    MtileDrawingList.lock();
+    {
+        FindTilesAround(tileDrawingList);
 
 #ifdef DEBUG_CORE
-            qDebug()<<"OnTileLoadStart: " << tileDrawingList.count() << " tiles to load at zoom " << Zoom() << ", time: " << QDateTime::currentDateTime().date();
+        qDebug()<<"OnTileLoadStart: " << tileDrawingList.count() << " tiles to load at zoom " << Zoom() << ", time: " << QDateTime::currentDateTime().date();
 #endif //DEBUG_CORE
 
-            emit OnTileLoadStart();
+        emit OnTileLoadStart();
 
+        QList<core::Point> aaa = tileDrawingList;
 
-            foreach(Point p,tileDrawingList)
-            {
-                LoadTask task = LoadTask(p, Zoom());
-                {
-                    MtileLoadQueue.lock();
-                    {
-                        if(!tileLoadQueue.contains(task))
-                        {
-                            MtileToload.lock();
-                            ++tilesToload;
-                            MtileToload.unlock();
-                            tileLoadQueue.enqueue(task);
-#ifdef DEBUG_CORE
-                            qDebug()<<"Core::UpdateBounds new Task"<<task.Pos.ToString();
-#endif //DEBUG_CORE
-                            ProcessLoadTaskCallback.start(this);
-                        }
-                    }
-                    MtileLoadQueue.unlock();
-                }
-
-            }
-        }
-        MtileDrawingList.unlock();
-        UpdateGroundResolution();
-    }
-    void Core::FindTilesAround(QList<Point> &list)
-    {
-        list.clear();;
-        for(int i = -sizeOfMapArea.Width(); i <= sizeOfMapArea.Width(); i++)
+        foreach(Point p,tileDrawingList)
         {
-            for(int j = -sizeOfMapArea.Height(); j <= sizeOfMapArea.Height(); j++)
+            LoadTask task = LoadTask(p, Zoom());
             {
-                Point p = centerTileXYLocation;
-                p.SetX(p.X() + i);
-                p.SetY(p.Y() + j);
-
-                //if(p.X < minOfTiles.Width)
-                //{
-                //   p.X += (maxOfTiles.Width + 1);
-                //}
-
-                //if(p.X > maxOfTiles.Width)
-                //{
-                //   p.X -= (maxOfTiles.Width + 1);
-                //}
-
-                if(p.X() >= minOfTiles.Width() && p.Y() >= minOfTiles.Height() && p.X() <= maxOfTiles.Width() && p.Y() <= maxOfTiles.Height())
+                MtileLoadQueue.lock();
                 {
-                    if(!list.contains(p))
+                    if(!tileLoadQueue.contains(task))
                     {
-                        list.append(p);
+                        MtileToload.lock();
+                        ++tilesToload;
+                        MtileToload.unlock();
+                        tileLoadQueue.enqueue(task);
+#ifdef DEBUG_CORE
+                        qDebug()<<"Core::UpdateBounds new Task"<<task.Pos.ToString();
+#endif //DEBUG_CORE
+                        ProcessLoadTaskCallback.start(this);
                     }
+                }
+                MtileLoadQueue.unlock();
+            }
+
+        }
+    }
+    MtileDrawingList.unlock();
+    UpdateGroundResolution();
+}
+void Core::FindTilesAround(QList<Point> &list)
+{
+    list.clear();;
+    int aw = sizeOfMapArea.Width(); int ah = sizeOfMapArea.Height();
+    for(int i = -sizeOfMapArea.Width(); i <= sizeOfMapArea.Width(); i++)
+    {
+        for(int j = -sizeOfMapArea.Height(); j <= sizeOfMapArea.Height(); j++)
+        {
+            Point p = centerTileXYLocation;
+            p.SetX(p.X() + i);
+            p.SetY(p.Y() + j);
+
+            //if(p.X < minOfTiles.Width)
+            //{
+            //   p.X += (maxOfTiles.Width + 1);
+            //}
+
+            //if(p.X > maxOfTiles.Width)
+            //{
+            //   p.X -= (maxOfTiles.Width + 1);
+            //}
+
+            if(p.X() >= minOfTiles.Width() && p.Y() >= minOfTiles.Height() && p.X() <= maxOfTiles.Width() && p.Y() <= maxOfTiles.Height())
+            {
+                if(!list.contains(p))
+                {
+                    list.append(p);
                 }
             }
         }
+    }
 
 
-    }
-    void Core::UpdateGroundResolution()
-    {
-        double rez = Projection()->GetGroundResolution(Zoom(), CurrentPosition().Lat());
-        pxRes100m =   (int) (100.0 / rez); // 100 meters
-        pxRes1000m =  (int) (1000.0 / rez); // 1km
-        pxRes10km =   (int) (10000.0 / rez); // 10km
-        pxRes100km =  (int) (100000.0 / rez); // 100km
-        pxRes1000km = (int) (1000000.0 / rez); // 1000km
-        pxRes5000km = (int) (5000000.0 / rez); // 5000km
-    }
+}
+void Core::UpdateGroundResolution()
+{
+    double rez = Projection()->GetGroundResolution(Zoom(), CurrentPosition().Lat());
+    pxRes100m =   (int) (100.0 / rez); // 100 meters
+    pxRes1000m =  (int) (1000.0 / rez); // 1km
+    pxRes10km =   (int) (10000.0 / rez); // 10km
+    pxRes100km =  (int) (100000.0 / rez); // 100km
+    pxRes1000km = (int) (1000000.0 / rez); // 1000km
+    pxRes5000km = (int) (5000000.0 / rez); // 5000km
+}
 }

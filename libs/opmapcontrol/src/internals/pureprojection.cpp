@@ -80,6 +80,7 @@ Point PureProjection::FromLatLngToPixel(const PointLatLng &p,const int &zoom)
       Size PureProjection::GetTileMatrixSizePixel(const int &zoom)
       {
          Size s = GetTileMatrixSizeXY(zoom);
+         Size aa = TileSize();
          return Size(s.Width() * TileSize().Width(), s.Height() * TileSize().Height());
       }
       QList<Point> PureProjection::GetAreaTileList(const RectLatLng &rect,const int &zoom,const int &padding)
