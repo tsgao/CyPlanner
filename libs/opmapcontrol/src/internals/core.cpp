@@ -185,7 +185,7 @@ void Core::run()
                                                             //double lat, lng;
                                                             QStringList  l = imgList.at(j).split("_");
                                                             //                                                            lng = l[1].toDouble();
-                                                            //                                                            l[2].chop(4);//remove jpg file name from string
+                                                            l[2].chop(4);//remove jpg file name from string
                                                             //                                                            lat = l[2].toDouble();
 
                                                             int tileY = l[2].toInt();
