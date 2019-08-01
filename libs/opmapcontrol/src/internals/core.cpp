@@ -64,7 +64,7 @@ Core::Core() :
     tilesToload=0;
 
     //load directory used to store custom image
-    imgDir = new QDir("/Users/xiangweiniu/Documents/pictest1/result5");
+    //imgDir = new QDir("/Users/xiangweiniu/Documents/pictest1/result5");
     //imgList = imgDir->entryList();
     OPMaps::Instance();
 }
@@ -142,27 +142,25 @@ void Core::run()
                             MapType::Types tl = layers.at(k);
                             //                            if (k == layers.size() - 1)
                             //                                break;
-                            int justCount = 0;
                             int retry = 0;
                             int tileNum = 0;
                             do
                             {
                                 QByteArray img;
-                                justCount++;
                                 // tile number inversion(BottomLeft -> TopLeft) for pergo maps
-                                if(tl == MapType::PergoTurkeyMap)
-                                {
-                                    img = OPMaps::Instance()->GetImageFrom(tl, Point(task.Pos.X(), maxOfTiles.Height() - task.Pos.Y()), task.Zoom);
-                                }
-                                else // ok
-                                {
+//                                if(tl == MapType::PergoTurkeyMap)
+//                                {
+//                                    img = OPMaps::Instance()->GetImageFrom(tl, Point(task.Pos.X(), maxOfTiles.Height() - task.Pos.Y()), task.Zoom);
+//                                }
+//                                else // ok
+//                                {
 #ifdef DEBUG_CORE
                                     qDebug()<<"start getting image"<<" ID="<<debug;
 #endif //DEBUG_CORE
                                     //check if zoom level is over n
-                                    if(task.Zoom >18 && task.Zoom <= 24 && k == 0){
+                                    if(task.Zoom >20 && task.Zoom <= 24 && k == 0){
                                         //load directory used to store custom image
-                                        QString loadPath = "/Users/xiangweiniu/Documents/pictest1/result7/" + QString::number(task.Zoom);
+                                        QString loadPath = "/Users/xiangweiniu/Documents/pictest/result2/" + QString::number(task.Zoom);
                                         imgDir = new QDir(loadPath);
                                         QStringList imgFolderList = imgDir->entryList();
 
@@ -219,9 +217,9 @@ void Core::run()
 #ifdef DEBUG_CORE
                                     qDebug()<<"Core::run:gotimage size:"<<img.count()<<" ID="<<debug<<" time="<<t.elapsed();
 #endif //DEBUG_CORE
-                                }
-                                if (img.length() == 0)
-                                    img = OPMaps::Instance()->GetImageFrom(tl, task.Pos, task.Zoom);
+//                                }
+//                                if (img.length() == 0)
+//                                    img = OPMaps::Instance()->GetImageFrom(tl, task.Pos, task.Zoom);
 
                                 if(img.length()!=0 )
                                 {

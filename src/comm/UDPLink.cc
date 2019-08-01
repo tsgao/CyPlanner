@@ -55,6 +55,7 @@ UDPLink::UDPLink(QHostAddress host, quint16 port) :
     this->port = port;
     // Set unique ID and add link to the list of links
     this->id = getNextLinkId();
+    int aaaa = this->id;
     this->name = tr("UDP Link (port:%1)").arg(this->port);
     emit nameChanged(this->name);
     QLOG_INFO() << "UDP Created " << name;
@@ -427,6 +428,7 @@ void UDPLink::readBytes()
             }
             UASIp t;
             t.IpAddress = sender;
+            int aa = message.sysid;
             t.uasId = message.sysid;
             t.port = senderPort;
             this->ipMap.append(t);
@@ -436,6 +438,13 @@ void UDPLink::readBytes()
         {
             int index = hosts.indexOf(sender);
             ports.replace(index, senderPort);
+            // update port
+            for (UASIp &uasip : this->ipMap){
+                if (uasip.IpAddress == sender){
+                    if (uasip.port != senderPort)
+                        uasip.port = senderPort;
+                }
+            }
         }
         if(!_running)
             break;

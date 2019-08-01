@@ -1057,7 +1057,7 @@ void UAS::receiveMessage(LinkInterface* link, mavlink_message_t message)
         {
             mavlink_mission_item_t wp;
             mavlink_msg_mission_item_decode(&message, &wp);
-            //QLOG_DEBUG() << "got waypoint (" << wp.seq << ") from ID " << message.sysid << " x=" << wp.x << " y=" << wp.y << " z=" << wp.z;
+            QLOG_DEBUG() << "got waypoint (" << wp.seq << ") from ID " << message.sysid << " x=" << wp.x << " y=" << wp.y << " z=" << wp.z;
             waypointManager.handleWaypoint(message.sysid, message.compid, &wp);
         }
             break;

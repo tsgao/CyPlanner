@@ -79,6 +79,7 @@ void MAVLinkProtocol::receiveBytes(LinkInterface* link, const QByteArray &dataBy
     // Cache the link ID for common use.
     quint8 linkId = static_cast<quint8>(link->getId());
 
+
     for(const auto &data : dataBytes)
     {
         unsigned int decodeState = mavlink_parse_char(MAVLINK_COMM_0, static_cast<quint8>(data), &message, &status);
@@ -249,6 +250,10 @@ void MAVLinkProtocol::receiveBytes(LinkInterface* link, const QByteArray &dataBy
 
             if (m_isOnline)
             {
+                // added by Xiangwei Niu
+                //we disable the system which the sysid is 0
+                if (message.sysid == 0)
+                    return;
                 handleMessage(link, message);
             }
         }

@@ -1012,6 +1012,7 @@ void UASWaypointManager::sendWaypointCount()
 
     emit updateStatusString(QString("Starting to transmit waypoints..."));
 
+    int aid = uas->getSystemId();
     mavlink_msg_mission_count_encode(uas->getSystemId(), uas->getComponentId(), &message, &wpc);
     uas->sendMessage(message);
     QGC::SLEEP::msleep(PROTOCOL_DELAY_MS);

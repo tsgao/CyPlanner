@@ -601,6 +601,7 @@ UASInterface* LinkManager::createUAS(MAVLinkProtocol* mavlink, LinkInterface* li
     int i;
     for(i = 0; i < u->ipMap.size();i++){
         if(u->ipMap[i].uasId == uas->getUASID()){
+            QString ipaaa = u->ipMap[i].IpAddress.toString();
             uas->setIpAddress(u->ipMap[i].IpAddress.toString());
         }
     }

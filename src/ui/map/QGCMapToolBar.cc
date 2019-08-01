@@ -349,7 +349,7 @@ void QGCMapToolBar::loadUASWaypointsDialogAccepted(){
     }
 
     //loops through entire file
-    int n;
+    int n; //UAS id
     bool skip = false;
     while(!in.atEnd()){
         //gets UAS ID
@@ -404,7 +404,10 @@ void QGCMapToolBar::loadUASWaypointsDialogAccepted(){
         wpm = uas->getWaypointManager();
         emit wpm->waypointEditableListChanged();
         emit wpm->waypointEditableListChanged(uas->getUASID());
-
+    }
+    foreach (UASInterface * uas, UASManager::instance()->getUASList()){
+        wpm = uas->getWaypointManager();
+        wpm->writeWaypoints();
     }
 }
 
