@@ -67,7 +67,6 @@ QGCCore::QGCCore(int &argc, char* argv[]) : QApplication(argc, argv)
 {
     // Set settings format
     QSettings::setDefaultFormat(QSettings::IniFormat);
-
     // Set application name
     this->setApplicationName(QGC_APPLICATION_NAME);
     this->setApplicationVersion(QGC_APPLICATION_VERSION);

@@ -70,6 +70,9 @@ MAVLinkDecoder::MAVLinkDecoder(QObject *parent):
     messageFilter.insert(MAVLINK_MSG_ID_PARAM_SET, false);
     messageFilter.insert(MAVLINK_MSG_ID_PARAM_VALUE, false);
     messageFilter.insert(MAVLINK_MSG_ID_MISSION_ITEM, false);
+    // added by Xiangwei Niu
+    messageFilter.insert(MAVLINK_MSG_ID_MISSION_ITEM_INT, false);
+
     messageFilter.insert(MAVLINK_MSG_ID_MISSION_COUNT, false);
     messageFilter.insert(MAVLINK_MSG_ID_MISSION_ACK, false);
     messageFilter.insert(MAVLINK_MSG_ID_DATA_STREAM, false);

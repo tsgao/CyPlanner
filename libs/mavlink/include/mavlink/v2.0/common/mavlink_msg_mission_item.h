@@ -2,24 +2,31 @@
 // MESSAGE MISSION_ITEM PACKING
 
 #define MAVLINK_MSG_ID_MISSION_ITEM 39
+//#define MAVLINK_MSG_ID_MISSION_ITEM 73
 
 MAVPACKED(
 typedef struct __mavlink_mission_item_t {
- float param1; /*< PARAM1, see MAV_CMD enum*/
- float param2; /*< PARAM2, see MAV_CMD enum*/
- float param3; /*< PARAM3, see MAV_CMD enum*/
- float param4; /*< PARAM4, see MAV_CMD enum*/
- float x; /*< PARAM5 / local: x position, global: latitude*/
- float y; /*< PARAM6 / y position: global: longitude*/
- float z; /*< PARAM7 / z position: global: altitude (relative or absolute, depending on frame.*/
- uint16_t seq; /*< Sequence*/
- uint16_t command; /*< The scheduled action for the waypoint, as defined by MAV_CMD enum*/
- uint8_t target_system; /*< System ID*/
- uint8_t target_component; /*< Component ID*/
- uint8_t frame; /*< The coordinate system of the waypoint, as defined by MAV_FRAME enum*/
- uint8_t current; /*< false:0, true:1*/
- uint8_t autocontinue; /*< autocontinue to next wp*/
- uint8_t mission_type; /*< Mission type, see MAV_MISSION_TYPE*/
+     float param1; /*< PARAM1, see MAV_CMD enum*/
+     float param2; /*< PARAM2, see MAV_CMD enum*/
+     float param3; /*< PARAM3, see MAV_CMD enum*/
+     float param4; /*< PARAM4, see MAV_CMD enum*/
+
+     // modified by Xiangwei Niu: float to int32_t
+     float x; /*< PARAM5 / local: x position, global: latitude*/
+     float y; /*< PARAM6 / y position: global: longitude*/
+
+//     int32_t x; /*< PARAM5 / local: x position, global: latitude*/
+//     int32_t y; /*< PARAM6 / y position: global: longitude*/
+
+     float z; /*< PARAM7 / z position: global: altitude (relative or absolute, depending on frame.*/
+     uint16_t seq; /*< Sequence*/
+     uint16_t command; /*< The scheduled action for the waypoint, as defined by MAV_CMD enum*/
+     uint8_t target_system; /*< System ID*/
+     uint8_t target_component; /*< Component ID*/
+     uint8_t frame; /*< The coordinate system of the waypoint, as defined by MAV_FRAME enum*/
+     uint8_t current; /*< false:0, true:1*/
+     uint8_t autocontinue; /*< autocontinue to next wp*/
+     uint8_t mission_type; /*< Mission type, see MAV_MISSION_TYPE*/
 }) mavlink_mission_item_t;
 
 #define MAVLINK_MSG_ID_MISSION_ITEM_LEN 38
@@ -496,8 +503,13 @@ static inline float mavlink_msg_mission_item_get_param4(const mavlink_message_t*
  *
  * @return PARAM5 / local: x position, global: latitude
  */
-static inline float mavlink_msg_mission_item_get_x(const mavlink_message_t* msg)
+// modified by Xiangwe Niu
+// change float to int32_t
+static inline int32_t mavlink_msg_mission_item_get_x(const mavlink_message_t* msg)
 {
+//    int32_t aa = _MAV_RETURN_int32_t(msg,  16);
+//    float aa1 = _MAV_RETURN_float(msg,  16);
+    //return _MAV_RETURN_int32_t(msg,  16);
     return _MAV_RETURN_float(msg,  16);
 }
 
@@ -506,8 +518,11 @@ static inline float mavlink_msg_mission_item_get_x(const mavlink_message_t* msg)
  *
  * @return PARAM6 / y position: global: longitude
  */
-static inline float mavlink_msg_mission_item_get_y(const mavlink_message_t* msg)
+// modified by Xiangwe Niu
+// change float to int32_t
+static inline int32_t mavlink_msg_mission_item_get_y(const mavlink_message_t* msg)
 {
+    //return _MAV_RETURN_int32_t(msg,  20);
     return _MAV_RETURN_float(msg,  20);
 }
 
@@ -516,7 +531,8 @@ static inline float mavlink_msg_mission_item_get_y(const mavlink_message_t* msg)
  *
  * @return PARAM7 / z position: global: altitude (relative or absolute, depending on frame.
  */
-static inline float mavlink_msg_mission_item_get_z(const mavlink_message_t* msg)
+
+static inline int32_t mavlink_msg_mission_item_get_z(const mavlink_message_t* msg)
 {
     return _MAV_RETURN_float(msg,  24);
 }
@@ -537,6 +553,8 @@ static inline uint8_t mavlink_msg_mission_item_get_mission_type(const mavlink_me
  * @param msg The message to decode
  * @param mission_item C-struct to decode the message contents into
  */
+// modified by Xiangwe Niu
+
 static inline void mavlink_msg_mission_item_decode(const mavlink_message_t* msg, mavlink_mission_item_t* mission_item)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS

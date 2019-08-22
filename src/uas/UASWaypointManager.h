@@ -73,6 +73,7 @@ public:
     /*@{*/
     void handleWaypointCount(quint8 systemId, quint8 compId, quint16 count);                            ///< Handles received waypoint count messages
     void handleWaypoint(quint8 systemId, quint8 compId, mavlink_mission_item_t *wp);                        ///< Handles received waypoint messages
+    void handleWaypointInt(quint8 systemId, quint8 compId, mavlink_mission_item_int_t *wp);
     void handleWaypointAck(quint8 systemId, quint8 compId, mavlink_mission_ack_t *wpa);                ///< Handles received waypoint ack messages
     void handleWaypointRequest(quint8 systemId, quint8 compId, mavlink_mission_request_t *wpr);        ///< Handles received waypoint request messages
     void handleWaypointReached(quint8 systemId, quint8 compId, mavlink_mission_item_reached_t *wpr);        ///< Handles received waypoint reached messages
@@ -85,6 +86,8 @@ public:
 
     void readWaypoints(bool read_to_edit=false);    ///< Requests the MAV's current waypoint list.
     void writeWaypoints();                          ///< Sends the waypoint list to the MAV
+    void writeWaypointsInt();
+
     int setCurrentWaypoint(quint16 seq);            ///< Sends the sequence number of the waypoint that should get the new target waypoint to the UAS
     int setCurrentEditable(quint16 seq);          ///< Changes the current waypoint in edit tab
     /*@}*/
@@ -129,7 +132,9 @@ private:
     void sendWaypointCount();
     void sendWaypointRequestList();
     void sendWaypointRequest(quint16 seq);          ///< Requests a waypoint with sequence number seq
+    void sendWaypointRequestInt(quint16 seq);
     void sendWaypoint(quint16 seq);                 ///< Sends a waypoint with sequence number seq
+    void sendWaypointInt(quint16 seq);
     void sendWaypointAck(quint8 type);              ///< Sends a waypoint ack
     /*@}*/
 
@@ -184,6 +189,7 @@ private:
     QList<Waypoint *> waypointsEditable;                  ///< local editable waypoint list
     Waypoint* currentWaypointEditable;                      ///< The currently used waypoint
     QList<mavlink_mission_item_t *> waypoint_buffer;  ///< buffer for waypoints during communication
+    QList<mavlink_mission_item_int_t *> waypoint_buffer_int;  ///< buffer for int waypoints during communication
     QTimer protocol_timer;                          ///< Timer to catch timeouts
     bool standalone;                                ///< If standalone is set, do not write to UAS
     quint16 uasid;

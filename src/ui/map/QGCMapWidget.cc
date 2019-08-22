@@ -479,7 +479,10 @@ void QGCMapWidget::updateGlobalPosition(UASInterface* uas, double lat, double lo
 
         // Follow status
         if (followUAVEnabled && (uas->getUASID() == followUAVID) && isValidGpsLocation(uas)){
+//            internals::PointLatLng pos1 = internals::PointLatLng(42.01069182, -93.73403099);
+//            SetCurrentPosition(pos1);
             SetCurrentPosition(pos_lat_lon);
+
         }
         // Convert from radians to degrees and apply
         uav->SetUAVHeading((uas->getYaw()/M_PI)*180.0f);
@@ -521,6 +524,8 @@ void QGCMapWidget::updateGlobalPosition()
         uav->SetUAVPos(pos_lat_lon, system->getAltitudeAMSL());
         // Follow status
         if (followUAVEnabled && (system->getUASID() == followUAVID) && isValidGpsLocation(system)) {
+//            internals::PointLatLng pos1 = internals::PointLatLng(42.01069182, -93.73403099);
+//            SetCurrentPosition(pos1);
             SetCurrentPosition(pos_lat_lon);
         }
         // Convert from radians to degrees and apply
@@ -551,6 +556,8 @@ void QGCMapWidget::updateLocalPosition()
         uav->SetUAVPos(pos_lat_lon, system->getAltitudeAMSL());
         // Follow status
         if (followUAVEnabled && (system->getUASID() == followUAVID) && isValidGpsLocation(system)) {
+//            internals::PointLatLng pos1 = internals::PointLatLng(42.01069182, -93.73403099);
+//            SetCurrentPosition(pos1);
             SetCurrentPosition(pos_lat_lon);
         }
         // Convert from radians to degrees and apply
@@ -753,6 +760,7 @@ void QGCMapWidget::handleMapWaypointEdit(mapcontrol::WayPointItem* waypoint)
  */
 void QGCMapWidget::updateWaypoint(int uas, Waypoint* wp)
 {
+
     QLOG_TRACE() << __FILE__ << __LINE__ << "UPDATING WP FUNCTION CALLED";
     // Source of the event was in this widget, do nothing
     if (firingWaypointChange == wp) {
@@ -786,6 +794,9 @@ void QGCMapWidget::updateWaypoint(int uas, Waypoint* wp)
                 // Create icon for new WP
                 QColor wpColor(Qt::red);
                 if (uasInstance) wpColor = uasInstance->getColor();
+                double ax = wp->getX();
+                double ay = wp->getY();
+
                 Waypoint2DIcon* icon = new Waypoint2DIcon(map, this, wp, wpColor, wpindex);
                 ConnectWP(icon);
                 icon->setParentItem(map);
@@ -872,7 +883,9 @@ void QGCMapWidget::redrawWaypointLines()
                 QGraphicsPathItem* gpi = new QGraphicsPathItem(map);
                 gpi->setPath(path);
 
-                QColor color(Qt::red);
+                // modified by Xiangwei Niu
+                //QColor color(Qt::red);
+                QColor color(u->getColor());
                 if (u) color = u->getColor();
                 QPen pen(color);
                 pen.setWidthF(1.75);

@@ -61,9 +61,10 @@ void Waypoint2DIcon::updateWaypoint()
         static QRectF oldSize;
 
         SetHeading(waypoint->getYaw());
+
         SetCoord(internals::PointLatLng(waypoint->getLatitude(), waypoint->getLongitude()));
 
-        // QLOG_DEBUG() << "UPDATING WP:" << waypoint->getId() << "LAT:" << waypoint->getLatitude() << "LON:" << waypoint->getLongitude();
+        QLOG_DEBUG() << "UPDATING WP:" << waypoint->getId() << "LAT:" << waypoint->getLatitude() << "LON:" << waypoint->getLongitude();
 
         SetDescription(waypoint->getDescription());
         SetAltitude(waypoint->getAltitude());

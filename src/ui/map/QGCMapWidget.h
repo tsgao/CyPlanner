@@ -85,7 +85,11 @@ public slots:
     /** @brief Cache visible region to harddisk */
     void cacheVisibleRegion();
     /** @brief Set follow mode */
-    void setFollowUAVEnabled(bool enabled) { followUAVEnabled = enabled; }
+    void setFollowUAVEnabled(bool enabled) {
+        followUAVEnabled = enabled;
+//        internals::PointLatLng pos1 = internals::PointLatLng(42.01069182, -93.73403099);
+//        SetCurrentPosition(pos1);
+    }
     /** @brief Set trail to time mode and set time @param seconds The minimum time between trail dots in seconds. If set to a value < 0, trails will be disabled*/
     void setTrailModeTimed(int seconds)
     {

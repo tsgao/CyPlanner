@@ -279,11 +279,13 @@ void WaypointList::loadWaypointsDialogAccepted()
     WPM->loadWaypoints(dialog->selectedFiles().at(0));
 }
 
+//modified by Xiangwei Niu
 void WaypointList::transmit()
 {
     if (m_uas)
     {
-        WPM->writeWaypoints();
+        //WPM->writeWaypoints();
+        WPM->writeWaypointsInt();
     }
 }
 

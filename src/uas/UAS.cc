@@ -27,6 +27,7 @@
 #include <iostream>
 #include <QDesktopServices>
 #include <QMutexLocker>
+#include <QTextStream>
 
 #include <cmath>
 #include <qmath.h>
@@ -1053,10 +1054,42 @@ void UAS::receiveMessage(LinkInterface* link, mavlink_message_t message)
         }
             break;
 
+            // added by Xiangwei Niu
+        case MAVLINK_MSG_ID_MISSION_ITEM_INT:
+        {
+            mavlink_mission_item_int_t wp;
+            mavlink_msg_mission_item_int_decode(&message, &wp);
+            mavlink_mission_item_int_t aaa = wp;
+            QFile file("/Users/xiangweiniu/Documents/pictest/gpsRead.txt");
+            if (file.open(QIODevice::WriteOnly | QIODevice::Append)) {
+                QTextStream stream( &file );
+                stream.setRealNumberPrecision(16);
+                stream << "INT system " << aaa.target_system << ": " << aaa.x <<"," << aaa.y << ", frame" << aaa.frame <<endl;
+            }
+
+            waypointManager.handleWaypointInt(message.sysid, message.compid, &wp);
+        }
+            break;
+
         case MAVLINK_MSG_ID_MISSION_ITEM:
         {
             mavlink_mission_item_t wp;
+
+            // added by Xiangwei Niu
+//            auto aba = message.payload64; // max length = 33
+//            for (int i =0; i<33; ++i)
+//                qDebug() << i << " "<< aba[i];
+
             mavlink_msg_mission_item_decode(&message, &wp);
+
+//            mavlink_mission_item_t aaa = wp;
+//            QFile file("/Users/xiangweiniu/Documents/pictest/gpsRead.txt");
+//            if (file.open(QIODevice::WriteOnly | QIODevice::Append)) {
+//                QTextStream stream( &file );
+//                stream.setRealNumberPrecision(16);
+//                stream << "system " << aaa.target_system << ": " << aaa.x <<"," << aaa.y << ", frame" << aaa.frame <<endl;
+//            }
+
             QLOG_DEBUG() << "got waypoint (" << wp.seq << ") from ID " << message.sysid << " x=" << wp.x << " y=" << wp.y << " z=" << wp.z;
             waypointManager.handleWaypoint(message.sysid, message.compid, &wp);
         }

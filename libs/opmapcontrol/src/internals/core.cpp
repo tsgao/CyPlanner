@@ -47,7 +47,7 @@ Core::Core() :
     isDragging(false),
     TooltipTextPadding(10,10),
     mapType(static_cast<MapType::Types>(0)),
-    loaderLimit(5),
+    loaderLimit(10), // modified by Xiangwei Niu, 5 to 10
     maxzoom(24),/** @brief GUANG YI LIM is for zoom slider, but breaks map if goes beyond 22 **/
     runningThreads(0),
     started(false),
@@ -107,6 +107,7 @@ void Core::run()
         }
     }
     MtileLoadQueue.unlock();
+    //int aa = tilesToload;
 
     if(task.HasValue())
         if(loaderLimit.tryAcquire(1,OPMaps::Instance()->Timeout))
@@ -140,8 +141,6 @@ void Core::run()
                         for (int k = 0; k<layers.size(); k++)
                         {
                             MapType::Types tl = layers.at(k);
-                            //                            if (k == layers.size() - 1)
-                            //                                break;
                             int retry = 0;
                             int tileNum = 0;
                             do
@@ -197,22 +196,12 @@ void Core::run()
                                                             }
                                                         }
                                                     }
-
-                                                    //                                                    QList<core::Point> aaa = tileDrawingList;
-                                                    //                                                    QList<PointLatLng> bbb;
-                                                    //                                                    for (int k = 0; k< aaa.size(); k++){
-                                                    //                                                        Point pi = Projection()->FromTileXYToPixel(aaa.at(k));
-                                                    //                                                        PointLatLng pp = Projection()->FromPixelToLatLng(pi,Zoom());
-                                                    //                                                        bbb.append(pp);
-                                                    //                                                    }
-
                                                 }
-
                                             }
                                         }
                                     }
                                     else{//if zoom level is above treshold use image from default source
-                                        img = OPMaps::Instance()->GetImageFrom(tl, task.Pos, task.Zoom);
+                                        //img = OPMaps::Instance()->GetImageFrom(tl, task.Pos, task.Zoom);
                                     }
 #ifdef DEBUG_CORE
                                     qDebug()<<"Core::run:gotimage size:"<<img.count()<<" ID="<<debug<<" time="<<t.elapsed();
