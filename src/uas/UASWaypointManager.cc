@@ -252,6 +252,8 @@ void UASWaypointManager::handleWaypoint(quint8 systemId, quint8 compId, mavlink_
     }
 }
 
+//modified by Xiangwei Niu
+// mavlink_mission_item_t -> mavlink_mission_item_int_t
 void UASWaypointManager::handleWaypointInt(quint8 systemId, quint8 compId, mavlink_mission_item_int_t *wp)
 {
     if (systemId == current_partner_systemid && current_state == WP_GETLIST_GETWPS) {
@@ -981,6 +983,7 @@ void UASWaypointManager::goToWaypoint(Waypoint *wp)
     }
 }
 
+// changed
 void UASWaypointManager::writeWaypoints()
 {
     if (current_state == WP_IDLE) {
@@ -999,18 +1002,18 @@ void UASWaypointManager::writeWaypoints()
             // Why not replace with waypoint_buffer.clear() ?
             // because this will lead to memory leaks, the waypoint-structs
             // have to be deleted, clear() would only delete the pointers.
-            while(!waypoint_buffer.empty()) {
-                delete waypoint_buffer.back();
-                waypoint_buffer.pop_back();
+            while(!waypoint_buffer_int.empty()) {
+                delete waypoint_buffer_int.back();
+                waypoint_buffer_int.pop_back();
             }
 
             bool noCurrent = true;
 
             //copy waypoint data to local buffer
             for (int i=0; i < current_count; i++) {
-                waypoint_buffer.push_back(new mavlink_mission_item_t);
-                mavlink_mission_item_t *cur_d = waypoint_buffer.back();
-                memset(cur_d, 0, sizeof(mavlink_mission_item_t));   //initialize with zeros
+                waypoint_buffer_int.push_back(new mavlink_mission_item_int_t);
+                mavlink_mission_item_int_t *cur_d = waypoint_buffer_int.back();
+                memset(cur_d, 0, sizeof(mavlink_mission_item_int_t));   //initialize with zeros
                 const Waypoint *cur_s = waypointsEditable.at(i);
 
                 cur_d->autocontinue = cur_s->getAutoContinue();
@@ -1022,8 +1025,8 @@ void UASWaypointManager::writeWaypoints()
                 cur_d->frame = cur_s->getFrame();
                 cur_d->command = cur_s->getAction();
                 cur_d->seq = i;     // don't read out the sequence number of the waypoint class
-                cur_d->x = cur_s->getX();
-                cur_d->y = cur_s->getY();
+                cur_d->x = (int32_t) (cur_s->getX() * 1E7);
+                cur_d->y = (int32_t) (cur_s->getY() * 1E7);
                 cur_d->z = cur_s->getZ();
 
                 if (cur_s->getCurrent() && noCurrent)
@@ -1031,8 +1034,6 @@ void UASWaypointManager::writeWaypoints()
                 if (i == (current_count - 1) && noCurrent == true) //not a single waypoint was set as "current"
                     cur_d->current = true; // set the last waypoint as current. Or should it better be the first waypoint ?
             }
-
-
 
 
             //send the waypoint count to UAS (this starts the send transaction)

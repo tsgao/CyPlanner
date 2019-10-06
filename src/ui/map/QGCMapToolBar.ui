@@ -60,6 +60,13 @@
     </widget>
    </item>
    <item>
+    <widget class="QPushButton" name="changeHomeButton">
+     <property name="text">
+      <string>Change Home</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QPushButton" name="lastPosButton">
      <property name="maximumSize">
       <size>

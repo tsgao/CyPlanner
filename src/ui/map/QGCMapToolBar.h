@@ -31,6 +31,7 @@ public slots:
     void setUpdateInterval();
     void setMapType();
     void goHome();
+    void changeHome();
     void loadUASWaypointsDialogAccepted();
 
 private:

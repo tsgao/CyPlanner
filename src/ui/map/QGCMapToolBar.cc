@@ -58,6 +58,8 @@ void QGCMapToolBar::setMap(QGCMapWidget* map)
     {
         connect(ui->goToButton, SIGNAL(clicked()), map, SLOT(showGoToDialog()));
         connect(ui->goHomeButton, SIGNAL(clicked()), this, SLOT(goHome()));
+        // added by Xiangwei Niu
+        connect(ui->changeHomeButton, SIGNAL(clicked()), this, SLOT(changeHome()));
         connect(ui->lastPosButton, SIGNAL(clicked()), map, SLOT(lastPosition()));
         connect(ui->clearTrailsButton, SIGNAL(clicked()), map, SLOT(deleteTrails()));
         connect(map, SIGNAL(OnTileLoadStart()), this, SLOT(tileLoadStart()));
@@ -280,6 +282,22 @@ void QGCMapToolBar::goHome()
             }
         } else {
             map->goHome();
+        }
+    }
+}
+
+void QGCMapToolBar::changeHome()
+{
+    UASManager *umanager = UASManager::instance();
+    if (umanager){
+        ArduPilotMegaMAV* apmUas= dynamic_cast<ArduPilotMegaMAV*>(umanager->getActiveUAS());
+        if (apmUas){
+            UASWaypointManager* wpManager = apmUas->getWaypointManager();
+            //const Waypoint* homeWp = wpManager->getWaypoint(0); // Waypoint 0 is home in APM
+            //if (homeWp){
+            map->updateHomePosition(42.0104024, -93.7340198, 0.0);
+                //map->goHome();
+            //}
         }
     }
 }

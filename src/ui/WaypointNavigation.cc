@@ -38,8 +38,9 @@ WaypointNavigation::path(QList<Waypoint*>& waypoints,
                          mapcontrol::MapGraphicItem& map)
 {
     Q_ASSERT(waypoints.size() > 0);
-
-    Waypoint* home = waypoints[0];
+    // changed by Xiangwei Niu
+    // wp 0 should not connect to wp 1
+    Waypoint* home = waypoints[1];
     QPainterPath path(toQPointF(*home, map));
 
     if (waypoints.size() == 1)

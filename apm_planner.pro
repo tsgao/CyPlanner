@@ -507,6 +507,7 @@ FORMS += \
 HEADERS += \
     src/MG.h \
     src/QGCCore.h \
+    src/uas/UASGPSInject.h \
     src/uas/UASInterface.h \
     src/uas/UAS.h \
     src/uas/UASManager.h \
@@ -756,6 +757,7 @@ HEADERS += \
 
 SOURCES += src/main.cc \
     src/QGCCore.cc \
+    src/uas/UASGPSInject.cpp \
     src/uas/UASManager.cc \
     src/uas/UAS.cc \
     src/comm/LinkManager.cc \
