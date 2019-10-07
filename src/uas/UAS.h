@@ -422,7 +422,8 @@ public:
     {
         return nedAttGlobalOffset;
     }
-
+    int getSystemIdPublic() { return systemId; }
+    int getComponentIdPublic() { return componentId; }
     friend class UASWaypointManager;
 
 protected: //COMMENTS FOR TEST UNIT

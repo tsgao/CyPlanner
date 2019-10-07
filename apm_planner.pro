@@ -36,6 +36,7 @@ load(configure)
 
 linux-g++-64 | linux-g++ {
     CONFIG += LinuxBuild
+    CONFIG+=sdk_no_version_check
 
     DISTRO = $$system(lsb_release -i)
     REDHAT_RELEASE = $$system(cat /etc/redhat-release)

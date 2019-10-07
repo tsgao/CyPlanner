@@ -56,6 +56,7 @@ protected:
 private slots:
     void on_pushButton_clicked();
     void on_multiButton_clicked();
+    void on_GPSInject_clicked();
 };
 
 #endif // QGCMAPTOOLBAR_H

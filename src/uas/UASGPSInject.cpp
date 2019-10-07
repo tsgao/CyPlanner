@@ -3,71 +3,130 @@
 #include "MainWindow.h"
 #include <algorithm>
 
-#include "mavlink_msg_gps_rtcm_data.h"
+//#include "mavlink_msg_gps_rtcm_data.h"
 
-UASGPSInject::UASGPSInject(UAS* _uas) : uas(_uas)
+UASGPSInject::UASGPSInject(QObject *parent) : QObject(parent)
 {
-    uasid = uas->getUASID();
+    uasid = 0;
     inject_seq_no = 0;
+    _bandwidthTimer.start();
+    connect(&socket,&QTcpSocket::connected,this,&UASGPSInject::connected);
+    connect(&socket,&QTcpSocket::disconnected,this,&UASGPSInject::disconnected);
+
+    connect(&socket,&QTcpSocket::stateChanged,this,&UASGPSInject::stateChanged);
+    connect(&socket,&QTcpSocket::readyRead,this,&UASGPSInject::readyRead);
+    connect(&socket,QOverload<QAbstractSocket::SocketError>::of(&QAbstractSocket::error),this,&UASGPSInject::error); //Explain
+}
+
+void UASGPSInject::connectToHost(QString host, quint16 port)
+{
+    if(socket.isOpen()) disconnect();
+    qInfo() << "Connecting to: " << host << " on port " << port;
+
+    socket.connectToHost(host,port);
+}
+
+void UASGPSInject::disconnect()
+{
+    socket.close();
+}
+
+void UASGPSInject::connected()
+{
+    qInfo() << "Connected!";
+
+    qInfo() << "Sending";
+    socket.write("HELLO\r\n");
+
+
+}
+
+void UASGPSInject::disconnected()
+{
+    qInfo() << "Disconnected";
+}
+
+void UASGPSInject::error(QAbstractSocket::SocketError socketError)
+{
+    qInfo() << "Error:" << socketError << " " << socket.errorString();
+}
+
+void UASGPSInject::stateChanged(QAbstractSocket::SocketState socketState)
+{
+    QMetaEnum metaEnum = QMetaEnum::fromType<QAbstractSocket::SocketState>();
+    qInfo() << "State: " << metaEnum.valueToKey(socketState);
+}
+
+void UASGPSInject::readyRead()
+{
+    qInfo() << "Data from: " << sender() << " bytes: " << socket.bytesAvailable() ;
+    QByteArray message = socket.readAll();
+    qInfo() << "Data: " << message;
+    RTCMDataUpdate(message);
 }
 
 void UASGPSInject::InjectGpsData()
 {
             //current_partner_systemid = uasid;
     //"GPS_INJECT_DATA", 123
-            current_partner_compid = MAV_COMP_ID_MISSIONPLANNER;
-
-            //clear local buffer
-            // Why not replace with waypoint_buffer.clear() ?
-            // because this will lead to memory leaks, the waypoint-structs
-            // have to be deleted, clear() would only delete the pointers.
-            while(!waypoint_buffer_int.empty()) {
-                delete waypoint_buffer_int.back();
-                waypoint_buffer_int.pop_back();
-            }
-
-            bool noCurrent = true;
-
-            //copy waypoint data to local buffer
-            for (int i=0; i < current_count; i++) {
-                waypoint_buffer_int.push_back(new mavlink_mission_item_int_t);
-                mavlink_mission_item_int_t *cur_d = waypoint_buffer_int.back();
-                memset(cur_d, 0, sizeof(mavlink_mission_item_int_t));   //initialize with zeros
-                const Waypoint *cur_s = waypointsEditable.at(i);
-
-                cur_d->autocontinue = cur_s->getAutoContinue();
-                cur_d->current = cur_s->getCurrent() & noCurrent;   //make sure only one current waypoint is selected, the first selected will be chosen
-                cur_d->param1 = cur_s->getParam1();
-                cur_d->param2 = cur_s->getParam2();
-                cur_d->param3 = cur_s->getParam3();
-                cur_d->param4 = cur_s->getParam4();
-                cur_d->frame = cur_s->getFrame();
-                cur_d->command = cur_s->getAction();
-                cur_d->seq = i;     // don't read out the sequence number of the waypoint class
-//                int32_t aa =(int32_t) cur_s->getX() * 1E7;
-//                int32_t bb =(int32_t) cur_s->getY() * 1E7;
-//                int32_t aa1 =(int32_t) (cur_s->getX() * 1E7);
-//                int32_t bb1 =(int32_t) (cur_s->getY() * 1E7);
-
-                cur_d->x = (int32_t) (cur_s->getX() * 1E7);
-                cur_d->y = (int32_t) (cur_s->getY() * 1E7);
-                cur_d->z = cur_s->getZ();
-
-                if (cur_s->getCurrent() && noCurrent)
-                    noCurrent = false;
-                if (i == (current_count - 1) && noCurrent == true) //not a single waypoint was set as "current"
-                    cur_d->current = true; // set the last waypoint as current. Or should it better be the first waypoint ?
-            }
-
-
-            //send the waypoint count to UAS (this starts the send transaction)
-            sendWaypointCount();
-        } else if (waypointsEditable.count() == 0)
-        {
-            sendWaypointClearAll();
-        }
 
 }
+
+void UASGPSInject::RTCMDataUpdate(QByteArray message)
+{
+    /* statistics */
+    _bandwidthByteCounter += message.size();
+    qint64 elapsed = _bandwidthTimer.elapsed();
+    if (elapsed > 1000) {
+        printf("RTCM bandwidth: %.2f kB/s\n", (float) _bandwidthByteCounter / elapsed * 1000.f / 1024.f);
+        _bandwidthTimer.restart();
+        _bandwidthByteCounter = 0;
+    }
+
+    const int maxMessageLength = MAVLINK_MSG_GPS_RTCM_DATA_FIELD_DATA_LEN;
+    mavlink_gps_rtcm_data_t mavlinkRtcmData;
+    memset(&mavlinkRtcmData, 0, sizeof(mavlink_gps_rtcm_data_t));
+
+    if (message.size() < maxMessageLength) {
+        mavlinkRtcmData.len = message.size();
+        mavlinkRtcmData.flags = (_sequenceId & 0x1F) << 3;
+        memcpy(&mavlinkRtcmData.data, message.data(), message.size());
+        sendMessageToVehicle(mavlinkRtcmData);
+    } else {
+        // We need to fragment
+
+        uint8_t fragmentId = 0;         // Fragment id indicates the fragment within a set
+        int start = 0;
+        while (start < message.size()) {
+            int length = std::min(message.size() - start, maxMessageLength);
+            mavlinkRtcmData.flags = 1;                      // LSB set indicates message is fragmented
+            mavlinkRtcmData.flags |= fragmentId++ << 1;     // Next 2 bits are fragment id
+            mavlinkRtcmData.flags |= (_sequenceId & 0x1F) << 3;     // Next 5 bits are sequence id
+            mavlinkRtcmData.len = length;
+            memcpy(&mavlinkRtcmData.data, message.data() + start, length);
+            sendMessageToVehicle(mavlinkRtcmData);
+            start += length;
+        }
+    }
+    ++_sequenceId;
+}
+
+void UASGPSInject::sendMessageToVehicle(const mavlink_gps_rtcm_data_t& msg)
+{
+    //if (!uas) return;
+    QList<UASInterface*> uasList = UASManager::instance()->getUASList();
+    for (UASInterface * uas1 : uasList) {
+        UAS *c = static_cast<UAS*>(uas1);
+        mavlink_message_t message;
+        mavlink_msg_gps_rtcm_data_encode(c->getSystemIdPublic(),
+                                         c->getComponentIdPublic(),
+                                         &message,
+                                         &msg);
+
+        c->sendMessage(message);
+    }
+}
+
 
 void UASGPSInject::InjectGpsData1(uint8_t data[], uint16_t length, bool rtcm)
 {
@@ -121,7 +180,7 @@ void UASGPSInject::InjectGpsData1(uint8_t data[], uint16_t length, bool rtcm)
             // set the length
             gps_inject_data.len = copy;
 
-            mavlink_msg_gps_rtcm_data_encode(uas->getSystemId(), uas->getComponentId(), &message, &gps_inject_data);
+            mavlink_msg_gps_rtcm_data_encode(uas->getSystemIdPublic(), uas->getComponentIdPublic(), &message, &gps_inject_data);
             //generatePacket((byte) MAVLINK_MSG_ID.GPS_RTCM_DATA, gps, sysid, compid);
         }
 
@@ -147,7 +206,7 @@ void UASGPSInject::InjectGpsData1(uint8_t data[], uint16_t length, bool rtcm)
             gps_inject_data.target_system = uasid;
             gps_inject_data.target_component = MAV_COMP_ID_IMU;
 
-            mavlink_msg_gps_inject_data_encode(uas->getSystemId(), uas->getComponentId(), &message, &gps_inject_data);
+            mavlink_msg_gps_inject_data_encode(uas->getSystemIdPublic(), uas->getComponentIdPublic(), &message, &gps_inject_data);
             //generatePacket((byte) MAVLINK_MSG_ID.GPS_INJECT_DATA, gps, sysid, compid);
         }
     }

@@ -8,6 +8,8 @@
 #include "MultiviewPopup.h"
 #include "qlogging.h"
 #include "Waypoint.h"
+#include "UASGPSInject.h"
+#include <QInputDialog>
 
 QGCMapToolBar::QGCMapToolBar(QWidget *parent) :
     QWidget(parent),
@@ -441,5 +443,23 @@ void QGCMapToolBar::on_multiButton_clicked()
 void QGCMapToolBar::setPopupStatus(){
     if(p != nullptr){
         p = nullptr;
+    }
+}
+
+void QGCMapToolBar::on_GPSInject_clicked()
+{
+    bool ok1, ok2;
+    QString ip = QInputDialog::getText(this, tr("QInputDialog::getText()"),
+                                             tr("Ip Address:"), QLineEdit::Normal,
+                                             QDir::home().dirName(), &ok1);
+    if (ok1 && !ip.isEmpty()){
+        QString port = QInputDialog::getText(this, tr("QInputDialog::getText()"),
+                                                 tr("port:"), QLineEdit::Normal,
+                                                 QDir::home().dirName(), &ok2);
+        if (ok2 && !port.isEmpty()){
+            UASGPSInject* gpsInject = new UASGPSInject(nullptr);
+            gpsInject->connectToHost(ip,port.toInt());
+        }
+
     }
 }
