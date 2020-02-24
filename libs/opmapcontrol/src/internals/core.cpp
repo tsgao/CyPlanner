@@ -159,7 +159,7 @@ void Core::run()
                                     //check if zoom level is over n
                                     if(task.Zoom >20 && task.Zoom <= 24 && k == 0){
                                         //load directory used to store custom image
-                                        QString loadPath = "/Users/xiangweiniu/Documents/pictest/result2/" + QString::number(task.Zoom);
+                                        QString loadPath = "/Users/xiangweiniu/Documents/pictest/result3_3/" + QString::number(task.Zoom);
                                         imgDir = new QDir(loadPath);
                                         QStringList imgFolderList = imgDir->entryList();
 

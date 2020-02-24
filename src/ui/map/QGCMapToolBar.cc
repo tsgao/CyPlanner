@@ -10,6 +10,8 @@
 #include "Waypoint.h"
 #include "UASGPSInject.h"
 #include <QInputDialog>
+#include "UASViconPosition.h"
+#include <QNetworkInterface>
 
 QGCMapToolBar::QGCMapToolBar(QWidget *parent) :
     QWidget(parent),
@@ -446,20 +448,49 @@ void QGCMapToolBar::setPopupStatus(){
     }
 }
 
+// added by Xiangwei Niu
 void QGCMapToolBar::on_GPSInject_clicked()
 {
-    bool ok1, ok2;
-    QString ip = QInputDialog::getText(this, tr("QInputDialog::getText()"),
-                                             tr("Ip Address:"), QLineEdit::Normal,
-                                             QDir::home().dirName(), &ok1);
-    if (ok1 && !ip.isEmpty()){
-        QString port = QInputDialog::getText(this, tr("QInputDialog::getText()"),
-                                                 tr("port:"), QLineEdit::Normal,
-                                                 QDir::home().dirName(), &ok2);
-        if (ok2 && !port.isEmpty()){
-            UASGPSInject* gpsInject = new UASGPSInject(nullptr);
-            gpsInject->connectToHost(ip,port.toInt());
+    QMessageBox msgBox;
+    msgBox.setText("Do you want to inject GPS from RTK GPS or Vicon.");
+    msgBox.setInformativeText("Yes - RTK GPS; No - Vicon");
+    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    msgBox.setDefaultButton(QMessageBox::Yes);
+    int ret = msgBox.exec();
+    if (ret == QMessageBox::Yes){
+        // inject GPS by using RTK GPS
+        bool ok1, ok2;
+        QString ip = QInputDialog::getText(this, tr("QInputDialog::getText()"),
+                                                 tr("Ip Address:"), QLineEdit::Normal,
+                                                 QDir::home().dirName(), &ok1);
+        if (ok1 && !ip.isEmpty()){
+            QString port = QInputDialog::getText(this, tr("QInputDialog::getText()"),
+                                                     tr("port:"), QLineEdit::Normal,
+                                                     QDir::home().dirName(), &ok2);
+            if (ok2 && !port.isEmpty()){
+                UASGPSInject* gpsInject = new UASGPSInject(nullptr);
+                gpsInject->connectToHost(ip,port.toInt());
+            }
+        }
+    }
+    else{
+        // inject GPS from vicon
+        QString ipaddr = "";
+        QList<QHostAddress> list = QNetworkInterface::allAddresses();
+        for(int nIter=0; nIter<list.count(); nIter++)
+        {
+            if(!list[nIter].isLoopback())
+                if (list[nIter].protocol() == QAbstractSocket::IPv4Protocol )
+                    ipaddr = list[nIter].toString();
         }
 
+        bool ok;
+        int port = QInputDialog::getInt(this, tr("QInputDialog::getInt()"),
+                                        tr("your ip address: ")+ ipaddr+tr(", port:"),
+                                        27000, 1025, 65534, 1, &ok);
+        if (ok){
+            UASViconPosition* vicon = new UASViconPosition(port);
+        }
     }
+
 }

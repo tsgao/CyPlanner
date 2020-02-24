@@ -62,6 +62,8 @@ void UASGPSInject::readyRead()
     qInfo() << "Data from: " << sender() << " bytes: " << socket.bytesAvailable() ;
     QByteArray message = socket.readAll();
     qInfo() << "Data: " << message;
+    QString DataAsString = QTextCodec::codecForMib(1015)->toUnicode(message);
+    qInfo() << "Data to string: " << DataAsString;
     RTCMDataUpdate(message);
 }
 
@@ -127,7 +129,7 @@ void UASGPSInject::sendMessageToVehicle(const mavlink_gps_rtcm_data_t& msg)
     }
 }
 
-
+//need not
 void UASGPSInject::InjectGpsData1(uint8_t data[], uint16_t length, bool rtcm)
 {
     if (!uas) return;

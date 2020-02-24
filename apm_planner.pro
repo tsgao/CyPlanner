@@ -520,6 +520,7 @@ HEADERS += \
     src/comm/QGCJSBSimLink.h \
 #    src/comm/QGCXPlaneLink.h \
     src/comm/serialconnection.h \
+    src/uas/UASViconPosition.h \
     src/ui/CommConfigurationWindow.h \
     src/ui/MultiviewPopup.h \
     src/ui/SerialConfigurationWindow.h \
@@ -767,6 +768,7 @@ SOURCES += src/main.cc \
     src/comm/QGCJSBSimLink.cc \
 #    src/comm/QGCXPlaneLink.cc \
     src/comm/serialconnection.cc \
+    src/uas/UASViconPosition.cpp \
     src/ui/CommConfigurationWindow.cc \
     src/ui/MultiviewPopup.cpp \
     src/ui/SerialConfigurationWindow.cc \
